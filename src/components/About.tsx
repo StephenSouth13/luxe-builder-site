@@ -1,0 +1,87 @@
+import { motion } from "framer-motion";
+import { useInView } from "framer-motion";
+import { useRef } from "react";
+import { Briefcase, Target, TrendingUp, Users } from "lucide-react";
+import profileImage from "@/assets/profile.jpg";
+
+const About = () => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+  const skills = [
+    { icon: Target, label: "Negotiation", color: "from-primary to-gold-light" },
+    { icon: TrendingUp, label: "Business Development", color: "from-gold to-primary" },
+    { icon: Users, label: "Leadership", color: "from-primary to-gold" },
+    { icon: Briefcase, label: "Market Expansion", color: "from-gold-light to-primary" },
+  ];
+
+  return (
+    <section id="about" className="py-20 lg:py-32 bg-secondary/30">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          ref={ref}
+          initial={{ opacity: 0, y: 50 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8 }}
+        >
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gradient text-center mb-12 lg:mb-16">
+            Về tôi
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Image */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={isInView ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="flex justify-center"
+            >
+              <div className="relative">
+                <div className="absolute -inset-4 bg-gradient-to-r from-primary to-gold-light rounded-2xl blur-xl opacity-30" />
+                <img
+                  src={profileImage}
+                  alt="Trịnh Bá Lâm"
+                  className="relative w-full max-w-md rounded-2xl shadow-2xl border-2 border-primary/20"
+                />
+              </div>
+            </motion.div>
+
+            {/* Content */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              animate={isInView ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="space-y-6"
+            >
+              <p className="text-base sm:text-lg text-foreground/90 leading-relaxed">
+                Với hơn <span className="font-semibold text-primary">8 năm kinh nghiệm</span> trong lĩnh vực kinh doanh và phát triển thị trường,
+                tôi tập trung vào việc giúp doanh nghiệp xây dựng chiến lược bán hàng bền vững,
+                mở rộng đối tác, và tăng trưởng doanh thu thông minh.
+              </p>
+
+              <div className="grid grid-cols-2 gap-4 pt-6">
+                {skills.map((skill, index) => (
+                  <motion.div
+                    key={skill.label}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                    transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
+                    className="group relative p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/20"
+                  >
+                    <div className={`absolute inset-0 bg-gradient-to-br ${skill.color} opacity-0 group-hover:opacity-5 rounded-xl transition-opacity duration-300`} />
+                    <skill.icon className="h-8 w-8 text-primary mb-3" />
+                    <h3 className="font-semibold text-sm sm:text-base text-foreground">
+                      {skill.label}
+                    </h3>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+export default About;
