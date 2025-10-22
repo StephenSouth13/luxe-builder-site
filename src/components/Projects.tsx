@@ -1,110 +1,162 @@
-import { motion } from "framer-motion";
-import { useInView } from "framer-motion";
-import { useRef } from "react";
-import { ExternalLink, TrendingUp } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useRef, useEffect, useState } from "react";
+import { motion, useInView } from "framer-motion";
+import { Button } from "./ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { Link, useLocation } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Loader2 } from "lucide-react";
+
+interface Project {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  image_url?: string;
+  metrics?: any;
+}
 
 const Projects = () => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const isInView = useInView(ref, { once: true });
+  const location = useLocation();
+  const { t } = useLanguage();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const projects = [
-    {
-      title: "Partnership Expansion Program",
-      category: "B2B Strategy",
-      description: "Thiết lập mạng lưới 50+ đối tác phân phối toàn quốc, tăng coverage 200%",
-      metrics: "+200% Coverage • +150% Revenue • 50+ Partners",
-      image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&q=80"
-    },
-    {
-      title: "Sales Team Transformation",
-      category: "Leadership",
-      description: "Xây dựng và đào tạo đội ngũ sales từ 5 lên 20 người, chuẩn hóa quy trình bán hàng",
-      metrics: "20 Members • 120% Growth • 30+ Trained",
-      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80"
-    },
-    {
-      title: "Market Entry Strategy",
-      category: "Business Development",
-      description: "Triển khai chiến lược xâm nhập 5 thị trường mới, đạt break-even trong 6 tháng",
-      metrics: "5 Markets • 6 Months ROI • 80% Target",
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80"
-    },
-    {
-      title: "Digital Sales Platform",
-      category: "Innovation",
-      description: "Triển khai CRM và automation tools, tăng hiệu suất sales team 40%",
-      metrics: "+40% Efficiency • 100% Adoption • ROI 3 Months",
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80"
+  const isHomePage = location.pathname === "/";
+
+  useEffect(() => {
+    fetchProjects();
+  }, [isHomePage]);
+
+  const fetchProjects = async () => {
+    try {
+      let query = supabase
+        .from("projects")
+        .select("*")
+        .order("sort_order", { ascending: true });
+
+      if (isHomePage) {
+        query = query.eq("featured", true).limit(4);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+      setProjects(data || []);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
+
+  if (isLoading) {
+    return (
+      <section id="projects" className="py-20 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-center items-center min-h-[400px]">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section id="projects" className="py-20 lg:py-32 bg-secondary/30">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          ref={ref}
-          initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-        >
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gradient text-center mb-4">
-            Dự án nổi bật
-          </h2>
-          <p className="text-center text-muted-foreground mb-12 lg:mb-16">
-            Những thành tựu và dự án tiêu biểu trong sự nghiệp
+    <section id="projects" className="py-20 bg-background">
+      <motion.div
+        ref={ref}
+        initial={{ opacity: 0, y: 20 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.5 }}
+        className="container mx-auto px-4"
+      >
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+          {isHomePage ? t("featuredProjects") : t("allProjects")}
+        </h2>
+        {isHomePage && (
+          <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-12">
+            Khám phá những dự án tiêu biểu mà tôi đã thực hiện
           </p>
+        )}
 
-          <div className="grid sm:grid-cols-2 gap-6 lg:gap-8">
-            {projects.map((project, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="group relative bg-card rounded-xl overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:shadow-primary/10"
-              >
-                {/* Image */}
-                <div className="relative h-48 sm:h-56 overflow-hidden">
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent" />
-                  <div className="absolute top-4 right-4 px-3 py-1 bg-primary/90 backdrop-blur-sm rounded-full text-xs font-semibold text-background">
-                    {project.category}
+        <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          {projects.map((project, index) => (
+            <motion.div
+              key={project.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+            >
+              <Card className="h-full hover:shadow-xl transition-shadow duration-300 overflow-hidden group">
+                {project.image_url && (
+                  <div className="relative h-48 overflow-hidden">
+                    <img
+                      src={project.image_url}
+                      alt={project.title}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    />
+                    <div className="absolute top-4 right-4">
+                      <span className="bg-primary/90 text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
+                        {project.category}
+                      </span>
+                    </div>
                   </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-6 space-y-4">
-                  <h3 className="text-xl font-bold group-hover:text-primary transition-colors">
-                    {project.title}
-                  </h3>
+                )}
+                <CardHeader>
+                  <CardTitle className="text-xl">{project.title}</CardTitle>
+                  {!project.image_url && (
+                    <CardDescription className="text-sm">
+                      {project.category}
+                    </CardDescription>
+                  )}
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-muted-foreground">{project.description}</p>
                   
-                  <p className="text-foreground/70 text-sm leading-relaxed">
-                    {project.description}
-                  </p>
+                  {project.metrics && project.metrics.length > 0 && (
+                    <div className="grid grid-cols-2 gap-4">
+                      {project.metrics.map((metric, i) => (
+                        <div key={i} className="text-center p-3 bg-accent/50 rounded-lg">
+                          <div className="text-2xl font-bold text-primary">
+                            {metric.value}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {metric.label}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
-                  <div className="flex items-center gap-2 text-sm text-primary font-medium">
-                    <TrendingUp className="h-4 w-4" />
-                    <span>{project.metrics}</span>
+                  <div className="flex justify-between items-center mt-4">
+                    <Button variant="outline" asChild>
+                      <Link to={`/projects/${project.id}`}>
+                        {t("viewDetails")}
+                      </Link>
+                    </Button>
                   </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
 
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-between group/btn hover:bg-primary/10 hover:text-primary"
-                  >
-                    <span>Xem chi tiết</span>
-                    <ExternalLink className="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
-                  </Button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
+        {isHomePage && projects.length === 4 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.8 }}
+            className="text-center mt-12"
+          >
+            <Button asChild size="lg">
+              <Link to="/projects">{t("viewMore")}</Link>
+            </Button>
+          </motion.div>
+        )}
+      </motion.div>
     </section>
   );
 };

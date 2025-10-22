@@ -1,15 +1,23 @@
 import { useState, useEffect } from "react";
-import { Moon, Sun, Menu, X } from "lucide-react";
+import { Moon, Sun, Menu, X, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "./ThemeProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   const { theme, toggleTheme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { language, setLanguage, t } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,10 +28,10 @@ const Header = () => {
   }, []);
 
   const navItems = [
-    { label: "Trang chủ", path: "/" },
-    { label: "Về tôi", path: "/about" },
-    { label: "Dự án", path: "/projects" },
-    { label: "Liên hệ", path: "/contact" },
+    { label: t("home"), path: "/" },
+    { label: t("about"), path: "/about" },
+    { label: t("projects"), path: "/projects" },
+    { label: t("contact"), path: "/contact" },
   ];
 
   const closeMobileMenu = () => {
@@ -75,6 +83,23 @@ const Header = () => {
           </nav>
 
           <div className="flex items-center gap-2 lg:gap-4">
+            {/* Language Switcher */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="hidden md:inline-flex hover:bg-primary/10">
+                  <Globe className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setLanguage("vi")}>
+                  🇻🇳 Tiếng Việt
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLanguage("en")}>
+                  🇬🇧 English
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Button
               variant="ghost"
               size="icon"
@@ -128,6 +153,26 @@ const Header = () => {
                   </button>
                 </Link>
               ))}
+              
+              {/* Mobile Language Switcher */}
+              <div className="flex gap-2 justify-center pt-2">
+                <Button
+                  variant={language === "vi" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setLanguage("vi")}
+                  className="flex-1"
+                >
+                  🇻🇳 VN
+                </Button>
+                <Button
+                  variant={language === "en" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setLanguage("en")}
+                  className="flex-1"
+                >
+                  🇬🇧 EN
+                </Button>
+              </div>
             </nav>
           </motion.div>
         )}

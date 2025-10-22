@@ -6,30 +6,45 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Edit, Trash2, X } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2, X, Upload, ExternalLink } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
 
 interface Project {
   id: string;
   title: string;
   category: string;
   description: string;
+  full_description?: string;
+  challenge?: string;
+  solution?: string;
   image_url: string | null;
   metrics: any;
   link: string | null;
   sort_order: number;
+  featured?: boolean;
+  technologies?: string[];
 }
 
 const AdminProjects = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [projects, setProjects] = useState<Project[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
   const [formData, setFormData] = useState({
     title: "",
     category: "",
     description: "",
+    full_description: "",
+    challenge: "",
+    solution: "",
     image_url: "",
     metrics: "",
     link: "",
+    featured: false,
+    technologies: "",
   });
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
@@ -60,38 +75,99 @@ const AdminProjects = () => {
 
   const handleEdit = (project: Project) => {
     setEditingId(project.id);
+    setImagePreview(project.image_url || "");
     setFormData({
       title: project.title,
       category: project.category,
       description: project.description,
+      full_description: project.full_description || "",
+      challenge: project.challenge || "",
+      solution: project.solution || "",
       image_url: project.image_url || "",
       metrics: JSON.stringify(project.metrics || []),
       link: project.link || "",
+      featured: project.featured || false,
+      technologies: project.technologies ? project.technologies.join(", ") : "",
     });
   };
 
   const handleNew = () => {
     setEditingId("new");
+    setImageFile(null);
+    setImagePreview("");
     setFormData({
       title: "",
       category: "",
       description: "",
+      full_description: "",
+      challenge: "",
+      solution: "",
       image_url: "",
       metrics: "[]",
       link: "",
+      featured: false,
+      technologies: "",
     });
   };
 
   const handleCancel = () => {
     setEditingId(null);
+    setImageFile(null);
+    setImagePreview("");
     setFormData({
       title: "",
       category: "",
       description: "",
+      full_description: "",
+      challenge: "",
+      solution: "",
       image_url: "",
       metrics: "[]",
       link: "",
+      featured: false,
+      technologies: "",
     });
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadImage = async (): Promise<string | null> => {
+    if (!imageFile) return formData.image_url || null;
+
+    try {
+      const fileExt = imageFile.name.split(".").pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("project-images")
+        .upload(filePath, imageFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("project-images")
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error: any) {
+      toast({
+        title: "Error uploading image",
+        description: error.message,
+        variant: "destructive",
+      });
+      return null;
+    }
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -99,6 +175,8 @@ const AdminProjects = () => {
     setIsSaving(true);
 
     try {
+      const imageUrl = await uploadImage();
+
       let metricsData = [];
       try {
         metricsData = JSON.parse(formData.metrics);
@@ -106,13 +184,22 @@ const AdminProjects = () => {
         throw new Error("Metrics phải là JSON hợp lệ");
       }
 
+      const technologiesArray = formData.technologies
+        ? formData.technologies.split(",").map((t) => t.trim())
+        : [];
+
       const saveData = {
         title: formData.title,
         category: formData.category,
         description: formData.description,
-        image_url: formData.image_url || null,
+        full_description: formData.full_description || null,
+        challenge: formData.challenge || null,
+        solution: formData.solution || null,
+        image_url: imageUrl,
         metrics: metricsData,
         link: formData.link || null,
+        featured: formData.featured,
+        technologies: technologiesArray,
       };
 
       if (editingId === "new") {
@@ -154,6 +241,8 @@ const AdminProjects = () => {
   };
 
   const handleDelete = async (id: string) => {
+    if (!confirm("Bạn có chắc muốn xóa dự án này?")) return;
+    
     try {
       const { error } = await supabase
         .from("projects")
@@ -217,45 +306,107 @@ const AdminProjects = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Mô tả</Label>
+              <Label htmlFor="description">Mô tả ngắn</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                rows={3}
+                rows={2}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="image_url">URL hình ảnh</Label>
-              <Input
-                id="image_url"
-                value={formData.image_url}
-                onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                placeholder="https://..."
+              <Label htmlFor="full_description">Mô tả đầy đủ</Label>
+              <Textarea
+                id="full_description"
+                value={formData.full_description}
+                onChange={(e) => setFormData({ ...formData, full_description: e.target.value })}
+                rows={4}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="metrics">Metrics (JSON array)</Label>
+              <Label htmlFor="challenge">Thách thức</Label>
+              <Textarea
+                id="challenge"
+                value={formData.challenge}
+                onChange={(e) => setFormData({ ...formData, challenge: e.target.value })}
+                rows={3}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="solution">Giải pháp</Label>
+              <Textarea
+                id="solution"
+                value={formData.solution}
+                onChange={(e) => setFormData({ ...formData, solution: e.target.value })}
+                rows={3}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="technologies">Công nghệ (ngăn cách bằng dấu phẩy)</Label>
+              <Input
+                id="technologies"
+                value={formData.technologies}
+                onChange={(e) => setFormData({ ...formData, technologies: e.target.value })}
+                placeholder="React, TypeScript, Tailwind CSS"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="image">Hình ảnh dự án</Label>
+              <div className="flex items-center gap-4">
+                <Input
+                  id="image"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="flex-1"
+                />
+                <Upload className="h-5 w-5 text-muted-foreground" />
+              </div>
+              {imagePreview && (
+                <div className="mt-2">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-full h-48 object-cover rounded-lg border"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="metrics">Metrics (JSON: [{"{"}label: "...", value: "..."{"}"}])</Label>
               <Textarea
                 id="metrics"
                 value={formData.metrics}
                 onChange={(e) => setFormData({ ...formData, metrics: e.target.value })}
-                rows={3}
+                rows={2}
                 placeholder='[{"label": "Tăng trưởng", "value": "200%"}]'
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="link">Link</Label>
+              <Label htmlFor="link">Link dự án</Label>
               <Input
                 id="link"
                 value={formData.link}
                 onChange={(e) => setFormData({ ...formData, link: e.target.value })}
                 placeholder="https://..."
               />
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="featured"
+                checked={formData.featured}
+                onCheckedChange={(checked) => setFormData({ ...formData, featured: checked })}
+              />
+              <Label htmlFor="featured">Hiển thị trên trang chủ</Label>
             </div>
 
             <div className="flex gap-2">
@@ -280,11 +431,20 @@ const AdminProjects = () => {
               className="p-4 border border-gold/20 rounded-md space-y-2"
             >
               <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-semibold">{project.title}</h3>
-                  <p className="text-sm text-muted-foreground">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-semibold">{project.title}</h3>
+                    {project.featured && <Badge variant="secondary">Featured</Badge>}
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-2">
                     {project.category}
                   </p>
+                  <Link to={`/projects/${project.id}`} target="_blank">
+                    <Button variant="ghost" size="sm" className="h-8 px-2">
+                      <ExternalLink className="h-3 w-3 mr-1" />
+                      Xem trang chi tiết
+                    </Button>
+                  </Link>
                 </div>
                 <div className="flex gap-2">
                   <Button
@@ -303,6 +463,22 @@ const AdminProjects = () => {
                   </Button>
                 </div>
               </div>
+              {project.technologies && project.technologies.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {project.technologies.map((tech, i) => (
+                    <Badge key={i} variant="outline" className="text-xs">
+                      {tech}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+              {project.image_url && (
+                <img
+                  src={project.image_url}
+                  alt={project.title}
+                  className="mt-2 rounded-lg w-full h-32 object-cover"
+                />
+              )}
             </div>
           ))}
         </div>
