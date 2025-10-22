@@ -1,15 +1,15 @@
 import Header from "@/components/Header";
-import Hero from "@/components/Hero";
+import ContactSection from "@/components/Contact";
 import Footer from "@/components/Footer";
 import FloatingChat from "@/components/FloatingChat";
 import BackToTop from "@/components/BackToTop";
 
-const Index = () => {
+const Contact = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
-      <main>
-        <Hero />
+      <main className="pt-20">
+        <ContactSection />
       </main>
       <Footer />
       <FloatingChat />
@@ -18,4 +18,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Contact;

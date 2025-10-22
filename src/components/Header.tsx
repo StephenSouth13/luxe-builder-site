@@ -3,11 +3,13 @@ import { Moon, Sun, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "./ThemeProvider";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link, useLocation } from "react-router-dom";
 
 const Header = () => {
   const { theme, toggleTheme } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,16 +20,13 @@ const Header = () => {
   }, []);
 
   const navItems = [
-    { label: "Trang chủ", href: "#home" },
-    { label: "Về tôi", href: "#about" },
-    { label: "Kinh nghiệm", href: "#experience" },
-    { label: "Dự án", href: "#projects" },
-    { label: "Liên hệ", href: "#contact" },
+    { label: "Trang chủ", path: "/" },
+    { label: "Về tôi", path: "/about" },
+    { label: "Dự án", path: "/projects" },
+    { label: "Liên hệ", path: "/contact" },
   ];
 
-  const scrollToSection = (href: string) => {
-    const element = document.querySelector(href);
-    element?.scrollIntoView({ behavior: "smooth" });
+  const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
   };
 
@@ -51,17 +50,27 @@ const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
             {navItems.map((item, index) => (
-              <motion.button
-                key={item.href}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                onClick={() => scrollToSection(item.href)}
-                className="px-3 lg:px-4 py-2 text-sm lg:text-base text-foreground/80 hover:text-primary transition-colors relative group"
-              >
-                {item.label}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
-              </motion.button>
+              <Link key={item.path} to={item.path}>
+                <motion.button
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className={`px-3 lg:px-4 py-2 text-sm lg:text-base transition-colors relative group ${
+                    location.pathname === item.path
+                      ? "text-primary"
+                      : "text-foreground/80 hover:text-primary"
+                  }`}
+                >
+                  {item.label}
+                  <span
+                    className={`absolute bottom-0 left-0 h-0.5 bg-primary transition-all duration-300 ${
+                      location.pathname === item.path
+                        ? "w-full"
+                        : "w-0 group-hover:w-full"
+                    }`}
+                  />
+                </motion.button>
+              </Link>
             ))}
           </nav>
 
@@ -107,13 +116,17 @@ const Header = () => {
           >
             <nav className="container mx-auto px-4 py-4 flex flex-col space-y-2">
               {navItems.map((item) => (
-                <button
-                  key={item.href}
-                  onClick={() => scrollToSection(item.href)}
-                  className="px-4 py-3 text-left text-foreground/80 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
-                >
-                  {item.label}
-                </button>
+                <Link key={item.path} to={item.path} onClick={closeMobileMenu}>
+                  <button
+                    className={`w-full px-4 py-3 text-left rounded-lg transition-colors ${
+                      location.pathname === item.path
+                        ? "text-primary bg-primary/10"
+                        : "text-foreground/80 hover:text-primary hover:bg-primary/5"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                </Link>
               ))}
             </nav>
           </motion.div>

@@ -1,15 +1,17 @@
 import Header from "@/components/Header";
-import Hero from "@/components/Hero";
+import AboutSection from "@/components/About";
+import Experience from "@/components/Experience";
 import Footer from "@/components/Footer";
 import FloatingChat from "@/components/FloatingChat";
 import BackToTop from "@/components/BackToTop";
 
-const Index = () => {
+const About = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />
-      <main>
-        <Hero />
+      <main className="pt-20">
+        <AboutSection />
+        <Experience />
       </main>
       <Footer />
       <FloatingChat />
@@ -18,4 +20,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default About;
