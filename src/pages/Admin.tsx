@@ -13,6 +13,9 @@ import AdminSkills from "@/components/admin/AdminSkills";
 import AdminExperiences from "@/components/admin/AdminExperiences";
 import AdminProjects from "@/components/admin/AdminProjects";
 import AdminContact from "@/components/admin/AdminContact";
+import AdminFooter from "@/components/admin/AdminFooter";
+import AdminSocial from "@/components/admin/AdminSocial";
+import AdminSubmissions from "@/components/admin/AdminSubmissions";
 
 const Admin = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -262,12 +265,15 @@ const Admin = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="about" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8">
+          <TabsList className="grid w-full grid-cols-6 mb-8">
             <TabsTrigger value="about">Về tôi</TabsTrigger>
             <TabsTrigger value="skills">Kỹ năng</TabsTrigger>
             <TabsTrigger value="experiences">Kinh nghiệm</TabsTrigger>
             <TabsTrigger value="projects">Dự án</TabsTrigger>
             <TabsTrigger value="contact">Liên hệ</TabsTrigger>
+            <TabsTrigger value="footer">Footer</TabsTrigger>
+            <TabsTrigger value="social">Social</TabsTrigger>
+            <TabsTrigger value="submissions">Liên hệ</TabsTrigger>
           </TabsList>
 
           <TabsContent value="about">
@@ -288,6 +294,14 @@ const Admin = () => {
 
           <TabsContent value="contact">
             <AdminContact />
+          </TabsContent>
+
+          <TabsContent value="footer">
+            <AdminFooter />
+          </TabsContent>
+
+          <TabsContent value="social">
+            <AdminSocial />
           </TabsContent>
         </Tabs>
       </main>

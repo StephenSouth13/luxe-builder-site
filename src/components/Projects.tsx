@@ -28,19 +28,52 @@ const Projects = () => {
   const isHomePage = location.pathname === "/";
   const { toast } = useToast();
 
+  const [filtersEnabled, setFiltersEnabled] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
   useEffect(() => {
     fetchProjects();
-  }, [isHomePage]);
+  }, [isHomePage, selectedCategory, filtersEnabled]);
+
+  const fetchSettings = async () => {
+    try {
+      const { data } = await supabase.from("settings").select("value").eq("key", "projects_filters_enabled").maybeSingle();
+      if (data && (data.value === "true" || data.value === true)) setFiltersEnabled(true);
+      else setFiltersEnabled(false);
+    } catch (err) {
+      setFiltersEnabled(true);
+    }
+  };
 
   const fetchProjects = async () => {
+    setIsLoading(true);
     try {
-      let query = supabase
-        .from("projects")
-        .select("*")
-        .order("sort_order", { ascending: true });
+      let query: any = supabase.from("projects").select("*");
+
+      // Prefer ordering if available
+      try {
+        query = query.order("sort_order", { ascending: true });
+      } catch (e) {
+        // ignore ordering errors
+      }
 
       if (isHomePage) {
-        query = query.eq("featured", true).limit(4);
+        try {
+          query = query.eq("featured", true).limit(4);
+        } catch (e) {
+          // featured may not exist; fallback to limit only
+          query = query.limit(4);
+        }
+      } else if (filtersEnabled && selectedCategory) {
+        try {
+          query = query.eq("category", selectedCategory);
+        } catch (e) {
+          // category might not exist
+        }
       }
 
       const { data, error } = await query;
@@ -48,9 +81,16 @@ const Projects = () => {
       if (error) {
         console.error("Error fetching projects:", error);
         toast({ title: "Lỗi tải dự án", description: error.message || String(error), variant: "destructive" });
-        setProjects([]);
+        // fallback: try simple select without filters
+        try {
+          const { data: fallback } = await supabase.from("projects").select("*");
+          setProjects(fallback || []);
+        } catch (e) {
+          setProjects([]);
+        }
         return;
       }
+
       setProjects(data || []);
     } catch (error: any) {
       console.error("Error fetching projects:", error);
@@ -82,9 +122,22 @@ const Projects = () => {
         transition={{ duration: 0.5 }}
         className="container mx-auto px-4"
       >
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-          {isHomePage ? t("featuredProjects") : t("allProjects")}
-        </h2>
+        <div className="flex flex-col md:flex-row items-center justify-between mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold">
+            {isHomePage ? t("featuredProjects") : t("allProjects")}
+          </h2>
+          {!isHomePage && filtersEnabled && (
+            <div className="mt-4 md:mt-0">
+              <label className="text-sm mr-2">Lọc theo danh mục:</label>
+              <select value={selectedCategory || ""} onChange={(e) => setSelectedCategory(e.target.value || null)} className="bg-card border-border px-3 py-2 rounded">
+                <option value="">Tất cả</option>
+                {Array.from(new Set(projects.map(p => p.category).filter(Boolean))).map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
         {isHomePage && (
           <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-12">
             Khám phá những dự án tiêu biểu mà tôi đã thực hiện

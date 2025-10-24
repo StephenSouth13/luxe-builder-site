@@ -33,6 +33,8 @@ const ProjectDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { t } = useLanguage();
 
+  const [related, setRelated] = useState<Project[]>([]);
+
   useEffect(() => {
     fetchProject();
   }, [idOrSlug]);
@@ -85,6 +87,22 @@ const ProjectDetail = () => {
       }
 
       setProject(data || null);
+
+      // fetch related by category
+      try {
+        if (data && data.category) {
+          const { data: rel } = await supabase
+            .from("projects")
+            .select("id,title,slug,image_url")
+            .eq("category", data.category)
+            .neq("id", data.id)
+            .limit(3);
+          setRelated(rel || []);
+        }
+      } catch (err) {
+        // ignore related fetch errors
+        setRelated([]);
+      }
     } catch (error) {
       console.error("Error fetching project:", error);
     } finally {
@@ -226,6 +244,25 @@ const ProjectDetail = () => {
                       <ExternalLink className="ml-2 h-4 w-4" />
                     </a>
                   </Button>
+                )}
+
+                {related && related.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold mt-6 mb-4">Các dự án liên quan</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {related.map((r) => (
+                        <Card key={r.id} className="p-2">
+                          {r.image_url && (
+                            <img src={r.image_url} alt={r.title} className="w-full h-28 object-cover rounded" />
+                          )}
+                          <CardContent>
+                            <h4 className="font-semibold truncate">{r.title}</h4>
+                            <Link to={`/projects/${r.slug || r.id}`} className="text-sm text-primary">Xem chi tiết →</Link>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
             </div>

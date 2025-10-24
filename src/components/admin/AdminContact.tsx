@@ -166,15 +166,35 @@ const AdminContact = () => {
             <Textarea
               id="map"
               value={formData.map_embed_url}
-              onChange={(e) =>
-                setFormData({ ...formData, map_embed_url: e.target.value })
-              }
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val.trim().startsWith("<")) {
+                  const match = val.match(/src=["']([^"']+)["']/i);
+                  setFormData({ ...formData, map_embed_url: match ? match[1] : "" });
+                } else {
+                  setFormData({ ...formData, map_embed_url: val });
+                }
+              }}
               placeholder="https://www.google.com/maps/embed?pb=..."
               rows={4}
             />
             <p className="text-xs text-muted-foreground">
-              Vào Google Maps, tìm địa điểm → Share → Embed a map → Copy HTML → Lấy URL trong src=""
+              Có thể dán trực tiếp toàn bộ thẻ iframe, hệ thống sẽ tự động lấy URL trong src="".
             </p>
+            {formData.map_embed_url?.trim() && (
+              <div className="mt-2 rounded-md overflow-hidden border border-border">
+                <iframe
+                  src={formData.map_embed_url}
+                  title="Google Map Preview"
+                  width="100%"
+                  height="200"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  allowFullScreen
+                />
+              </div>
+            )}
           </div>
         </div>
 

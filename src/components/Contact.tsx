@@ -39,13 +39,23 @@ const Contact = () => {
     load();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Tin nhắn đã được gửi!",
-      description: "Cảm ơn bạn đã liên hệ. Tôi sẽ phản hồi sớm nhất có thể.",
-    });
-    setFormData({ name: "", email: "", message: "" });
+    try {
+      await supabase.from("contact_submissions").insert({
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+      });
+      toast({
+        title: "Tin nhắn đã được gửi!",
+        description: "Cảm ơn bạn đã liên hệ. Tôi sẽ phản hồi sớm nhất có thể.",
+      });
+      setFormData({ name: "", email: "", message: "" });
+    } catch (err: any) {
+      console.error("Failed to save submission", err);
+      toast({ title: "Lỗi", description: "Không thể gửi tin nhắn, thử lại sau", variant: "destructive" });
+    }
   };
 
   const contactInfo = [
@@ -114,19 +124,33 @@ const Contact = () => {
                 ))}
               </div>
 
-              {contact?.map_embed_url && (
-                <div className="rounded-lg overflow-hidden border border-border">
-                  <iframe
-                    src={contact.map_embed_url}
-                    title="Google Map"
-                    width="100%"
-                    height="260"
-                    style={{ border: 0 }}
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-                </div>
-              )}
+              {(() => {
+                const raw = contact?.map_embed_url?.trim();
+                const extractSrc = (input: string | null | undefined) => {
+                  if (!input) return null;
+                  if (input.startsWith("<")) {
+                    const match = input.match(/src=["']([^"']+)["']/i);
+                    return match ? match[1] : null;
+                  }
+                  const maybe = input.replace(/^\((.*)\)$/s, "$1");
+                  return maybe || null;
+                };
+                const mapSrc = extractSrc(raw);
+                return mapSrc ? (
+                  <div className="rounded-lg overflow-hidden border border-border">
+                    <iframe
+                      src={mapSrc}
+                      title="Google Map"
+                      width="100%"
+                      height="260"
+                      style={{ border: 0 }}
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      allowFullScreen
+                    />
+                  </div>
+                ) : null;
+              })()}
             </motion.div>
 
             <motion.div
