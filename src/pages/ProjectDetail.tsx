@@ -245,6 +245,25 @@ const ProjectDetail = () => {
                     </a>
                   </Button>
                 )}
+
+                {related && related.length > 0 && (
+                  <div>
+                    <h3 className="text-xl font-semibold mt-6 mb-4">Các dự án liên quan</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {related.map((r) => (
+                        <Card key={r.id} className="p-2">
+                          {r.image_url && (
+                            <img src={r.image_url} alt={r.title} className="w-full h-28 object-cover rounded" />
+                          )}
+                          <CardContent>
+                            <h4 className="font-semibold truncate">{r.title}</h4>
+                            <Link to={`/projects/${r.slug || r.id}`} className="text-sm text-primary">Xem chi tiết →</Link>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>
