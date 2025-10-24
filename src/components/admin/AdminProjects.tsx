@@ -115,6 +115,69 @@ const AdminProjects = () => {
     });
   };
 
+  const runBackfillPrompt = async () => {
+    const key = window.prompt("Paste Supabase Service Role key (will not be stored), or cancel to abort:");
+    if (!key) return;
+    if (!confirm("This will run a backfill that updates project slugs. Proceed?")) return;
+    await runBackfillWithKey(key);
+  };
+
+  const runBackfillWithKey = async (serviceKey: string) => {
+    const { toast } = { toast } as any;
+    try {
+      setIsSaving(true);
+      const admin = createClient(import.meta.env.VITE_SUPABASE_URL, serviceKey);
+      const { data: projects, error } = await admin.from('projects').select('id,title,slug');
+      if (error) throw error;
+      if (!projects || projects.length === 0) {
+        alert('No projects found');
+        setIsSaving(false);
+        return;
+      }
+
+      const sanitize = (s: string) =>
+        s
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, '-');
+
+      for (const p of projects) {
+        if (p.slug) continue;
+        let base = sanitize(p.title || `project-${p.id}`);
+        let candidate = base;
+        let i = 0;
+        while (true) {
+          const { data: existing, error: e } = await admin.from('projects').select('id').eq('slug', candidate).limit(1).maybeSingle();
+          if (e) {
+            // if slug column missing or other error, break
+            console.warn('backfill check error', e.message || e);
+            break;
+          }
+          if (!existing) break;
+          i += 1;
+          candidate = `${base}-${i}`;
+        }
+
+        try {
+          const { error: upErr } = await admin.from('projects').update({ slug: candidate }).eq('id', p.id);
+          if (upErr) {
+            console.error('Failed update', p.id, upErr.message || upErr);
+          }
+        } catch (upErr) {
+          console.error('Update error', upErr);
+        }
+      }
+
+      alert('Backfill complete. Refresh to see changes.');
+    } catch (err: any) {
+      alert('Backfill failed: ' + (err.message || String(err)));
+    } finally {
+      setIsSaving(false);
+      await fetchProjects();
+    }
+  };
+
   const handleCancel = () => {
     setEditingId(null);
     setImageFile(null);
@@ -375,7 +438,7 @@ const AdminProjects = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="full_description">Mô tả đầy đ���</Label>
+              <Label htmlFor="full_description">Mô tả đầy đủ</Label>
               <Textarea
                 id="full_description"
                 value={formData.full_description}
