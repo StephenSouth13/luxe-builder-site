@@ -25,6 +25,7 @@ interface Project {
   sort_order: number;
   featured?: boolean;
   technologies?: string[];
+  slug?: string;
 }
 
 const AdminProjects = () => {
@@ -155,11 +156,11 @@ const AdminProjects = () => {
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
+      const { data } = supabase.storage
         .from("project-images")
         .getPublicUrl(filePath);
 
-      return publicUrl;
+      return data?.publicUrl || null;
     } catch (error: any) {
       toast({
         title: "Error uploading image",
@@ -188,6 +189,14 @@ const AdminProjects = () => {
         ? formData.technologies.split(",").map((t) => t.trim())
         : [];
 
+      const slug = formData.title
+        ? formData.title
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9\s-]/g, "")
+            .replace(/\s+/g, "-")
+        : null;
+
       const saveData = {
         title: formData.title,
         category: formData.category,
@@ -200,6 +209,7 @@ const AdminProjects = () => {
         link: formData.link || null,
         featured: formData.featured,
         technologies: technologiesArray,
+        slug: slug,
       };
 
       if (editingId === "new") {
