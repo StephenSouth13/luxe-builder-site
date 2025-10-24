@@ -33,6 +33,8 @@ const ProjectDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { t } = useLanguage();
 
+  const [related, setRelated] = useState<Project[]>([]);
+
   useEffect(() => {
     fetchProject();
   }, [idOrSlug]);
