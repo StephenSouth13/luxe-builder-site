@@ -137,6 +137,35 @@ const AdminProjects = () => {
     await runBackfillWithKey(key);
   };
 
+  const fetchSettings = async () => {
+    try {
+      const { data, error } = await supabase.from("settings").select("value").eq("key", "projects_filters_enabled").maybeSingle();
+      if (error) throw error;
+      if (data && (data.value === "true" || data.value === true)) setFiltersEnabled(true);
+      else setFiltersEnabled(false);
+    } catch (err: any) {
+      // settings table might not exist; keep default true
+      console.warn("Could not fetch settings for projects_filters_enabled:", err?.message || err);
+      setFiltersEnabled(true);
+    }
+  };
+
+  const saveFiltersEnabled = async (v: boolean) => {
+    setIsSaving(true);
+    try {
+      const sb: any = supabase;
+      // Try upsert into settings table
+      const { error } = await sb.from("settings").upsert({ key: "projects_filters_enabled", value: v ? "true" : "false" }, { onConflict: ["key"] });
+      if (error) throw error;
+      setFiltersEnabled(v);
+      toast({ title: "Thành công", description: "Đã cập nhật cài đặt bộ lọc" });
+    } catch (err: any) {
+      toast({ title: "Lỗi", description: err.message || "Không thể lưu cài đặt", variant: "destructive" });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const runBackfillWithKey = async (serviceKey: string) => {
     try {
       setIsSaving(true);
@@ -394,7 +423,7 @@ const AdminProjects = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Bạn có chắc muốn xóa dự án này?")) return;
+    if (!confirm("Bạn có chắc muốn xóa dự án n��y?")) return;
     
     try {
       const { error } = await supabase
