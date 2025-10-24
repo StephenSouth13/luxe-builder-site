@@ -79,23 +79,38 @@ const Footer = () => {
           <div className="text-2xl font-bold text-gradient">Trịnh Bá Lâm</div>
 
           <div className="flex items-center gap-4">
-            {socialLinks.map((social, index) => (
-              <motion.a
-                key={social.label}
-                href={social.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                initial={{ opacity: 0, scale: 0 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: index * 0.1 }}
-                whileHover={{ scale: 1.1 }}
-                className="p-3 rounded-full bg-card border border-border hover:border-primary hover:bg-primary/10 transition-all duration-300 glow-gold"
-                aria-label={social.label}
-              >
-                <social.icon className="h-5 w-5 text-primary" />
-              </motion.a>
-            ))}
+            {(socials.length > 0 ? socials : [
+              { id: "fallback-linkedin", provider: "linkedin", url: "https://linkedin.com", sort_order: 0 },
+              { id: "fallback-facebook", provider: "facebook", url: "https://facebook.com", sort_order: 1 },
+              { id: "fallback-zalo", provider: "zalo", url: "https://zalo.me", sort_order: 2 },
+            ]).map((s, index) => {
+              const provider = (s.provider || "").toLowerCase();
+              let Icon: any = MessageCircle;
+              if (provider.includes("linkedin")) Icon = Linkedin;
+              else if (provider.includes("facebook")) Icon = Facebook;
+              else if (provider.includes("twitter")) Icon = Twitter;
+              else if (provider.includes("github") || provider.includes("git")) Icon = Github;
+              else if (provider.includes("instagram")) Icon = Instagram;
+              else if (provider.includes("youtube")) Icon = Youtube;
+
+              return (
+                <motion.a
+                  key={s.id}
+                  href={(s as any).url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  initial={{ opacity: 0, scale: 0 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  whileHover={{ scale: 1.1 }}
+                  className="p-3 rounded-full bg-card border border-border hover:border-primary hover:bg-primary/10 transition-all duration-300 glow-gold"
+                  aria-label={provider}
+                >
+                  <Icon className="h-5 w-5 text-primary" />
+                </motion.a>
+              );
+            })}
           </div>
         </motion.div>
 
