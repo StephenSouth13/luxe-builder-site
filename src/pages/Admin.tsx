@@ -273,6 +273,7 @@ const Admin = () => {
             <TabsTrigger value="contact">Liên hệ</TabsTrigger>
             <TabsTrigger value="footer">Footer</TabsTrigger>
             <TabsTrigger value="social">Social</TabsTrigger>
+            <TabsTrigger value="submissions">Liên hệ</TabsTrigger>
           </TabsList>
 
           <TabsContent value="about">
