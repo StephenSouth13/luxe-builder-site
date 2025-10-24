@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Plus, Edit, Trash2, X, Check } from "lucide-react";
+import AdminSocial from "@/components/admin/AdminSocial";
 
 interface FooterLink {
   id: string;
