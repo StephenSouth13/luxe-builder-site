@@ -89,14 +89,16 @@ const Experience = () => {
                       
                       <p className="text-foreground/70 mb-4">{exp.description}</p>
                       
-                      <div className="space-y-2">
-                        {exp.achievements.map((achievement, i) => (
-                          <div key={i} className={`flex items-start gap-2 ${index % 2 === 0 ? "md:justify-end md:text-right" : ""}`}>
-                            <Award className="h-4 w-4 text-primary mt-1 shrink-0" />
-                            <span className="text-sm text-foreground/80">{achievement}</span>
-                          </div>
-                        ))}
-                      </div>
+                      {exp.achievements && exp.achievements.length > 0 && (
+                        <div className="space-y-2">
+                          {exp.achievements.map((achievement, i) => (
+                            <div key={i} className={`flex items-start gap-2 ${index % 2 === 0 ? "md:justify-end md:text-right" : ""}`}>
+                              <Award className="h-4 w-4 text-primary mt-1 shrink-0" />
+                              <span className="text-sm text-foreground/80">{achievement}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
 
