@@ -27,6 +27,7 @@ const Projects = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const isHomePage = location.pathname === "/";
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchProjects();
@@ -45,10 +46,17 @@ const Projects = () => {
 
       const { data, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching projects:", error);
+        toast({ title: "Lỗi tải dự án", description: error.message || String(error), variant: "destructive" });
+        setProjects([]);
+        return;
+      }
       setProjects(data || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching projects:", error);
+      toast({ title: "Lỗi tải dự án", description: error.message || String(error), variant: "destructive" });
+      setProjects([]);
     } finally {
       setIsLoading(false);
     }
