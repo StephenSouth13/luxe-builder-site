@@ -66,11 +66,23 @@ const AdminProjects = () => {
       if (error) throw error;
       setProjects(data || []);
     } catch (error: any) {
-      toast({
-        title: "Lỗi",
-        description: "Không thể tải danh sách dự án",
-        variant: "destructive",
-      });
+      const msg = String(error?.message || "").toLowerCase();
+      // If schema change (missing column) or relation missing, try a fallback without ordering
+      if (msg.includes("does not exist") || msg.includes("relation") || msg.includes("column \"sort_order\"")) {
+        try {
+          const { data: fallback } = await supabase.from("projects").select("*");
+          setProjects(fallback || []);
+          toast({
+            title: "Lưu ý",
+            description:
+              "Không thể sắp xếp bằng sort_order (có thể do thay đổi schema). Hiển thị dữ liệu bằng fallback.",
+          });
+        } catch (e) {
+          toast({ title: "Lỗi", description: "Không thể tải danh sách dự án", variant: "destructive" });
+        }
+      } else {
+        toast({ title: "Lỗi", description: "Không thể tải danh sách dự án", variant: "destructive" });
+      }
     } finally {
       setIsLoading(false);
     }
