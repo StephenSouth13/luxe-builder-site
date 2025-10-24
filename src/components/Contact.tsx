@@ -39,13 +39,23 @@ const Contact = () => {
     load();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Tin nhắn đã được gửi!",
-      description: "Cảm ơn bạn đã liên hệ. Tôi sẽ phản hồi sớm nhất có thể.",
-    });
-    setFormData({ name: "", email: "", message: "" });
+    try {
+      await supabase.from("contact_submissions").insert({
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+      });
+      toast({
+        title: "Tin nhắn đã được gửi!",
+        description: "Cảm ơn bạn đã liên hệ. Tôi sẽ phản hồi sớm nhất có thể.",
+      });
+      setFormData({ name: "", email: "", message: "" });
+    } catch (err: any) {
+      console.error("Failed to save submission", err);
+      toast({ title: "Lỗi", description: "Không thể gửi tin nhắn, thử lại sau", variant: "destructive" });
+    }
   };
 
   const contactInfo = [
