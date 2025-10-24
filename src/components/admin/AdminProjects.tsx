@@ -325,11 +325,18 @@ const AdminProjects = () => {
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle>Quản lý Dự án</CardTitle>
-          {!editingId && (
-            <Button onClick={handleNew}>
-              <Plus className="h-4 w-4 mr-2" /> Thêm mới
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            {!editingId && (
+              <>
+                <Button onClick={handleNew}>
+                  <Plus className="h-4 w-4 mr-2" /> Thêm mới
+                </Button>
+                <Button variant="outline" onClick={() => runBackfillPrompt()}>
+                  Backfill Slugs
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -368,7 +375,7 @@ const AdminProjects = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="full_description">Mô tả đầy đủ</Label>
+              <Label htmlFor="full_description">Mô tả đầy đ���</Label>
               <Textarea
                 id="full_description"
                 value={formData.full_description}
