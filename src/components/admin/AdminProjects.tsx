@@ -123,7 +123,6 @@ const AdminProjects = () => {
   };
 
   const runBackfillWithKey = async (serviceKey: string) => {
-    const { toast } = { toast } as any;
     try {
       setIsSaving(true);
       const admin = createClient(import.meta.env.VITE_SUPABASE_URL, serviceKey);
