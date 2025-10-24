@@ -46,6 +46,7 @@ const AdminProjects = () => {
     link: "",
     featured: false,
     technologies: "",
+    slug: "",
   });
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
@@ -89,6 +90,7 @@ const AdminProjects = () => {
       link: project.link || "",
       featured: project.featured || false,
       technologies: project.technologies ? project.technologies.join(", ") : "",
+      slug: project.slug || "",
     });
   };
 
@@ -108,6 +110,7 @@ const AdminProjects = () => {
       link: "",
       featured: false,
       technologies: "",
+      slug: "",
     });
   };
 
@@ -127,6 +130,7 @@ const AdminProjects = () => {
       link: "",
       featured: false,
       technologies: "",
+      slug: "",
     });
   };
 
@@ -189,13 +193,14 @@ const AdminProjects = () => {
         ? formData.technologies.split(",").map((t) => t.trim())
         : [];
 
-      const rawSlug = formData.title
-        ? formData.title
-            .toLowerCase()
-            .trim()
-            .replace(/[^a-z0-9\s-]/g, "")
-            .replace(/\s+/g, "-")
-        : null;
+      const sanitize = (s: string) =>
+      s
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-");
+
+    const rawSlug = formData.slug && formData.slug.trim() !== "" ? sanitize(formData.slug) : (formData.title ? sanitize(formData.title) : null);
 
       // Ensure slug uniqueness by appending suffix if needed
       const ensureUniqueSlug = async (base: string | null, excludeId?: string | null) => {
@@ -384,6 +389,34 @@ const AdminProjects = () => {
               />
             </div>
 
+            <div className="grid grid-cols-2 gap-2 items-end">
+              <div className="space-y-2">
+                <Label htmlFor="slug">Slug (tùy chỉnh)</Label>
+                <Input
+                  id="slug"
+                  value={formData.slug}
+                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                  placeholder="auto-generated-from-title"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>&nbsp;</Label>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    const s = formData.title
+                      .toLowerCase()
+                      .trim()
+                      .replace(/[^a-z0-9\s-]/g, "")
+                      .replace(/\s+/g, "-");
+                    setFormData({ ...formData, slug: s });
+                  }}
+                >
+                  Tạo từ tiêu đề
+                </Button>
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="image">Hình ảnh dự án</Label>
               <div className="flex items-center gap-4">
@@ -467,7 +500,7 @@ const AdminProjects = () => {
                   <p className="text-sm text-muted-foreground mb-2">
                     {project.category}
                   </p>
-                  <Link to={`/projects/${project.id}`} target="_blank">
+                  <Link to={`/projects/${project.slug || project.id}`} target="_blank">
                     <Button variant="ghost" size="sm" className="h-8 px-2">
                       <ExternalLink className="h-3 w-3 mr-1" />
                       Xem trang chi tiết
