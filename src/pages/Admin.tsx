@@ -297,6 +297,10 @@ const Admin = () => {
           <TabsContent value="footer">
             <AdminFooter />
           </TabsContent>
+
+          <TabsContent value="social">
+            <AdminSocial />
+          </TabsContent>
         </Tabs>
       </main>
     </div>
