@@ -291,6 +291,10 @@ const Admin = () => {
           <TabsContent value="contact">
             <AdminContact />
           </TabsContent>
+
+          <TabsContent value="footer">
+            <AdminFooter />
+          </TabsContent>
         </Tabs>
       </main>
     </div>
