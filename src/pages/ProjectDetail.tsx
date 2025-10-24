@@ -50,12 +50,22 @@ const ProjectDetail = () => {
 
       if (!data) {
         // Try slug column if exists
-        const slugTry = await supabase
-          .from("projects")
-          .select("*")
-          .eq("slug", idOrSlug)
-          .maybeSingle();
-        if (slugTry.data) data = slugTry.data as any;
+        try {
+          const slugTry = await supabase
+            .from("projects")
+            .select("*")
+            .eq("slug", idOrSlug)
+            .maybeSingle();
+          if (slugTry.data) data = slugTry.data as any;
+        } catch (err: any) {
+          const msg = String(err?.message || "").toLowerCase();
+          if (msg.includes("slug") && msg.includes("does not exist")) {
+            // slug column missing, skip slug lookup
+            console.warn("projects.slug column missing, skipping slug lookup");
+          } else {
+            throw err;
+          }
+        }
       }
 
       if (!data) {
