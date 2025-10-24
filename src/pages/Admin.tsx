@@ -263,12 +263,13 @@ const Admin = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="about" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8">
+          <TabsList className="grid w-full grid-cols-6 mb-8">
             <TabsTrigger value="about">Về tôi</TabsTrigger>
             <TabsTrigger value="skills">Kỹ năng</TabsTrigger>
             <TabsTrigger value="experiences">Kinh nghiệm</TabsTrigger>
             <TabsTrigger value="projects">Dự án</TabsTrigger>
             <TabsTrigger value="contact">Liên hệ</TabsTrigger>
+            <TabsTrigger value="footer">Footer</TabsTrigger>
           </TabsList>
 
           <TabsContent value="about">
