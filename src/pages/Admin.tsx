@@ -12,6 +12,7 @@ import AdminAbout from "@/components/admin/AdminAbout";
 import AdminSkills from "@/components/admin/AdminSkills";
 import AdminExperiences from "@/components/admin/AdminExperiences";
 import AdminProjects from "@/components/admin/AdminProjects";
+import AdminContact from "@/components/admin/AdminContact";
 
 const Admin = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -261,11 +262,12 @@ const Admin = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="about" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8">
+          <TabsList className="grid w-full grid-cols-5 mb-8">
             <TabsTrigger value="about">Về tôi</TabsTrigger>
             <TabsTrigger value="skills">Kỹ năng</TabsTrigger>
             <TabsTrigger value="experiences">Kinh nghiệm</TabsTrigger>
             <TabsTrigger value="projects">Dự án</TabsTrigger>
+            <TabsTrigger value="contact">Liên hệ</TabsTrigger>
           </TabsList>
 
           <TabsContent value="about">
@@ -282,6 +284,10 @@ const Admin = () => {
 
           <TabsContent value="projects">
             <AdminProjects />
+          </TabsContent>
+
+          <TabsContent value="contact">
+            <AdminContact />
           </TabsContent>
         </Tabs>
       </main>

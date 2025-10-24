@@ -1,73 +1,75 @@
-# Welcome to your Lovable project
+# Portfolio Website - Trịnh Bá Lâm
 
-## Project info
+Trang web portfolio cá nhân với React, TypeScript, Tailwind CSS và Lovable Cloud.
 
-**URL**: https://lovable.dev/projects/d8c7c9ca-cac9-414a-a9e8-db2245b36c09
+## 🚀 Demo & Admin
 
-## How can I edit this code?
+- **Website**: https://luxe-builder-site.vercel.app
+- **Admin Panel**: https://luxe-builder-site.vercel.app/admin
 
-There are several ways of editing your application.
+**Tài khoản admin mặc định**:
+- Email: `admin@trinhbalam.com`
+- Password: `Admin@123456`
 
-**Use Lovable**
+## ⚙️ Cài đặt & Chạy
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/d8c7c9ca-cac9-414a-a9e8-db2245b36c09) and start prompting.
+```bash
+# Clone repository
+git clone <repository-url>
+cd <project-folder>
 
-Changes made via Lovable will be committed automatically to this repo.
+# Cài đặt dependencies
+npm install
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Chạy development
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 🔐 Environment Variables
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Tạo file `.env`:
 
-**Use GitHub Codespaces**
+```env
+VITE_SUPABASE_PROJECT_ID="hcigjefjrtkroeitictp"
+VITE_SUPABASE_PUBLISHABLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjaWdqZWZqcnRrcm9laXRpY3RwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5MDE4MDUsImV4cCI6MjA3NjQ3NzgwNX0.o0rzJlzrYCPjflqB7KiQZGr9sl5WhZSDRGAeVS84Xfk"
+VITE_SUPABASE_URL="https://hcigjefjrtkroeitictp.supabase.co"
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 📦 Deploy lên Vercel
 
-## What technologies are used for this project?
+1. Push code lên GitHub
+2. Import vào Vercel
+3. Thêm Environment Variables từ file `.env`
+4. Deploy
 
-This project is built with:
+**Fix lỗi 404**: File `vercel.json` đã được tạo sẵn để xử lý routing.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🎨 Tính năng Admin CMS
 
-## How can I deploy this project?
+- **Về tôi**: Cập nhật thông tin, hình ảnh
+- **Kỹ năng**: Quản lý danh sách kỹ năng
+- **Kinh nghiệm**: Timeline kinh nghiệm (theo mốc thời gian)
+- **Dự án**: Quản lý portfolio dự án
+- **Liên hệ**: Email, phone, địa chỉ, Google Maps
 
-Simply open [Lovable](https://lovable.dev/projects/d8c7c9ca-cac9-414a-a9e8-db2245b36c09) and click on Share -> Publish.
+## 🗺️ Google Maps Setup
 
-## Can I connect a custom domain to my Lovable project?
+1. Vào [Google Maps](https://www.google.com/maps)
+2. Tìm địa điểm → Share → Embed a map
+3. Copy URL trong `src="..."`
+4. Paste vào Admin > Liên hệ > Google Maps Embed URL
 
-Yes, you can!
+## 🛠️ Tech Stack
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- React 18 + TypeScript + Vite
+- Tailwind CSS + shadcn/ui
+- Lovable Cloud (Supabase)
+- Framer Motion
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## 📧 Liên hệ
+
+Email: trinhbalam@gmail.com
+
+---
+
+Made with ❤️ using [Lovable](https://lovable.dev)

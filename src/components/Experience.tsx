@@ -1,50 +1,42 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Calendar, MapPin, Award } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Experience {
+  id: string;
+  year: string;
+  title: string;
+  company: string;
+  location: string | null;
+  description: string | null;
+  achievements: string[] | null;
+  sort_order: number;
+}
 
 const Experience = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [experiences, setExperiences] = useState<Experience[]>([]);
 
-  const experiences = [
-    {
-      year: "2020 - Hiện tại",
-      title: "Senior Business Development Manager",
-      company: "Tech Solutions Vietnam",
-      location: "Hồ Chí Minh",
-      description: "Phát triển và duy trì mối quan hệ với 50+ đối tác chiến lược, tăng doanh thu 150% trong 3 năm.",
-      achievements: [
-        "Mở rộng thị trường mới tại 5 tỉnh thành",
-        "Xây dựng đội ngũ sales 20+ người",
-        "Đạt giải thưởng Best Partner Award 2023"
-      ]
-    },
-    {
-      year: "2017 - 2020",
-      title: "Sales Team Leader",
-      company: "Digital Marketing Agency",
-      location: "Hà Nội",
-      description: "Quản lý đội ngũ 10 sales, phát triển kênh B2B cho các sản phẩm digital marketing.",
-      achievements: [
-        "Tăng trưởng doanh số 120% năm 2019",
-        "Xây dựng quy trình sales chuẩn hóa",
-        "Đào tạo 30+ sales professionals"
-      ]
-    },
-    {
-      year: "2015 - 2017",
-      title: "Business Development Executive",
-      company: "E-commerce Platform",
-      location: "Hồ Chí Minh",
-      description: "Phụ trách phát triển đối tác merchant và mở rộng danh mục sản phẩm.",
-      achievements: [
-        "Onboard 100+ merchants",
-        "Thiết lập quan hệ với top brands",
-        "Tăng GMV 80% trong 2 năm"
-      ]
+  useEffect(() => {
+    fetchExperiences();
+  }, []);
+
+  const fetchExperiences = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("experiences")
+        .select("*")
+        .order("sort_order", { ascending: true });
+
+      if (error) throw error;
+      if (data) setExperiences(data);
+    } catch (error) {
+      console.error("Error fetching experiences:", error);
     }
-  ];
+  };
 
   return (
     <section id="experience" className="py-20 lg:py-32">
