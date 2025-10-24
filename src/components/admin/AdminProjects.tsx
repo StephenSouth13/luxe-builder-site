@@ -52,8 +52,11 @@ const AdminProjects = () => {
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
+  const [filtersEnabled, setFiltersEnabled] = useState<boolean>(true);
+
   useEffect(() => {
     fetchProjects();
+    fetchSettings();
   }, []);
 
   const fetchProjects = async () => {
@@ -75,7 +78,7 @@ const AdminProjects = () => {
           toast({
             title: "Lưu ý",
             description:
-              "Không thể sắp xếp b��ng sort_order (có thể do thay đổi schema). Hiển thị dữ liệu bằng fallback.",
+              "Không thể sắp xếp bằng sort_order (có thể do thay đổi schema). Hiển thị dữ liệu bằng fallback.",
           });
         } catch (e) {
           toast({ title: "Lỗi", description: "Không thể tải danh sách dự án", variant: "destructive" });
