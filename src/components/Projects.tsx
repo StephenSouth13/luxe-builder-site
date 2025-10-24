@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link, useLocation } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Project {
   id: string;
@@ -25,6 +26,7 @@ const Projects = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const isHomePage = location.pathname === "/";
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchProjects();
@@ -43,10 +45,17 @@ const Projects = () => {
 
       const { data, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching projects:", error);
+        toast({ title: "Lỗi tải dự án", description: error.message || String(error), variant: "destructive" });
+        setProjects([]);
+        return;
+      }
       setProjects(data || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching projects:", error);
+      toast({ title: "Lỗi tải dự án", description: error.message || String(error), variant: "destructive" });
+      setProjects([]);
     } finally {
       setIsLoading(false);
     }
@@ -83,65 +92,71 @@ const Projects = () => {
         )}
 
         <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-          {projects.map((project, index) => (
-            <motion.div
-              key={project.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <Card className="h-full hover:shadow-xl transition-shadow duration-300 overflow-hidden group">
-                {project.image_url && (
-                  <div className="relative h-48 overflow-hidden">
-                    <img
-                      src={project.image_url}
-                      alt={project.title}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                    />
-                    <div className="absolute top-4 right-4">
-                      <span className="bg-primary/90 text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
+          {projects.length === 0 ? (
+            <div className="col-span-2 text-center text-muted-foreground py-12">
+              Không có dự án để hiển thị.
+            </div>
+          ) : (
+            projects.map((project, index) => (
+              <motion.div
+                key={project.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <Card className="h-full hover:shadow-xl transition-shadow duration-300 overflow-hidden group">
+                  {project.image_url && (
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={project.image_url}
+                        alt={project.title}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                      <div className="absolute top-4 right-4">
+                        <span className="bg-primary/90 text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
+                          {project.category}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  <CardHeader>
+                    <CardTitle className="text-xl">{project.title}</CardTitle>
+                    {!project.image_url && (
+                      <CardDescription className="text-sm">
                         {project.category}
-                      </span>
-                    </div>
-                  </div>
-                )}
-                <CardHeader>
-                  <CardTitle className="text-xl">{project.title}</CardTitle>
-                  {!project.image_url && (
-                    <CardDescription className="text-sm">
-                      {project.category}
-                    </CardDescription>
-                  )}
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-muted-foreground">{project.description}</p>
-                  
-                  {project.metrics && project.metrics.length > 0 && (
-                    <div className="grid grid-cols-2 gap-4">
-                      {project.metrics.map((metric, i) => (
-                        <div key={i} className="text-center p-3 bg-accent/50 rounded-lg">
-                          <div className="text-2xl font-bold text-primary">
-                            {metric.value}
-                          </div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {metric.label}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                      </CardDescription>
+                    )}
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p className="text-muted-foreground">{project.description}</p>
 
-                  <div className="flex justify-between items-center mt-4">
-                    <Button variant="outline" asChild>
-                      <Link to={`/projects/${project.id}`}>
-                        {t("viewDetails")}
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+                    {project.metrics && project.metrics.length > 0 && (
+                      <div className="grid grid-cols-2 gap-4">
+                        {project.metrics.map((metric, i) => (
+                          <div key={i} className="text-center p-3 bg-accent/50 rounded-lg">
+                            <div className="text-2xl font-bold text-primary">
+                              {metric.value}
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-1">
+                              {metric.label}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="flex justify-between items-center mt-4">
+                      <Button variant="outline" asChild>
+                        <Link to={`/projects/${project.slug || project.id}`}>
+                          {t("viewDetails")}
+                        </Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))
+          )}
         </div>
 
         {isHomePage && projects.length === 4 && (

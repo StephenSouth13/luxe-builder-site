@@ -1,11 +1,20 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Send, Mail, Phone, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+
+interface ContactRow {
+  id: string;
+  email: string;
+  phone: string | null;
+  location: string | null;
+  map_embed_url: string | null;
+}
 
 const Contact = () => {
   const ref = useRef(null);
@@ -16,10 +25,22 @@ const Contact = () => {
     email: "",
     message: ""
   });
+  const [contact, setContact] = useState<ContactRow | null>(null);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const { data } = await supabase.from("contacts").select("*").limit(1).maybeSingle();
+        if (data) setContact(data as ContactRow);
+      } catch (e) {
+        console.error("Failed to load contact info", e);
+      }
+    };
+    load();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
     toast({
       title: "Tin nhắn đã được gửi!",
       description: "Cảm ơn bạn đã liên hệ. Tôi sẽ phản hồi sớm nhất có thể.",
@@ -28,10 +49,10 @@ const Contact = () => {
   };
 
   const contactInfo = [
-    { icon: Mail, label: "Email", value: "trinhbalam@business.com", href: "mailto:trinhbalam@business.com" },
-    { icon: Phone, label: "Phone", value: "+84 912 345 678", href: "tel:+84912345678" },
-    { icon: MapPin, label: "Location", value: "Hồ Chí Minh, Việt Nam", href: null }
-  ];
+    { icon: Mail, label: "Email", value: contact?.email || "", href: contact?.email ? `mailto:${contact.email}` : null },
+    { icon: Phone, label: "Phone", value: contact?.phone || "", href: contact?.phone ? `tel:${contact.phone}` : null },
+    { icon: MapPin, label: "Location", value: contact?.location || "", href: null }
+  ].filter((i) => i.value);
 
   return (
     <section id="contact" className="py-20 lg:py-32">
@@ -50,7 +71,6 @@ const Contact = () => {
           </p>
 
           <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
-            {/* Contact Info */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={isInView ? { opacity: 1, x: 0 } : {}}
@@ -93,9 +113,22 @@ const Contact = () => {
                   </motion.div>
                 ))}
               </div>
+
+              {contact?.map_embed_url && (
+                <div className="rounded-lg overflow-hidden border border-border">
+                  <iframe
+                    src={contact.map_embed_url}
+                    title="Google Map"
+                    width="100%"
+                    height="260"
+                    style={{ border: 0 }}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
+              )}
             </motion.div>
 
-            {/* Contact Form */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={isInView ? { opacity: 1, x: 0 } : {}}

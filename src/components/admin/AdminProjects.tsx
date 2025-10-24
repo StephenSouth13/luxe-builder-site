@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { createClient } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,6 +26,7 @@ interface Project {
   sort_order: number;
   featured?: boolean;
   technologies?: string[];
+  slug?: string;
 }
 
 const AdminProjects = () => {
@@ -45,6 +47,7 @@ const AdminProjects = () => {
     link: "",
     featured: false,
     technologies: "",
+    slug: "",
   });
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
@@ -88,6 +91,7 @@ const AdminProjects = () => {
       link: project.link || "",
       featured: project.featured || false,
       technologies: project.technologies ? project.technologies.join(", ") : "",
+      slug: project.slug || "",
     });
   };
 
@@ -107,7 +111,70 @@ const AdminProjects = () => {
       link: "",
       featured: false,
       technologies: "",
+      slug: "",
     });
+  };
+
+  const runBackfillPrompt = async () => {
+    const key = window.prompt("Paste Supabase Service Role key (will not be stored), or cancel to abort:");
+    if (!key) return;
+    if (!confirm("This will run a backfill that updates project slugs. Proceed?")) return;
+    await runBackfillWithKey(key);
+  };
+
+  const runBackfillWithKey = async (serviceKey: string) => {
+    try {
+      setIsSaving(true);
+      const admin = createClient(import.meta.env.VITE_SUPABASE_URL, serviceKey);
+      const { data: projects, error } = await admin.from('projects').select('id,title,slug');
+      if (error) throw error;
+      if (!projects || projects.length === 0) {
+        alert('No projects found');
+        setIsSaving(false);
+        return;
+      }
+
+      const sanitize = (s: string) =>
+        s
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, '-');
+
+      for (const p of projects) {
+        if (p.slug) continue;
+        let base = sanitize(p.title || `project-${p.id}`);
+        let candidate = base;
+        let i = 0;
+        while (true) {
+          const { data: existing, error: e } = await admin.from('projects').select('id').eq('slug', candidate).limit(1).maybeSingle();
+          if (e) {
+            // if slug column missing or other error, break
+            console.warn('backfill check error', e.message || e);
+            break;
+          }
+          if (!existing) break;
+          i += 1;
+          candidate = `${base}-${i}`;
+        }
+
+        try {
+          const { error: upErr } = await admin.from('projects').update({ slug: candidate }).eq('id', p.id);
+          if (upErr) {
+            console.error('Failed update', p.id, upErr.message || upErr);
+          }
+        } catch (upErr) {
+          console.error('Update error', upErr);
+        }
+      }
+
+      alert('Backfill complete. Refresh to see changes.');
+    } catch (err: any) {
+      alert('Backfill failed: ' + (err.message || String(err)));
+    } finally {
+      setIsSaving(false);
+      await fetchProjects();
+    }
   };
 
   const handleCancel = () => {
@@ -126,6 +193,7 @@ const AdminProjects = () => {
       link: "",
       featured: false,
       technologies: "",
+      slug: "",
     });
   };
 
@@ -155,11 +223,11 @@ const AdminProjects = () => {
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
+      const { data } = supabase.storage
         .from("project-images")
         .getPublicUrl(filePath);
 
-      return publicUrl;
+      return data?.publicUrl || null;
     } catch (error: any) {
       toast({
         title: "Error uploading image",
@@ -188,6 +256,50 @@ const AdminProjects = () => {
         ? formData.technologies.split(",").map((t) => t.trim())
         : [];
 
+      const sanitize = (s: string) =>
+      s
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-");
+
+    const rawSlug = formData.slug && formData.slug.trim() !== "" ? sanitize(formData.slug) : (formData.title ? sanitize(formData.title) : null);
+
+      // Ensure slug uniqueness by appending suffix if needed
+      const ensureUniqueSlug = async (base: string | null, excludeId?: string | null) => {
+        if (!base) return null;
+        let candidate = base;
+        let i = 0;
+        while (true) {
+          try {
+            const query = supabase.from("projects").select("id").eq("slug", candidate);
+            if (excludeId) query.neq("id", excludeId);
+            const { data: existing, error } = await query.limit(1).maybeSingle();
+            if (error) {
+              // If slug column doesn't exist, stop trying uniqueness checks and return candidate
+              const msg = String(error.message || "").toLowerCase();
+              if (msg.includes("slug") && msg.includes("does not exist")) {
+                return candidate;
+              }
+              throw error;
+            }
+
+            if (!existing) return candidate;
+          } catch (err: any) {
+            const msg = String(err?.message || "").toLowerCase();
+            if (msg.includes("slug") && msg.includes("does not exist")) {
+              return candidate;
+            }
+            throw err;
+          }
+
+          i += 1;
+          candidate = `${base}-${i}`;
+        }
+      };
+
+      const slug = await ensureUniqueSlug(rawSlug, editingId && editingId !== "new" ? editingId : undefined);
+
       const saveData = {
         title: formData.title,
         category: formData.category,
@@ -200,6 +312,7 @@ const AdminProjects = () => {
         link: formData.link || null,
         featured: formData.featured,
         technologies: technologiesArray,
+        slug: slug,
       };
 
       if (editingId === "new") {
@@ -274,11 +387,18 @@ const AdminProjects = () => {
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle>Quản lý Dự án</CardTitle>
-          {!editingId && (
-            <Button onClick={handleNew}>
-              <Plus className="h-4 w-4 mr-2" /> Thêm mới
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            {!editingId && (
+              <>
+                <Button onClick={handleNew}>
+                  <Plus className="h-4 w-4 mr-2" /> Thêm mới
+                </Button>
+                <Button variant="outline" onClick={() => runBackfillPrompt()}>
+                  Backfill Slugs
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -354,6 +474,34 @@ const AdminProjects = () => {
                 onChange={(e) => setFormData({ ...formData, technologies: e.target.value })}
                 placeholder="React, TypeScript, Tailwind CSS"
               />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 items-end">
+              <div className="space-y-2">
+                <Label htmlFor="slug">Slug (tùy chỉnh)</Label>
+                <Input
+                  id="slug"
+                  value={formData.slug}
+                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                  placeholder="auto-generated-from-title"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>&nbsp;</Label>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    const s = formData.title
+                      .toLowerCase()
+                      .trim()
+                      .replace(/[^a-z0-9\s-]/g, "")
+                      .replace(/\s+/g, "-");
+                    setFormData({ ...formData, slug: s });
+                  }}
+                >
+                  Tạo từ tiêu đề
+                </Button>
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -439,7 +587,7 @@ const AdminProjects = () => {
                   <p className="text-sm text-muted-foreground mb-2">
                     {project.category}
                   </p>
-                  <Link to={`/projects/${project.id}`} target="_blank">
+                  <Link to={`/projects/${project.slug || project.id}`} target="_blank">
                     <Button variant="ghost" size="sm" className="h-8 px-2">
                       <ExternalLink className="h-3 w-3 mr-1" />
                       Xem trang chi tiết
