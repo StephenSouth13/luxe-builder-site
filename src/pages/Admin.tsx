@@ -14,6 +14,7 @@ import AdminExperiences from "@/components/admin/AdminExperiences";
 import AdminProjects from "@/components/admin/AdminProjects";
 import AdminContact from "@/components/admin/AdminContact";
 import AdminFooter from "@/components/admin/AdminFooter";
+import AdminSocial from "@/components/admin/AdminSocial";
 
 const Admin = () => {
   const [isLoading, setIsLoading] = useState(true);
