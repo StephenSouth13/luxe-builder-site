@@ -208,11 +208,28 @@ const AdminProjects = () => {
         let candidate = base;
         let i = 0;
         while (true) {
-          const query = supabase.from("projects").select("id").eq("slug", candidate);
-          if (excludeId) query.neq("id", excludeId);
-          const { data: existing, error } = await query.limit(1).maybeSingle();
-          if (error) throw error;
-          if (!existing) return candidate;
+          try {
+            const query = supabase.from("projects").select("id").eq("slug", candidate);
+            if (excludeId) query.neq("id", excludeId);
+            const { data: existing, error } = await query.limit(1).maybeSingle();
+            if (error) {
+              // If slug column doesn't exist, stop trying uniqueness checks and return candidate
+              const msg = String(error.message || "").toLowerCase();
+              if (msg.includes("slug") && msg.includes("does not exist")) {
+                return candidate;
+              }
+              throw error;
+            }
+
+            if (!existing) return candidate;
+          } catch (err: any) {
+            const msg = String(err?.message || "").toLowerCase();
+            if (msg.includes("slug") && msg.includes("does not exist")) {
+              return candidate;
+            }
+            throw err;
+          }
+
           i += 1;
           candidate = `${base}-${i}`;
         }
