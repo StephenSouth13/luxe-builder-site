@@ -189,13 +189,31 @@ const AdminProjects = () => {
         ? formData.technologies.split(",").map((t) => t.trim())
         : [];
 
-      const slug = formData.title
+      const rawSlug = formData.title
         ? formData.title
             .toLowerCase()
             .trim()
             .replace(/[^a-z0-9\s-]/g, "")
             .replace(/\s+/g, "-")
         : null;
+
+      // Ensure slug uniqueness by appending suffix if needed
+      const ensureUniqueSlug = async (base: string | null, excludeId?: string | null) => {
+        if (!base) return null;
+        let candidate = base;
+        let i = 0;
+        while (true) {
+          const query = supabase.from("projects").select("id").eq("slug", candidate);
+          if (excludeId) query.neq("id", excludeId);
+          const { data: existing, error } = await query.limit(1).maybeSingle();
+          if (error) throw error;
+          if (!existing) return candidate;
+          i += 1;
+          candidate = `${base}-${i}`;
+        }
+      };
+
+      const slug = await ensureUniqueSlug(rawSlug, editingId && editingId !== "new" ? editingId : undefined);
 
       const saveData = {
         title: formData.title,
