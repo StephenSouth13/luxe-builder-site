@@ -114,19 +114,33 @@ const Contact = () => {
                 ))}
               </div>
 
-              {contact?.map_embed_url && (
-                <div className="rounded-lg overflow-hidden border border-border">
-                  <iframe
-                    src={contact.map_embed_url}
-                    title="Google Map"
-                    width="100%"
-                    height="260"
-                    style={{ border: 0 }}
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-                </div>
-              )}
+              {(() => {
+                const raw = contact?.map_embed_url?.trim();
+                const extractSrc = (input: string | null | undefined) => {
+                  if (!input) return null;
+                  if (input.startsWith("<")) {
+                    const match = input.match(/src=["']([^"']+)["']/i);
+                    return match ? match[1] : null;
+                  }
+                  const maybe = input.replace(/^\((.*)\)$/s, "$1");
+                  return maybe || null;
+                };
+                const mapSrc = extractSrc(raw);
+                return mapSrc ? (
+                  <div className="rounded-lg overflow-hidden border border-border">
+                    <iframe
+                      src={mapSrc}
+                      title="Google Map"
+                      width="100%"
+                      height="260"
+                      style={{ border: 0 }}
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      allowFullScreen
+                    />
+                  </div>
+                ) : null;
+              })()}
             </motion.div>
 
             <motion.div
