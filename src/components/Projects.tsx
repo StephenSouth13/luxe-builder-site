@@ -133,7 +133,7 @@ const Projects = () => {
 
                   <div className="flex justify-between items-center mt-4">
                     <Button variant="outline" asChild>
-                      <Link to={`/projects/${project.id}`}>
+                      <Link to={`/projects/${project.slug || project.id}`}>
                         {t("viewDetails")}
                       </Link>
                     </Button>
