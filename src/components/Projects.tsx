@@ -122,9 +122,22 @@ const Projects = () => {
         transition={{ duration: 0.5 }}
         className="container mx-auto px-4"
       >
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-          {isHomePage ? t("featuredProjects") : t("allProjects")}
-        </h2>
+        <div className="flex flex-col md:flex-row items-center justify-between mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold">
+            {isHomePage ? t("featuredProjects") : t("allProjects")}
+          </h2>
+          {!isHomePage && filtersEnabled && (
+            <div className="mt-4 md:mt-0">
+              <label className="text-sm mr-2">Lọc theo danh mục:</label>
+              <select value={selectedCategory || ""} onChange={(e) => setSelectedCategory(e.target.value || null)} className="bg-card border-border px-3 py-2 rounded">
+                <option value="">Tất cả</option>
+                {Array.from(new Set(projects.map(p => p.category).filter(Boolean))).map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
         {isHomePage && (
           <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-12">
             Khám phá những dự án tiêu biểu mà tôi đã thực hiện
