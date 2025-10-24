@@ -27,25 +27,54 @@ interface Project {
 }
 
 const ProjectDetail = () => {
-  const { id } = useParams<{ id: string }>();
+  const params = useParams<{ id: string }>();
+  const idOrSlug = params.id;
   const [project, setProject] = useState<Project | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { t } = useLanguage();
 
   useEffect(() => {
     fetchProject();
-  }, [id]);
+  }, [idOrSlug]);
 
   const fetchProject = async () => {
+    if (!idOrSlug) return;
+    setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      // Try by id first
+      let { data, error } = await supabase
         .from("projects")
         .select("*")
-        .eq("id", id)
-        .single();
+        .eq("id", idOrSlug)
+        .maybeSingle();
 
-      if (error) throw error;
-      setProject(data);
+      if (!data) {
+        // Try slug column if exists
+        const slugTry = await supabase
+          .from("projects")
+          .select("*")
+          .eq("slug", idOrSlug)
+          .maybeSingle();
+        if (slugTry.data) data = slugTry.data as any;
+      }
+
+      if (!data) {
+        // Fallback: try matching title by replacing dashes with spaces
+        const decoded = decodeURIComponent(idOrSlug).replace(/-/g, " ");
+        const titleTry = await supabase
+          .from("projects")
+          .select("*")
+          .ilike("title", `%${decoded}%`)
+          .limit(1)
+          .maybeSingle();
+        if (titleTry.data) data = titleTry.data as any;
+      }
+
+      if (!data) {
+        console.warn("Project not found for", idOrSlug);
+      }
+
+      setProject(data || null);
     } catch (error) {
       console.error("Error fetching project:", error);
     } finally {
