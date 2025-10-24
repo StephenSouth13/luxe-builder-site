@@ -87,6 +87,22 @@ const ProjectDetail = () => {
       }
 
       setProject(data || null);
+
+      // fetch related by category
+      try {
+        if (data && data.category) {
+          const { data: rel } = await supabase
+            .from("projects")
+            .select("id,title,slug,image_url")
+            .eq("category", data.category)
+            .neq("id", data.id)
+            .limit(3);
+          setRelated(rel || []);
+        }
+      } catch (err) {
+        // ignore related fetch errors
+        setRelated([]);
+      }
     } catch (error) {
       console.error("Error fetching project:", error);
     } finally {
