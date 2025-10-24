@@ -75,7 +75,7 @@ const AdminProjects = () => {
           toast({
             title: "Lưu ý",
             description:
-              "Không thể sắp xếp bằng sort_order (có thể do thay đổi schema). Hiển thị dữ liệu bằng fallback.",
+              "Không thể sắp xếp b��ng sort_order (có thể do thay đổi schema). Hiển thị dữ liệu bằng fallback.",
           });
         } catch (e) {
           toast({ title: "Lỗi", description: "Không thể tải danh sách dự án", variant: "destructive" });
@@ -327,28 +327,53 @@ const AdminProjects = () => {
         slug: slug,
       };
 
-      if (editingId === "new") {
-        const maxOrder = projects.length > 0 ? Math.max(...projects.map(p => p.sort_order)) : 0;
-        
-        const { error } = await supabase
-          .from("projects")
-          .insert({
-            ...saveData,
-            sort_order: maxOrder + 1,
-          });
+      const attemptSave = async (dataToSave: any, mode: "insert" | "update") => {
+        try {
+          if (mode === "insert") {
+            const maxOrder = projects.length > 0 ? Math.max(...projects.map((p) => p.sort_order)) : 0;
+            const { error } = await supabase.from("projects").insert({ ...dataToSave, sort_order: maxOrder + 1 });
+            if (error) throw error;
+            return;
+          }
 
-        if (error) throw error;
+          if (mode === "update") {
+            const { error } = await supabase.from("projects").update({ ...dataToSave, updated_at: new Date().toISOString() }).eq("id", editingId);
+            if (error) throw error;
+            return;
+          }
+        } catch (err: any) {
+          const message = String(err?.message || "").toLowerCase();
+          // If error mentions missing column, strip the offending keys and retry once
+          const missingColMatch = message.match(/column "([^"]+)"/i);
+          if (missingColMatch) {
+            const col = missingColMatch[1];
+            // map common column names to our saveData keys
+            const keyMap = { slug: "slug", technologies: "technologies", metrics: "metrics" };
+            const keyToRemove = Object.keys(dataToSave).find((k) => k === col || (keyMap[col] && k === keyMap[col]));
+            if (keyToRemove) {
+              const cleaned = { ...dataToSave };
+              delete cleaned[keyToRemove];
+              // retry
+              if (mode === "insert") {
+                const maxOrder = projects.length > 0 ? Math.max(...projects.map((p) => p.sort_order)) : 0;
+                const { error: err2 } = await supabase.from("projects").insert({ ...cleaned, sort_order: maxOrder + 1 });
+                if (!err2) return;
+              } else {
+                const { error: err2 } = await supabase.from("projects").update({ ...cleaned, updated_at: new Date().toISOString() }).eq("id", editingId);
+                if (!err2) return;
+              }
+            }
+          }
+          // rethrow
+          throw err;
+        }
+      };
+
+      if (editingId === "new") {
+        await attemptSave(saveData, "insert");
         toast({ title: "Thành công", description: "Đã thêm dự án mới" });
       } else {
-        const { error } = await supabase
-          .from("projects")
-          .update({
-            ...saveData,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", editingId);
-
-        if (error) throw error;
+        await attemptSave(saveData, "update");
         toast({ title: "Thành công", description: "Đã cập nhật dự án" });
       }
 
