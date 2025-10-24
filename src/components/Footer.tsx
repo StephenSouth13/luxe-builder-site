@@ -1,18 +1,39 @@
 import { motion } from "framer-motion";
-import { Linkedin, Facebook, MessageCircle } from "lucide-react";
+import { Linkedin, Facebook, MessageCircle, Twitter, Github, Instagram, Youtube } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface FooterLink { id: string; section: string; label: string; url: string; sort_order: number; }
+interface SocialRow { id: string; provider: string; url: string; sort_order: number }
 
 const Footer = () => {
-  const socialLinks = [
-    { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
-    { icon: Facebook, href: "https://facebook.com", label: "Facebook" },
-    { icon: MessageCircle, href: "https://zalo.me", label: "Zalo" }
-  ];
-
   const [links, setLinks] = useState<FooterLink[]>([]);
+  const [socials, setSocials] = useState<SocialRow[]>([]);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const sb: any = supabase;
+        const { data } = await sb
+          .from("footer_links")
+          .select("*")
+          .order("section", { ascending: true })
+          .order("sort_order", { ascending: true });
+        setLinks(data || []);
+      } catch {
+        setLinks([]);
+      }
+
+      try {
+        const sb: any = supabase;
+        const { data } = await sb.from("social_links").select("*").order("sort_order", { ascending: true });
+        setSocials(data || []);
+      } catch {
+        setSocials([]);
+      }
+    };
+    load();
+  }, []);
 
   useEffect(() => {
     const load = async () => {
