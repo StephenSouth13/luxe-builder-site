@@ -1,5 +1,9 @@
 import { motion } from "framer-motion";
 import { Linkedin, Facebook, MessageCircle } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface FooterLink { id: string; section: string; label: string; url: string; sort_order: number; }
 
 const Footer = () => {
   const socialLinks = [
@@ -8,12 +12,42 @@ const Footer = () => {
     { icon: MessageCircle, href: "https://zalo.me", label: "Zalo" }
   ];
 
+  const [links, setLinks] = useState<FooterLink[]>([]);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const sb: any = supabase;
+        const { data } = await sb
+          .from("footer_links")
+          .select("*")
+          .order("section", { ascending: true })
+          .order("sort_order", { ascending: true });
+        setLinks(data || []);
+      } catch {
+        setLinks([]);
+      }
+    };
+    load();
+  }, []);
+
+  const sections = useMemo(() => {
+    const map = new Map<string, FooterLink[]>();
+    for (const l of links) {
+      const arr = map.get(l.section) || [];
+      arr.push(l);
+      map.set(l.section, arr);
+    }
+    return Array.from(map.entries());
+  }, [links]);
+
+  const year = new Date().getFullYear();
+
   return (
     <footer className="relative bg-background border-t border-primary/20">
-      {/* Top gradient border */}
       <div className="absolute top-0 left-0 right-0 h-1 gold-gradient" />
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -21,12 +55,8 @@ const Footer = () => {
           transition={{ duration: 0.6 }}
           className="flex flex-col items-center space-y-6"
         >
-          {/* Logo/Name */}
-          <div className="text-2xl font-bold text-gradient">
-            Trịnh Bá Lâm
-          </div>
+          <div className="text-2xl font-bold text-gradient">Trịnh Bá Lâm</div>
 
-          {/* Social Links */}
           <div className="flex items-center gap-4">
             {socialLinks.map((social, index) => (
               <motion.a
@@ -46,11 +76,41 @@ const Footer = () => {
               </motion.a>
             ))}
           </div>
+        </motion.div>
 
-          {/* Copyright */}
-          <div className="text-center text-sm text-muted-foreground">
-            <p>© {new Date().getFullYear()} Trịnh Bá Lâm. All rights reserved.</p>
+        {sections.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {sections.map(([title, items], idx) => (
+              <motion.div
+                key={title}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: idx * 0.05 }}
+              >
+                <h4 className="font-semibold mb-3 text-primary">{title}</h4>
+                <ul className="space-y-2 text-sm">
+                  {items.map((l) => (
+                    <li key={l.id}>
+                      <a href={l.url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
+                        {l.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
           </div>
+        )}
+
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4 }}
+          className="text-center text-sm text-muted-foreground"
+        >
+          <p>© {year} Trịnh Bá Lâm. All rights reserved.</p>
         </motion.div>
       </div>
     </footer>
