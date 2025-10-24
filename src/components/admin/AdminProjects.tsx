@@ -158,7 +158,7 @@ const AdminProjects = () => {
       const { error } = await sb.from("settings").upsert({ key: "projects_filters_enabled", value: v ? "true" : "false" }, { onConflict: ["key"] });
       if (error) throw error;
       setFiltersEnabled(v);
-      toast({ title: "Thành công", description: "Đã cập nhật cài đặt bộ lọc" });
+      toast({ title: "Thành công", description: "Đã cập nhật cài đặt b�� lọc" });
     } catch (err: any) {
       toast({ title: "Lỗi", description: err.message || "Không thể lưu cài đặt", variant: "destructive" });
     } finally {
@@ -456,17 +456,23 @@ const AdminProjects = () => {
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle>Quản lý Dự án</CardTitle>
-          <div className="flex items-center gap-2">
-            {!editingId && (
-              <>
-                <Button onClick={handleNew}>
-                  <Plus className="h-4 w-4 mr-2" /> Thêm mới
-                </Button>
-                <Button variant="outline" onClick={() => runBackfillPrompt()}>
-                  Backfill Slugs
-                </Button>
-              </>
-            )}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <label className="text-sm">Bật bộ lọc danh mục</label>
+              <Switch checked={filtersEnabled} onCheckedChange={(v) => saveFiltersEnabled(Boolean(v))} />
+            </div>
+            <div className="flex items-center gap-2">
+              {!editingId && (
+                <>
+                  <Button onClick={handleNew}>
+                    <Plus className="h-4 w-4 mr-2" /> Thêm mới
+                  </Button>
+                  <Button variant="outline" onClick={() => runBackfillPrompt()}>
+                    Backfill Slugs
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </CardHeader>
