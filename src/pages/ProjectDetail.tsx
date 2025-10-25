@@ -24,6 +24,14 @@ interface Project {
   link?: string;
   technologies?: string[];
   metrics?: any;
+  slug?: string | null;
+}
+
+interface RelatedProject {
+  id: string;
+  title: string;
+  slug?: string | null;
+  image_url?: string;
 }
 
 const ProjectDetail = () => {
@@ -33,7 +41,7 @@ const ProjectDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { t } = useLanguage();
 
-  const [related, setRelated] = useState<Project[]>([]);
+  const [related, setRelated] = useState<RelatedProject[]>([]);
 
   useEffect(() => {
     fetchProject();

@@ -141,7 +141,7 @@ const AdminProjects = () => {
     try {
       const { data, error } = await supabase.from("settings").select("value").eq("key", "projects_filters_enabled").maybeSingle();
       if (error) throw error;
-      if (data && (data.value === "true" || data.value === true)) setFiltersEnabled(true);
+      if (data && data.value === "true") setFiltersEnabled(true);
       else setFiltersEnabled(false);
     } catch (err: any) {
       // settings table might not exist; keep default true

@@ -15,6 +15,8 @@ interface Project {
   description: string;
   image_url?: string;
   metrics?: any;
+  slug?: string | null;
+  featured?: boolean;
 }
 
 const Projects = () => {
@@ -42,7 +44,7 @@ const Projects = () => {
   const fetchSettings = async () => {
     try {
       const { data } = await supabase.from("settings").select("value").eq("key", "projects_filters_enabled").maybeSingle();
-      if (data && (data.value === "true" || data.value === true)) setFiltersEnabled(true);
+      if (data && data.value === "true") setFiltersEnabled(true);
       else setFiltersEnabled(false);
     } catch (err) {
       setFiltersEnabled(true);
