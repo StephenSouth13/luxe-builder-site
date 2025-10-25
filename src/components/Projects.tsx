@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,8 +20,6 @@ interface Project {
 }
 
 const Projects = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
   const location = useLocation();
   const { t } = useLanguage();
   const [projects, setProjects] = useState<Project[]>([]);
@@ -118,9 +116,9 @@ const Projects = () => {
   return (
     <section id="projects" className="py-20 bg-background">
       <motion.div
-        ref={ref}
         initial={{ opacity: 0, y: 20 }}
-        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.1 }}
         transition={{ duration: 0.5 }}
         className="container mx-auto px-4"
       >
@@ -153,12 +151,13 @@ const Projects = () => {
             </div>
           ) : (
             projects.map((project, index) => (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.1 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
                 <Card className="h-full hover:shadow-xl transition-shadow duration-300 overflow-hidden group">
                   {project.image_url && (
                     <div className="relative h-48 overflow-hidden">
@@ -217,7 +216,8 @@ const Projects = () => {
         {isHomePage && projects.length === 4 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 0.5, delay: 0.8 }}
             className="text-center mt-12"
           >
