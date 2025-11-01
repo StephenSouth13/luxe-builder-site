@@ -144,9 +144,13 @@ const Projects = () => {
           </p>
         )}
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <div className={`grid gap-6 md:gap-8 max-w-7xl mx-auto ${
+          isHomePage 
+            ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" 
+            : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+        }`}>
           {projects.length === 0 ? (
-            <div className="col-span-2 text-center text-muted-foreground py-12">
+            <div className={`${isHomePage ? 'col-span-1 sm:col-span-2 lg:col-span-4' : 'col-span-1 md:col-span-2 lg:col-span-3'} text-center text-muted-foreground py-12`}>
               Không có dự án để hiển thị.
             </div>
           ) : (
