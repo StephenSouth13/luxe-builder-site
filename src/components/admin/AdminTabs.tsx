@@ -3,6 +3,7 @@ import AdminAbout from "./AdminAbout";
 import AdminSkills from "./AdminSkills";
 import AdminExperiences from "./AdminExperiences";
 import AdminProjects from "./AdminProjects";
+import AdminBlog from "./AdminBlog";
 import AdminContact from "./AdminContact";
 import AdminFooter from "./AdminFooter";
 import AdminSocial from "./AdminSocial";
@@ -19,6 +20,7 @@ const tabConfigs: TabConfig[] = [
   { value: "skills", label: "Kỹ năng", component: AdminSkills },
   { value: "experiences", label: "Kinh nghiệm", component: AdminExperiences },
   { value: "projects", label: "Dự án", component: AdminProjects },
+  { value: "blog", label: "Blog", component: AdminBlog },
   { value: "contact", label: "Liên hệ", component: AdminContact },
   { value: "footer", label: "Footer", component: AdminFooter },
   { value: "social", label: "Social", component: AdminSocial },
@@ -28,7 +30,7 @@ const tabConfigs: TabConfig[] = [
 const AdminTabs = () => {
   return (
     <Tabs defaultValue="about" className="w-full">
-      <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 mb-8 gap-2">
+      <TabsList className="grid w-full grid-cols-3 md:grid-cols-9 mb-8 gap-2">
         {tabConfigs.map((tab) => (
           <TabsTrigger key={tab.value} value={tab.value}>
             {tab.label}
