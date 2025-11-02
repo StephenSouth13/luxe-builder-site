@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import AboutSection from "@/components/About";
+import Education from "@/components/Education";
 import Experience from "@/components/Experience";
 import Footer from "@/components/Footer";
 import FloatingChat from "@/components/FloatingChat";
@@ -16,6 +17,7 @@ const About = () => {
       <Header />
       <main className="pt-20">
         <AboutSection />
+        <Education />
         <Experience />
       </main>
       <Footer />

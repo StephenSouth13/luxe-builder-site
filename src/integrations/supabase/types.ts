@@ -90,6 +90,7 @@ export type Database = {
           id: string
           message: string
           name: string
+          phone: string | null
           seen: boolean | null
         }
         Insert: {
@@ -98,6 +99,7 @@ export type Database = {
           id?: string
           message: string
           name: string
+          phone?: string | null
           seen?: boolean | null
         }
         Update: {
@@ -106,6 +108,7 @@ export type Database = {
           id?: string
           message?: string
           name?: string
+          phone?: string | null
           seen?: boolean | null
         }
         Relationships: []
@@ -137,6 +140,45 @@ export type Database = {
           map_embed_url?: string | null
           phone?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      education: {
+        Row: {
+          achievements: string[] | null
+          created_at: string | null
+          degree: string
+          description: string | null
+          field: string | null
+          id: string
+          institution: string
+          sort_order: number | null
+          updated_at: string | null
+          year: string
+        }
+        Insert: {
+          achievements?: string[] | null
+          created_at?: string | null
+          degree: string
+          description?: string | null
+          field?: string | null
+          id?: string
+          institution: string
+          sort_order?: number | null
+          updated_at?: string | null
+          year: string
+        }
+        Update: {
+          achievements?: string[] | null
+          created_at?: string | null
+          degree?: string
+          description?: string | null
+          field?: string | null
+          id?: string
+          institution?: string
+          sort_order?: number | null
+          updated_at?: string | null
+          year?: string
         }
         Relationships: []
       }
@@ -176,6 +218,36 @@ export type Database = {
           title?: string
           updated_at?: string | null
           year?: string
+        }
+        Relationships: []
+      }
+      footer_links: {
+        Row: {
+          created_at: string | null
+          id: string
+          label: string
+          section: string
+          sort_order: number | null
+          updated_at: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          label: string
+          section: string
+          sort_order?: number | null
+          updated_at?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          label?: string
+          section?: string
+          sort_order?: number | null
+          updated_at?: string | null
+          url?: string
         }
         Relationships: []
       }

@@ -23,6 +23,7 @@ const Contact = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
     message: ""
   });
   const [contact, setContact] = useState<ContactRow | null>(null);
@@ -45,13 +46,14 @@ const Contact = () => {
       await supabase.from("contact_submissions").insert({
         name: formData.name,
         email: formData.email,
+        phone: formData.phone || null,
         message: formData.message,
       });
       toast({
         title: "Tin nhắn đã được gửi!",
         description: "Cảm ơn bạn đã liên hệ. Tôi sẽ phản hồi sớm nhất có thể.",
       });
-      setFormData({ name: "", email: "", message: "" });
+      setFormData({ name: "", email: "", phone: "", message: "" });
     } catch (err: any) {
       console.error("Failed to save submission", err);
       toast({ title: "Lỗi", description: "Không thể gửi tin nhắn, thử lại sau", variant: "destructive" });
@@ -185,6 +187,20 @@ const Contact = () => {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="email@example.com"
+                    className="bg-card border-border focus:border-primary"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium mb-2">
+                    Số điện thoại
+                  </label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    placeholder="+84 123 456 789"
                     className="bg-card border-border focus:border-primary"
                   />
                 </div>
