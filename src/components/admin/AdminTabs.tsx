@@ -8,6 +8,7 @@ import AdminBlog from "./AdminBlog";
 import AdminContact from "./AdminContact";
 import AdminFooter from "./AdminFooter";
 import AdminSubmissions from "./AdminSubmissions";
+import AdminChatbot from "./AdminChatbot";
 
 interface TabConfig {
   value: string;
@@ -24,13 +25,14 @@ const tabConfigs: TabConfig[] = [
   { value: "blog", label: "Blog", component: AdminBlog },
   { value: "contact", label: "Liên hệ", component: AdminContact },
   { value: "footer", label: "Footer", component: AdminFooter },
+  { value: "chatbot", label: "Chatbot", component: AdminChatbot },
   { value: "submissions", label: "Tin nhắn", component: AdminSubmissions },
 ];
 
 const AdminTabs = () => {
   return (
     <Tabs defaultValue="about" className="w-full">
-      <TabsList className="grid w-full grid-cols-3 md:grid-cols-9 mb-8 gap-2">
+      <TabsList className="grid w-full grid-cols-3 md:grid-cols-10 mb-8 gap-2">
         {tabConfigs.map((tab) => (
           <TabsTrigger key={tab.value} value={tab.value}>
             {tab.label}

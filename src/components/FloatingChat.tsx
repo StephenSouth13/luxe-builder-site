@@ -1,8 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
+
+interface ChatbotTraining {
+  id: string;
+  keywords: string[];
+  question: string;
+  answer: string;
+  language: string;
+  priority: number;
+  active: boolean;
+}
 
 const FloatingChat = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,25 +22,69 @@ const FloatingChat = () => {
     { text: language === "vi" ? "Xin chào! Tôi có thể giúp gì cho bạn?" : "Hello! How can I help you?", isBot: true }
   ]);
   const [inputValue, setInputValue] = useState("");
+  const [trainings, setTrainings] = useState<ChatbotTraining[]>([]);
+
+  useEffect(() => {
+    fetchTrainings();
+  }, []);
+
+  const fetchTrainings = async () => {
+    const { data } = await supabase
+      .from("chatbot_training")
+      .select("*")
+      .eq("active", true)
+      .order("priority", { ascending: false });
+
+    if (data) {
+      setTrainings(data);
+    }
+  };
+
+  const findBestAnswer = (userInput: string): string => {
+    const normalizedInput = userInput.toLowerCase();
+    
+    const relevantTrainings = trainings.filter(
+      (t) => t.language === language
+    );
+
+    let bestMatch: ChatbotTraining | null = null;
+    let highestPriority = -1;
+
+    for (const training of relevantTrainings) {
+      const hasMatch = training.keywords.some((keyword) =>
+        normalizedInput.includes(keyword.toLowerCase())
+      );
+
+      if (hasMatch && training.priority >= highestPriority) {
+        bestMatch = training;
+        highestPriority = training.priority;
+      }
+    }
+
+    if (bestMatch) {
+      return bestMatch.answer;
+    }
+
+    return language === "vi"
+      ? "Cảm ơn bạn đã liên hệ! Đây là phản hồi tự động. Để được hỗ trợ tốt nhất, vui lòng điền form liên hệ."
+      : "Thank you for reaching out! This is an automated response. For best support, please fill out the contact form.";
+  };
 
   const handleSend = () => {
     if (!inputValue.trim()) return;
 
     const userMessage = { text: inputValue, isBot: false };
+    const userInput = inputValue;
     setMessages([...messages, userMessage]);
+    setInputValue("");
     
-    // Mock bot response
     setTimeout(() => {
       const botResponse = {
-        text: language === "vi" 
-          ? "Cảm ơn bạn đã liên hệ! Đây là phản hồi tự động. Để được hỗ trợ tốt nhất, vui lòng điền form liên hệ."
-          : "Thank you for reaching out! This is an automated response. For best support, please fill out the contact form.",
+        text: findBestAnswer(userInput),
         isBot: true
       };
       setMessages(prev => [...prev, botResponse]);
-    }, 1000);
-
-    setInputValue("");
+    }, 500);
   };
 
   const toggleLanguage = () => {

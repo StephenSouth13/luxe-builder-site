@@ -83,6 +83,42 @@ export type Database = {
         }
         Relationships: []
       }
+      chatbot_training: {
+        Row: {
+          active: boolean | null
+          answer: string
+          created_at: string
+          id: string
+          keywords: string[]
+          language: string
+          priority: number | null
+          question: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean | null
+          answer: string
+          created_at?: string
+          id?: string
+          keywords: string[]
+          language?: string
+          priority?: number | null
+          question: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean | null
+          answer?: string
+          created_at?: string
+          id?: string
+          keywords?: string[]
+          language?: string
+          priority?: number | null
+          question?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contact_submissions: {
         Row: {
           created_at: string | null
