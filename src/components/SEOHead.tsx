@@ -17,7 +17,8 @@ const SEOHead = ({
   type = "website"
 }: SEOHeadProps) => {
   const location = useLocation();
-  const currentUrl = `${window.location.origin}${location.pathname}`;
+  const baseUrl = "https://trinhbalam.id.vn";
+  const currentUrl = `${baseUrl}${location.pathname}`;
 
   useEffect(() => {
     // Update document title
@@ -47,19 +48,22 @@ const SEOHead = ({
     updateMetaTag("og:description", description, true);
     updateMetaTag("og:type", type, true);
     updateMetaTag("og:url", currentUrl, true);
-    updateMetaTag("og:image", `${window.location.origin}${image}`, true);
+    updateMetaTag("og:image", `${baseUrl}${image}`, true);
     updateMetaTag("og:site_name", "Trịnh Bá Lâm Portfolio", true);
+    updateMetaTag("og:locale", "vi_VN", true);
 
     // Twitter Card tags
     updateMetaTag("twitter:card", "summary_large_image");
     updateMetaTag("twitter:title", title);
     updateMetaTag("twitter:description", description);
-    updateMetaTag("twitter:image", `${window.location.origin}${image}`);
+    updateMetaTag("twitter:image", `${baseUrl}${image}`);
 
     // Additional SEO tags
     updateMetaTag("robots", "index, follow");
     updateMetaTag("language", "Vietnamese");
     updateMetaTag("revisit-after", "7 days");
+    updateMetaTag("geo.region", "VN");
+    updateMetaTag("geo.placename", "Vietnam");
 
     // Canonical link
     let canonicalLink = document.querySelector('link[rel="canonical"]');
@@ -77,8 +81,12 @@ const SEOHead = ({
       "name": "Trịnh Bá Lâm",
       "jobTitle": "Sales & Business Development Expert",
       "description": description,
-      "url": window.location.origin,
-      "image": `${window.location.origin}${image}`,
+      "url": baseUrl,
+      "image": `${baseUrl}${image}`,
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "VN"
+      },
       "sameAs": [
         // Social media links will be dynamically added from database
       ],
