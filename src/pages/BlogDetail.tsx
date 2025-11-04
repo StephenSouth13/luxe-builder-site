@@ -143,11 +143,9 @@ const BlogDetail = () => {
               </div>
 
               <div 
-                className="text-foreground/90 leading-relaxed"
-                style={{ whiteSpace: 'pre-wrap' }}
-              >
-                {blog.content}
-              </div>
+                className="prose-content text-foreground/90 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: blog.content }}
+              />
             </article>
           </div>
         </main>

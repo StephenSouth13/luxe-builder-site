@@ -116,3 +116,80 @@ All colors MUST be HSL.
     }
   }
 }
+
+/* Rich Text Editor Styles */
+.ql-container {
+  @apply bg-background text-foreground border-border;
+  min-height: 300px;
+}
+
+.ql-editor {
+  @apply text-foreground;
+  min-height: 300px;
+}
+
+.ql-toolbar {
+  @apply bg-secondary border-border;
+}
+
+.ql-stroke {
+  @apply stroke-foreground;
+}
+
+.ql-fill {
+  @apply fill-foreground;
+}
+
+.ql-picker-label {
+  @apply text-foreground;
+}
+
+/* Blog Content Styles */
+.prose-content {
+  @apply max-w-none;
+}
+
+.prose-content h1 {
+  @apply text-4xl font-bold mt-8 mb-4;
+}
+
+.prose-content h2 {
+  @apply text-3xl font-bold mt-6 mb-3;
+}
+
+.prose-content h3 {
+  @apply text-2xl font-semibold mt-4 mb-2;
+}
+
+.prose-content p {
+  @apply mb-4 leading-relaxed;
+}
+
+.prose-content ul,
+.prose-content ol {
+  @apply mb-4 ml-6;
+}
+
+.prose-content li {
+  @apply mb-2;
+}
+
+.prose-content img {
+  @apply rounded-lg my-6 max-w-full h-auto;
+}
+
+.prose-content a {
+  @apply text-primary underline hover:text-primary/80;
+}
+
+.prose-content blockquote {
+  @apply border-l-4 border-primary pl-4 italic my-4;
+}
+
+.prose-content code {
+  @apply bg-secondary px-2 py-1 rounded text-sm;
+}
+
+.prose-content pre {
+  @apply bg-secondary p-4 rounded-lg overflow-x-auto my-4;
+}

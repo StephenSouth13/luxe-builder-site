@@ -95,32 +95,37 @@ const BlogsSection = () => {
               to={`/blog/${blog.slug}`}
               className="group"
             >
-              <Card className="h-full overflow-hidden transition-all hover:shadow-xl hover:scale-[1.02] border-border/50 hover:border-primary/50">
-                {blog.image_url && (
-                  <div className="relative h-48 overflow-hidden">
-                    <img
-                      src={blog.image_url}
-                      alt={blog.title}
-                      className="w-full h-full object-cover transition-transform group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-                  </div>
-                )}
-                <CardContent className="p-4 space-y-3">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Calendar className="h-3 w-3" />
-                    <span>{formatDate(blog.created_at)}</span>
-                  </div>
-                  <h3 className="text-lg font-semibold group-hover:text-primary transition-colors line-clamp-2">
-                    {blog.title}
-                  </h3>
-                  {blog.excerpt && (
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      {blog.excerpt}
-                    </p>
+                <Card key={blog.id} className="h-full overflow-hidden transition-all hover:shadow-xl hover:scale-[1.02] border-border/50 hover:border-primary/50 flex flex-col">
+                  {blog.image_url && (
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={blog.image_url}
+                        alt={blog.title}
+                        className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+                    </div>
                   )}
-                </CardContent>
-              </Card>
+                  <CardContent className="p-4 flex flex-col flex-1">
+                    <div className="flex-1 space-y-3">
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Calendar className="h-3 w-3" />
+                        <span>{formatDate(blog.created_at)}</span>
+                      </div>
+                      <h3 className="text-lg font-semibold group-hover:text-primary transition-colors line-clamp-2">
+                        {blog.title}
+                      </h3>
+                      {blog.excerpt && (
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {blog.excerpt}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 text-primary text-sm font-medium pt-4 mt-auto">
+                      Xem chi tiết <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </CardContent>
+                </Card>
             </Link>
           ))}
         </div>

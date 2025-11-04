@@ -6,8 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Edit, Trash2, X, Upload } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2, X } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 interface Blog {
   id: string;
@@ -16,15 +19,23 @@ interface Blog {
   content: string;
   excerpt: string;
   image_url: string | null;
+  category_id: string | null;
   featured: boolean;
   published: boolean;
   sort_order: number;
   created_at: string;
 }
 
+interface BlogCategory {
+  id: string;
+  name: string;
+  color: string;
+}
+
 const AdminBlog = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -34,6 +45,7 @@ const AdminBlog = () => {
     content: "",
     excerpt: "",
     image_url: "",
+    category_id: "",
     featured: false,
     published: false,
   });
@@ -42,6 +54,7 @@ const AdminBlog = () => {
 
   useEffect(() => {
     fetchBlogs();
+    fetchCategories();
   }, []);
 
   const fetchBlogs = async () => {
@@ -64,6 +77,20 @@ const AdminBlog = () => {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("blog_categories")
+        .select("id, name, color")
+        .order("sort_order", { ascending: true });
+
+      if (error) throw error;
+      setCategories(data || []);
+    } catch (error: any) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
   const handleEdit = (blog: Blog) => {
     setEditingId(blog.id);
     setImagePreview(blog.image_url || "");
@@ -73,6 +100,7 @@ const AdminBlog = () => {
       content: blog.content,
       excerpt: blog.excerpt || "",
       image_url: blog.image_url || "",
+      category_id: blog.category_id || "",
       featured: blog.featured,
       published: blog.published,
     });
@@ -88,6 +116,7 @@ const AdminBlog = () => {
       content: "",
       excerpt: "",
       image_url: "",
+      category_id: "",
       featured: false,
       published: false,
     });
@@ -103,6 +132,7 @@ const AdminBlog = () => {
       content: "",
       excerpt: "",
       image_url: "",
+      category_id: "",
       featured: false,
       published: false,
     });
@@ -171,6 +201,7 @@ const AdminBlog = () => {
         content: formData.content,
         excerpt: formData.excerpt || null,
         image_url: imageUrl,
+        category_id: formData.category_id || null,
         featured: formData.featured,
         published: formData.published,
       };
@@ -278,13 +309,50 @@ const AdminBlog = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="content">Nội dung</Label>
-              <Textarea
-                id="content"
+              <Label htmlFor="category">Danh mục</Label>
+              <Select
+                value={formData.category_id}
+                onValueChange={(value) => setFormData({ ...formData, category_id: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Chọn danh mục" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Không chọn</SelectItem>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.id}>
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: cat.color }}
+                        />
+                        {cat.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="content">Nội dung (Rich Text Editor)</Label>
+              <ReactQuill
+                theme="snow"
                 value={formData.content}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                rows={15}
-                required
+                onChange={(value) => setFormData({ ...formData, content: value })}
+                modules={{
+                  toolbar: [
+                    [{ header: [1, 2, 3, false] }],
+                    ["bold", "italic", "underline", "strike"],
+                    [{ list: "ordered" }, { list: "bullet" }],
+                    [{ color: [] }, { background: [] }],
+                    [{ align: [] }],
+                    ["link", "image"],
+                    ["clean"],
+                  ],
+                }}
+                className="bg-background"
+                style={{ minHeight: "300px" }}
               />
             </div>
 
