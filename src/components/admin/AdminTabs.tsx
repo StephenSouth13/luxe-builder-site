@@ -12,6 +12,7 @@ import AdminFooter from "./AdminFooter";
 import AdminSocial from "./AdminSocial";
 import AdminSubmissions from "./AdminSubmissions";
 import AdminChatbot from "./AdminChatbot";
+import AdminStore from "./AdminStore";
 
 interface TabConfig {
   value: string;
@@ -28,6 +29,7 @@ const tabConfigs: TabConfig[] = [
   { value: "projects", label: "Dự án", component: AdminProjects },
   { value: "blog", label: "Blog", component: AdminBlog },
   { value: "blog-categories", label: "Danh mục", component: AdminBlogCategories },
+  { value: "store", label: "Cửa hàng", component: AdminStore },
   { value: "social", label: "Mạng xã hội", component: AdminSocial },
   { value: "contact", label: "Liên hệ", component: AdminContact },
   { value: "footer", label: "Footer", component: AdminFooter },
@@ -38,7 +40,7 @@ const tabConfigs: TabConfig[] = [
 const AdminTabs = () => {
   return (
     <Tabs defaultValue="hero" className="w-full">
-      <TabsList className="grid w-full grid-cols-3 md:grid-cols-12 mb-8 gap-2">
+      <TabsList className="grid w-full grid-cols-3 md:grid-cols-7 lg:grid-cols-14 mb-8 gap-2">
         {tabConfigs.map((tab) => (
           <TabsTrigger key={tab.value} value={tab.value}>
             {tab.label}
