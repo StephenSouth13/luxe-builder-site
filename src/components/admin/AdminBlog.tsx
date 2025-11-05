@@ -311,14 +311,14 @@ const AdminBlog = () => {
             <div className="space-y-2">
               <Label htmlFor="category">Danh mục</Label>
               <Select
-                value={formData.category_id}
-                onValueChange={(value) => setFormData({ ...formData, category_id: value })}
+                value={formData.category_id || "none"}
+                onValueChange={(value) => setFormData({ ...formData, category_id: value === "none" ? "" : value })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Chọn danh mục" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Không chọn</SelectItem>
+                  <SelectItem value="none">Không chọn</SelectItem>
                   {categories.map((cat) => (
                     <SelectItem key={cat.id} value={cat.id}>
                       <div className="flex items-center gap-2">
