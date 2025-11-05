@@ -1,20 +1,55 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowDown, Download } from "lucide-react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import profileImage from "@/assets/profile.jpg";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const Hero = () => {
+  const [heroData, setHeroData] = useState({
+    name: "Trịnh Bá Lâm",
+    title: "Sales & Business Development Expert",
+    quote: "Kết nối – Thuyết phục – Bứt phá doanh số cùng đối tác chiến lược.",
+    profile_image_url: null as string | null,
+    background_image_url: null as string | null,
+  });
+
+  useEffect(() => {
+    fetchHeroData();
+  }, []);
+
+  const fetchHeroData = async () => {
+    const { data } = await supabase
+      .from("hero_section")
+      .select("*")
+      .limit(1)
+      .maybeSingle();
+
+    if (data) {
+      setHeroData({
+        name: data.name,
+        title: data.title,
+        quote: data.quote,
+        profile_image_url: data.profile_image_url,
+        background_image_url: data.background_image_url,
+      });
+    }
+  };
+
   const scrollToContact = () => {
     document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" });
   };
+
+  const displayProfileImage = heroData.profile_image_url || profileImage;
+  const displayBackgroundImage = heroData.background_image_url || heroBg;
 
   return (
     <section
       id="home"
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
       style={{
-        backgroundImage: `linear-gradient(rgba(15, 15, 15, 0.85), rgba(15, 15, 15, 0.85)), url(${heroBg})`,
+        backgroundImage: `linear-gradient(rgba(15, 15, 15, 0.85), rgba(15, 15, 15, 0.85)), url(${displayBackgroundImage})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
@@ -33,8 +68,8 @@ const Hero = () => {
           >
             <div className="absolute -inset-1 bg-gradient-to-r from-primary to-gold-light rounded-full blur-lg opacity-75 animate-float" />
             <img
-              src={profileImage}
-              alt="Trịnh Bá Lâm"
+              src={displayProfileImage}
+              alt={heroData.name}
               className="relative w-40 h-40 sm:w-48 sm:h-48 lg:w-56 lg:h-56 rounded-full object-cover border-4 border-primary glow-gold"
             />
           </motion.div>
@@ -46,7 +81,7 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-4xl sm:text-5xl lg:text-7xl font-bold text-gradient"
           >
-            Trịnh Bá Lâm
+            {heroData.name}
           </motion.h1>
 
           {/* Title */}
@@ -56,7 +91,7 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.5 }}
             className="text-xl sm:text-2xl lg:text-3xl font-semibold text-foreground/90"
           >
-            Sales & Business Development Expert
+            {heroData.title}
           </motion.h2>
 
           {/* Quote */}
@@ -66,7 +101,7 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.7 }}
             className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-3xl italic border-l-4 border-primary pl-4 sm:pl-6"
           >
-            "Kết nối – Thuyết phục – Bứt phá doanh số cùng đối tác chiến lược."
+            "{heroData.quote}"
           </motion.p>
 
           {/* CTA Buttons */}

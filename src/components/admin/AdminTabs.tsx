@@ -1,4 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import AdminHero from "./AdminHero";
 import AdminAbout from "./AdminAbout";
 import AdminSkills from "./AdminSkills";
 import AdminEducation from "./AdminEducation";
@@ -19,6 +20,7 @@ interface TabConfig {
 }
 
 const tabConfigs: TabConfig[] = [
+  { value: "hero", label: "Hero", component: AdminHero },
   { value: "about", label: "Về tôi", component: AdminAbout },
   { value: "skills", label: "Kỹ năng", component: AdminSkills },
   { value: "education", label: "Học vấn", component: AdminEducation },
@@ -35,7 +37,7 @@ const tabConfigs: TabConfig[] = [
 
 const AdminTabs = () => {
   return (
-    <Tabs defaultValue="about" className="w-full">
+    <Tabs defaultValue="hero" className="w-full">
       <TabsList className="grid w-full grid-cols-3 md:grid-cols-12 mb-8 gap-2">
         {tabConfigs.map((tab) => (
           <TabsTrigger key={tab.value} value={tab.value}>
