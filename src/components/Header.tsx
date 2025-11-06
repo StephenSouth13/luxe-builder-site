@@ -50,6 +50,7 @@ const Header = () => {
     { label: t("about"), path: "/about" },
     { label: t("projects"), path: "/projects" },
     { label: "Blog", path: "/blog" },
+    { label: "Cửa hàng", path: "/store" },
     { label: t("contact"), path: "/contact" },
   ];
 
