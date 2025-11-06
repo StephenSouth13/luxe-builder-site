@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Package } from "lucide-react";
 import { toast } from "sonner";
 import SEOHead from "@/components/SEOHead";
+import Header from "@/components/Header";
 import { useState } from "react";
 import {
   Select,
@@ -119,8 +120,10 @@ const Store = () => {
   }
 
   return (
-    <div className="min-h-screen pt-20 px-4 pb-20">
-      <SEOHead 
+    <>
+      <Header />
+      <div className="min-h-screen pt-20 px-4 pb-20">
+        <SEOHead
         title="Cửa hàng - Sản phẩm chất lượng"
         description="Khám phá các sản phẩm chất lượng cao với giá tốt nhất"
       />
@@ -230,6 +233,7 @@ const Store = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

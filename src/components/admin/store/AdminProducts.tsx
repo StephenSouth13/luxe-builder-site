@@ -64,10 +64,22 @@ const AdminProducts = () => {
     }
   });
 
+  const generateSlug = (name: string) => {
+    return name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  };
+
   const saveMutation = useMutation({
     mutationFn: async (data: any) => {
+      const slug = editingProduct?.slug || generateSlug(data.name);
       const productData = {
         ...data,
+        slug,
         price: parseFloat(data.price),
         discount_percent: parseInt(data.discount_percent) || 0,
         stock_quantity: parseInt(data.stock_quantity),

@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import SEOHead from "@/components/SEOHead";
+import Header from "@/components/Header";
+import { QRCodeSVG } from "qrcode.react";
 
 const Payment = () => {
   const navigate = useNavigate();
@@ -155,9 +157,22 @@ const Payment = () => {
     }, 0);
   };
 
+  const totalAmount = calculateTotal();
+  
+  // Generate VietQR payment string
+  const bankInfo = {
+    bank: "VietinBank",
+    accountNumber: "0363974125",
+    accountName: "TRINH BA LAM",
+    amount: totalAmount,
+    message: `DH${user?.id?.substring(0, 8)}`
+  };
+
   return (
-    <div className="min-h-screen pt-20 px-4 pb-20">
-      <SEOHead 
+    <>
+      <Header />
+      <div className="min-h-screen pt-20 px-4 pb-20">
+        <SEOHead
         title="Thanh toán - Cửa hàng"
         description="Hoàn tất đơn hàng của bạn"
       />
@@ -238,18 +253,55 @@ const Payment = () => {
               </div>
             </Card>
 
+            <Card className="p-6 mb-4">
+              <h2 className="text-xl font-bold mb-4">Thông tin chuyển khoản</h2>
+              <div className="flex flex-col items-center gap-4">
+                <QRCodeSVG 
+                  value={`|${bankInfo.bank}|${bankInfo.accountNumber}|${bankInfo.accountName}|${bankInfo.amount}|${bankInfo.message}`}
+                  size={200}
+                  level="H"
+                />
+                <div className="text-sm space-y-1 w-full">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Ngân hàng:</span>
+                    <span className="font-semibold">VietinBank</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Số TK:</span>
+                    <span className="font-semibold">0363974125</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Tên TK:</span>
+                    <span className="font-semibold">TRINH BA LAM</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Số tiền:</span>
+                    <span className="font-semibold text-primary">{totalAmount.toLocaleString()}đ</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Nội dung:</span>
+                    <span className="font-semibold">{bankInfo.message}</span>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground text-center">
+                  Quét mã QR hoặc chuyển khoản theo thông tin trên
+                </p>
+              </div>
+            </Card>
+
             <Button 
               type="submit" 
               className="w-full" 
               size="lg"
               disabled={createOrderMutation.isPending}
             >
-              {createOrderMutation.isPending ? "Đang xử lý..." : "Đặt hàng"}
+              {createOrderMutation.isPending ? "Đang xử lý..." : "Xác nhận đã chuyển khoản"}
             </Button>
           </div>
         </form>
       </div>
     </div>
+    </>
   );
 };
 
