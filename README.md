@@ -72,4 +72,3 @@ Email: trinhbalam@gmail.com
 
 ---
 
-Made with ❤️ using [Lovable](https://lovable.dev)
