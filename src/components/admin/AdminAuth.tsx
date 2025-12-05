@@ -15,40 +15,7 @@ const AdminAuth = ({ onAuthSuccess }: AdminAuthProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSignupMode, setIsSignupMode] = useState(false);
   const { toast } = useToast();
-
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      const { data, error } = await supabase.auth.signUp({ email, password });
-      if (error) throw error;
-
-      if (data.user) {
-        const { error: roleError } = await supabase
-          .from("user_roles")
-          .insert({ user_id: data.user.id, role: "admin" });
-
-        if (roleError) throw roleError;
-
-        toast({
-          title: "Tạo tài khoản thành công",
-          description: "Tài khoản admin đã được tạo. Đang đăng nhập...",
-        });
-        onAuthSuccess();
-      }
-    } catch (error: any) {
-      toast({
-        title: "Tạo tài khoản thất bại",
-        description: error.message || "Không thể tạo tài khoản admin",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,15 +64,13 @@ const AdminAuth = ({ onAuthSuccess }: AdminAuthProps) => {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md border-border">
         <CardHeader>
-          <CardTitle className="text-2xl text-center">
-            {isSignupMode ? "Tạo tài khoản Admin" : "Admin Login"}
-          </CardTitle>
+          <CardTitle className="text-2xl text-center">Admin Login</CardTitle>
           <CardDescription className="text-center">
-            {isSignupMode ? "Tạo tài khoản admin đầu tiên" : "Đăng nhập để quản lý nội dung"}
+            Đăng nhập để quản lý nội dung
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={isSignupMode ? handleSignup : handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -131,19 +96,11 @@ const AdminAuth = ({ onAuthSuccess }: AdminAuthProps) => {
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {isSignupMode ? "Đang tạo tài khoản..." : "Đang đăng nhập..."}
+                  Đang đăng nhập...
                 </>
               ) : (
-                isSignupMode ? "Tạo tài khoản Admin" : "Đăng nhập"
+                "Đăng nhập"
               )}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full"
-              onClick={() => setIsSignupMode(!isSignupMode)}
-            >
-              {isSignupMode ? "Đã có tài khoản? Đăng nhập" : "Chưa có tài khoản? Đăng ký"}
             </Button>
           </form>
         </CardContent>
