@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import DOMPurify from "dompurify";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -270,7 +271,7 @@ const ProductDetail = () => {
                   <h3 className="font-semibold mb-2">Mô tả chi tiết</h3>
                   <div 
                     className="text-muted-foreground prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{ __html: product.full_description }}
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.full_description) }}
                   />
                 </Card>
               )}
