@@ -26,15 +26,25 @@ const Contact = () => {
     phone: "",
     message: ""
   });
-  const [contact, setContact] = useState<ContactRow | null>(null);
+  // Default contact info (shown to public users since contacts table is admin-only)
+  const defaultContact: ContactRow = {
+    id: "default",
+    email: "lambatrinh0812@gmail.com",
+    phone: "+84 363974125",
+    location: "TP. Hồ Chí Minh, Việt Nam",
+    map_embed_url: null
+  };
+  
+  const [contact, setContact] = useState<ContactRow>(defaultContact);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const { data } = await supabase.from("contacts").select("*").limit(1).maybeSingle();
-        if (data) setContact(data as ContactRow);
+        const { data, error } = await supabase.from("contacts").select("*").limit(1).maybeSingle();
+        // Only update if admin successfully fetches data (non-admins will get RLS error)
+        if (data && !error) setContact(data as ContactRow);
       } catch (e) {
-        console.error("Failed to load contact info", e);
+        // Silently use default contact info for non-admin users
       }
     };
     load();
