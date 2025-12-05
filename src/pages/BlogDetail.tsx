@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
+import DOMPurify from "dompurify";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -144,7 +145,7 @@ const BlogDetail = () => {
 
               <div 
                 className="prose-content text-foreground/90 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: blog.content }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(blog.content) }}
               />
             </article>
           </div>
