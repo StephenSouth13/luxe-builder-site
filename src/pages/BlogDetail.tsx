@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import DOMPurify from "dompurify";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -18,6 +17,14 @@ interface Blog {
   image_url: string | null;
   created_at: string;
 }
+
+// Simple HTML sanitizer - removes script tags and event handlers
+const sanitizeHtml = (html: string): string => {
+  return html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/on\w+="[^"]*"/gi, '')
+    .replace(/on\w+='[^']*'/gi, '');
+};
 
 const BlogDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -145,7 +152,7 @@ const BlogDetail = () => {
 
               <div 
                 className="prose-content text-foreground/90 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(blog.content) }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(blog.content) }}
               />
             </article>
           </div>
