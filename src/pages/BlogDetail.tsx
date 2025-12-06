@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import SEOHead from "@/components/SEOHead";
+import DOMPurify from "dompurify";
 
 interface Blog {
   id: string;
@@ -17,14 +18,6 @@ interface Blog {
   image_url: string | null;
   created_at: string;
 }
-
-// Simple HTML sanitizer - removes script tags and event handlers
-const sanitizeHtml = (html: string): string => {
-  return html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/on\w+="[^"]*"/gi, '')
-    .replace(/on\w+='[^']*'/gi, '');
-};
 
 const BlogDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -152,7 +145,7 @@ const BlogDetail = () => {
 
               <div 
                 className="prose-content text-foreground/90 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: sanitizeHtml(blog.content) }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(blog.content) }}
               />
             </article>
           </div>
