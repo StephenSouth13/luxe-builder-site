@@ -6,16 +6,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, BookOpen, ShoppingBag } from "lucide-react";
 
 const AdminProducts = () => {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [filterType, setFilterType] = useState<string>("all");
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -29,7 +32,8 @@ const AdminProducts = () => {
     sizes: "",
     image_url: "",
     published: true,
-    featured: false
+    featured: false,
+    product_type: "product"
   });
 
   const { data: products = [] } = useQuery({
@@ -64,6 +68,15 @@ const AdminProducts = () => {
     }
   });
 
+  // Filter products by type
+  const filteredProducts = products.filter(p => {
+    if (filterType === 'all') return true;
+    return (p as any).product_type === filterType || (filterType === 'product' && !(p as any).product_type);
+  });
+
+  const productCount = products.filter(p => (p as any).product_type === 'product' || !(p as any).product_type).length;
+  const courseCount = products.filter(p => (p as any).product_type === 'course').length;
+
   const generateSlug = (name: string) => {
     return name
       .toLowerCase()
@@ -85,7 +98,8 @@ const AdminProducts = () => {
         stock_quantity: parseInt(data.stock_quantity),
         colors: data.colors ? data.colors.split(',').map((c: string) => c.trim()) : [],
         sizes: data.sizes ? data.sizes.split(',').map((s: string) => s.trim()) : [],
-        category_id: data.category_id || null
+        category_id: data.category_id || null,
+        product_type: data.product_type
       };
 
       if (editingProduct) {
@@ -103,7 +117,7 @@ const AdminProducts = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-products'] });
-      toast.success(editingProduct ? "Đã cập nhật sản phẩm" : "Đã thêm sản phẩm mới");
+      toast.success(editingProduct ? "Đã cập nhật" : "Đã thêm mới");
       setOpen(false);
       resetForm();
     }
@@ -119,7 +133,7 @@ const AdminProducts = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-products'] });
-      toast.success("Đã xóa sản phẩm");
+      toast.success("Đã xóa");
     }
   });
 
@@ -137,7 +151,8 @@ const AdminProducts = () => {
       sizes: "",
       image_url: "",
       published: true,
-      featured: false
+      featured: false,
+      product_type: "product"
     });
     setEditingProduct(null);
   };
@@ -157,7 +172,8 @@ const AdminProducts = () => {
       sizes: product.sizes?.join(', ') || "",
       image_url: product.image_url || "",
       published: product.published,
-      featured: product.featured
+      featured: product.featured,
+      product_type: product.product_type || "product"
     });
     setOpen(true);
   };
@@ -167,10 +183,12 @@ const AdminProducts = () => {
     saveMutation.mutate(formData);
   };
 
+  const isCourse = formData.product_type === 'course';
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Quản lý sản phẩm</h2>
+        <h2 className="text-2xl font-bold">Quản lý sản phẩm & khóa học</h2>
         <Dialog open={open} onOpenChange={(isOpen) => {
           setOpen(isOpen);
           if (!isOpen) resetForm();
@@ -178,16 +196,43 @@ const AdminProducts = () => {
           <DialogTrigger asChild>
             <Button>
               <Plus className="h-4 w-4 mr-2" />
-              Thêm sản phẩm
+              Thêm mới
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{editingProduct ? "Chỉnh sửa" : "Thêm"} sản phẩm</DialogTitle>
+              <DialogTitle>{editingProduct ? "Chỉnh sửa" : "Thêm"} {isCourse ? "khóa học" : "sản phẩm"}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Product Type Selection */}
               <div>
-                <Label htmlFor="name">Tên sản phẩm *</Label>
+                <Label>Loại</Label>
+                <Select
+                  value={formData.product_type}
+                  onValueChange={(value) => setFormData({ ...formData, product_type: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="product">
+                      <div className="flex items-center gap-2">
+                        <ShoppingBag className="h-4 w-4" />
+                        Sản phẩm
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="course">
+                      <div className="flex items-center gap-2">
+                        <BookOpen className="h-4 w-4" />
+                        Khóa học
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="name">{isCourse ? "Tên khóa học" : "Tên sản phẩm"} *</Label>
                 <Input
                   id="name"
                   required
@@ -218,7 +263,7 @@ const AdminProducts = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="brand">Hãng</Label>
+                  <Label htmlFor="brand">{isCourse ? "Giảng viên" : "Hãng"}</Label>
                   <Input
                     id="brand"
                     value={formData.brand}
@@ -252,7 +297,7 @@ const AdminProducts = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="stock">Số lượng *</Label>
+                  <Label htmlFor="stock">{isCourse ? "Số chỗ" : "Số lượng"} *</Label>
                   <Input
                     id="stock"
                     type="number"
@@ -282,27 +327,29 @@ const AdminProducts = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="colors">Màu sắc (phân cách bằng dấu phẩy)</Label>
-                  <Input
-                    id="colors"
-                    value={formData.colors}
-                    onChange={(e) => setFormData({ ...formData, colors: e.target.value })}
-                    placeholder="Đỏ, Xanh, Vàng"
-                  />
-                </div>
+              {!isCourse && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="colors">Màu sắc (phân cách bằng dấu phẩy)</Label>
+                    <Input
+                      id="colors"
+                      value={formData.colors}
+                      onChange={(e) => setFormData({ ...formData, colors: e.target.value })}
+                      placeholder="Đỏ, Xanh, Vàng"
+                    />
+                  </div>
 
-                <div>
-                  <Label htmlFor="sizes">Kích cỡ (phân cách bằng dấu phẩy)</Label>
-                  <Input
-                    id="sizes"
-                    value={formData.sizes}
-                    onChange={(e) => setFormData({ ...formData, sizes: e.target.value })}
-                    placeholder="S, M, L, XL"
-                  />
+                  <div>
+                    <Label htmlFor="sizes">Kích cỡ (phân cách bằng dấu phẩy)</Label>
+                    <Input
+                      id="sizes"
+                      value={formData.sizes}
+                      onChange={(e) => setFormData({ ...formData, sizes: e.target.value })}
+                      placeholder="S, M, L, XL"
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div>
                 <Label htmlFor="image">URL hình ảnh</Label>
@@ -347,47 +394,74 @@ const AdminProducts = () => {
         </Dialog>
       </div>
 
+      {/* Filter Tabs */}
+      <Tabs value={filterType} onValueChange={setFilterType}>
+        <TabsList>
+          <TabsTrigger value="all">Tất cả ({products.length})</TabsTrigger>
+          <TabsTrigger value="product" className="flex items-center gap-1">
+            <ShoppingBag className="h-4 w-4" />
+            Sản phẩm ({productCount})
+          </TabsTrigger>
+          <TabsTrigger value="course" className="flex items-center gap-1">
+            <BookOpen className="h-4 w-4" />
+            Khóa học ({courseCount})
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
+
       <div className="grid gap-4">
-        {products.map((product: any) => (
-          <Card key={product.id} className="p-4">
-            <div className="flex gap-4">
-              {product.image_url && (
-                <img 
-                  src={product.image_url} 
-                  alt={product.name}
-                  className="w-20 h-20 object-cover rounded"
-                />
-              )}
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg">{product.name}</h3>
-                <p className="text-sm text-muted-foreground">{product.description}</p>
-                <div className="flex gap-4 mt-2 text-sm">
-                  <span>Giá: {product.price.toLocaleString()}đ</span>
-                  {product.discount_percent > 0 && (
-                    <span className="text-green-600">-{product.discount_percent}%</span>
-                  )}
-                  <span>Tồn kho: {product.stock_quantity}</span>
+        {filteredProducts.map((product: any) => {
+          const isProductCourse = product.product_type === 'course';
+          return (
+            <Card key={product.id} className="p-4">
+              <div className="flex gap-4">
+                {product.image_url && (
+                  <img 
+                    src={product.image_url} 
+                    alt={product.name}
+                    className="w-20 h-20 object-cover rounded"
+                  />
+                )}
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-semibold text-lg">{product.name}</h3>
+                    <Badge variant={isProductCourse ? "default" : "secondary"}>
+                      {isProductCourse ? (
+                        <><BookOpen className="h-3 w-3 mr-1" /> Khóa học</>
+                      ) : (
+                        <><ShoppingBag className="h-3 w-3 mr-1" /> Sản phẩm</>
+                      )}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{product.description}</p>
+                  <div className="flex gap-4 mt-2 text-sm">
+                    <span>Giá: {product.price.toLocaleString()}đ</span>
+                    {product.discount_percent > 0 && (
+                      <span className="text-green-600">-{product.discount_percent}%</span>
+                    )}
+                    <span>{isProductCourse ? "Chỗ:" : "Tồn kho:"} {product.stock_quantity}</span>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => handleEdit(product)}>
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="destructive"
+                    onClick={() => {
+                      if (confirm('Xác nhận xóa?')) {
+                        deleteMutation.mutate(product.id);
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => handleEdit(product)}>
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                <Button 
-                  size="sm" 
-                  variant="destructive"
-                  onClick={() => {
-                    if (confirm('Xác nhận xóa sản phẩm này?')) {
-                      deleteMutation.mutate(product.id);
-                    }
-                  }}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

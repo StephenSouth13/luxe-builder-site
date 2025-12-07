@@ -543,6 +543,7 @@ export type Database = {
           images: string[] | null
           name: string
           price: number
+          product_type: string
           published: boolean | null
           sizes: string[] | null
           slug: string | null
@@ -564,6 +565,7 @@ export type Database = {
           images?: string[] | null
           name: string
           price: number
+          product_type?: string
           published?: boolean | null
           sizes?: string[] | null
           slug?: string | null
@@ -585,6 +587,7 @@ export type Database = {
           images?: string[] | null
           name?: string
           price?: number
+          product_type?: string
           published?: boolean | null
           sizes?: string[] | null
           slug?: string | null
