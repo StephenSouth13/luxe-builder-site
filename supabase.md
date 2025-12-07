@@ -237,6 +237,7 @@ CREATE TABLE public.products (
     colors TEXT[],
     sizes TEXT[],
     category_id UUID REFERENCES public.product_categories(id),
+    product_type TEXT NOT NULL DEFAULT 'product', -- 'product' hoặc 'course'
     featured BOOLEAN DEFAULT false,
     published BOOLEAN DEFAULT true,
     sort_order INTEGER DEFAULT 0,
@@ -245,6 +246,11 @@ CREATE TABLE public.products (
 );
 
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+
+-- Index cho lọc theo loại sản phẩm
+CREATE INDEX idx_products_product_type ON public.products(product_type);
+
+COMMENT ON COLUMN public.products.product_type IS 'Type of product: product or course';
 ```
 
 #### Cart Items
