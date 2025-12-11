@@ -195,6 +195,7 @@ CREATE TABLE public.blogs (
     content TEXT NOT NULL,
     image_url TEXT,
     category_id UUID REFERENCES public.blog_categories(id),
+    view_count INTEGER DEFAULT 0, -- Lượt xem bài viết
     featured BOOLEAN DEFAULT false,
     published BOOLEAN DEFAULT false,
     sort_order INTEGER DEFAULT 0,
@@ -203,6 +204,42 @@ CREATE TABLE public.blogs (
 );
 
 ALTER TABLE public.blogs ENABLE ROW LEVEL SECURITY;
+
+-- Index cho view count
+CREATE INDEX IF NOT EXISTS idx_blogs_view_count ON public.blogs(view_count DESC);
+```
+
+#### Blog Tags (Nhãn bài viết)
+```sql
+CREATE TABLE public.blog_tags (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL UNIQUE,
+    slug TEXT NOT NULL UNIQUE,
+    color TEXT DEFAULT '#6366F1',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+ALTER TABLE public.blog_tags ENABLE ROW LEVEL SECURITY;
+
+-- Index cho slug
+CREATE INDEX IF NOT EXISTS idx_blog_tags_slug ON public.blog_tags(slug);
+```
+
+#### Blog Post Tags (Liên kết bài viết và tag - Many to Many)
+```sql
+CREATE TABLE public.blog_post_tags (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    blog_id UUID NOT NULL REFERENCES public.blogs(id) ON DELETE CASCADE,
+    tag_id UUID NOT NULL REFERENCES public.blog_tags(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    UNIQUE(blog_id, tag_id)
+);
+
+ALTER TABLE public.blog_post_tags ENABLE ROW LEVEL SECURITY;
+
+-- Indexes cho performance
+CREATE INDEX IF NOT EXISTS idx_blog_post_tags_blog_id ON public.blog_post_tags(blog_id);
+CREATE INDEX IF NOT EXISTS idx_blog_post_tags_tag_id ON public.blog_post_tags(tag_id);
 ```
 
 #### Product Categories
@@ -443,6 +480,23 @@ END;
 $$;
 ```
 
+### 4. Increment Blog View Count Function
+```sql
+-- Function để tăng lượt xem bài viết
+CREATE OR REPLACE FUNCTION public.increment_blog_view(blog_slug TEXT)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+    UPDATE public.blogs 
+    SET view_count = COALESCE(view_count, 0) + 1 
+    WHERE slug = blog_slug AND published = true;
+END;
+$$;
+```
+
 ---
 
 ## Row Level Security (RLS)
@@ -580,6 +634,32 @@ USING (published = true);
 
 CREATE POLICY "Admins can manage blogs"
 ON public.blogs FOR ALL
+TO authenticated
+USING (has_role(auth.uid(), 'admin'::app_role))
+WITH CHECK (has_role(auth.uid(), 'admin'::app_role));
+```
+
+### Blog Tags Policies
+```sql
+CREATE POLICY "Anyone can view tags"
+ON public.blog_tags FOR SELECT
+USING (true);
+
+CREATE POLICY "Admins can manage tags"
+ON public.blog_tags FOR ALL
+TO authenticated
+USING (has_role(auth.uid(), 'admin'::app_role))
+WITH CHECK (has_role(auth.uid(), 'admin'::app_role));
+```
+
+### Blog Post Tags Policies
+```sql
+CREATE POLICY "Anyone can view post tags"
+ON public.blog_post_tags FOR SELECT
+USING (true);
+
+CREATE POLICY "Admins can manage post tags"
+ON public.blog_post_tags FOR ALL
 TO authenticated
 USING (has_role(auth.uid(), 'admin'::app_role))
 WITH CHECK (has_role(auth.uid(), 'admin'::app_role));

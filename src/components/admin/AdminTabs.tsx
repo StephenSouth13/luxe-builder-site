@@ -7,6 +7,7 @@ import AdminExperiences from "./AdminExperiences";
 import AdminProjects from "./AdminProjects";
 import AdminBlog from "./AdminBlog";
 import AdminBlogCategories from "./AdminBlogCategories";
+import AdminBlogTags from "./AdminBlogTags";
 import AdminContact from "./AdminContact";
 import AdminFooter from "./AdminFooter";
 import AdminSocial from "./AdminSocial";
@@ -47,12 +48,14 @@ const AdminTabs = () => {
 
       <TabsContent value="blog">
         <Tabs defaultValue="posts" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger value="posts">Bài viết</TabsTrigger>
             <TabsTrigger value="categories">Danh mục</TabsTrigger>
+            <TabsTrigger value="tags">Tags</TabsTrigger>
           </TabsList>
           <TabsContent value="posts"><AdminBlog /></TabsContent>
           <TabsContent value="categories"><AdminBlogCategories /></TabsContent>
+          <TabsContent value="tags"><AdminBlogTags /></TabsContent>
         </Tabs>
       </TabsContent>
 

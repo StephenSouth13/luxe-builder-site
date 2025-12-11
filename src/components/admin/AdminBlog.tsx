@@ -6,9 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Edit, Trash2, X } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2, X, Eye } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
@@ -24,6 +26,7 @@ interface Blog {
   published: boolean;
   sort_order: number;
   created_at: string;
+  view_count: number;
 }
 
 interface BlogCategory {
@@ -32,10 +35,19 @@ interface BlogCategory {
   color: string;
 }
 
+interface BlogTag {
+  id: string;
+  name: string;
+  slug: string;
+  color: string;
+}
+
 const AdminBlog = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [categories, setCategories] = useState<BlogCategory[]>([]);
+  const [tags, setTags] = useState<BlogTag[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -55,6 +67,7 @@ const AdminBlog = () => {
   useEffect(() => {
     fetchBlogs();
     fetchCategories();
+    fetchTags();
   }, []);
 
   const fetchBlogs = async () => {
@@ -91,6 +104,34 @@ const AdminBlog = () => {
     }
   };
 
+  const fetchTags = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("blog_tags")
+        .select("*")
+        .order("name");
+
+      if (error) throw error;
+      setTags(data || []);
+    } catch (error: any) {
+      console.error("Error fetching tags:", error);
+    }
+  };
+
+  const fetchBlogTags = async (blogId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("blog_post_tags")
+        .select("tag_id")
+        .eq("blog_id", blogId);
+
+      if (error) throw error;
+      setSelectedTags(data?.map((item) => item.tag_id) || []);
+    } catch (error: any) {
+      console.error("Error fetching blog tags:", error);
+    }
+  };
+
   const handleEdit = (blog: Blog) => {
     setEditingId(blog.id);
     setImagePreview(blog.image_url || "");
@@ -104,12 +145,14 @@ const AdminBlog = () => {
       featured: blog.featured,
       published: blog.published,
     });
+    fetchBlogTags(blog.id);
   };
 
   const handleNew = () => {
     setEditingId("new");
     setImageFile(null);
     setImagePreview("");
+    setSelectedTags([]);
     setFormData({
       title: "",
       slug: "",
@@ -126,6 +169,7 @@ const AdminBlog = () => {
     setEditingId(null);
     setImageFile(null);
     setImagePreview("");
+    setSelectedTags([]);
     setFormData({
       title: "",
       slug: "",
@@ -206,13 +250,18 @@ const AdminBlog = () => {
         published: formData.published,
       };
 
+      let blogId = editingId;
+
       if (editingId === "new") {
         const maxOrder = blogs.length > 0 ? Math.max(...blogs.map((b) => b.sort_order)) : 0;
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("blogs")
-          .insert({ ...saveData, sort_order: maxOrder + 1 });
+          .insert({ ...saveData, sort_order: maxOrder + 1 })
+          .select("id")
+          .single();
 
         if (error) throw error;
+        blogId = data.id;
         toast({ title: "Thành công", description: "Đã thêm blog mới" });
       } else {
         const { error } = await supabase
@@ -222,6 +271,21 @@ const AdminBlog = () => {
 
         if (error) throw error;
         toast({ title: "Thành công", description: "Đã cập nhật blog" });
+      }
+
+      // Save tags
+      if (blogId && blogId !== "new") {
+        // Delete existing tags
+        await supabase.from("blog_post_tags").delete().eq("blog_id", blogId);
+
+        // Insert new tags
+        if (selectedTags.length > 0) {
+          const tagInserts = selectedTags.map((tagId) => ({
+            blog_id: blogId,
+            tag_id: tagId,
+          }));
+          await supabase.from("blog_post_tags").insert(tagInserts);
+        }
       }
 
       handleCancel();
@@ -235,6 +299,12 @@ const AdminBlog = () => {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const toggleTag = (tagId: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]
+    );
   };
 
   const handleDelete = async (id: string) => {
@@ -372,6 +442,33 @@ const AdminBlog = () => {
                 />
               )}
             </div>
+
+            {/* Tags Selector */}
+            {tags.length > 0 && (
+              <div className="space-y-2">
+                <Label>Tags</Label>
+                <div className="flex flex-wrap gap-2 p-3 border rounded-md">
+                  {tags.map((tag) => (
+                    <div
+                      key={tag.id}
+                      className={`flex items-center gap-2 px-3 py-1 rounded-full cursor-pointer transition-all ${
+                        selectedTags.includes(tag.id)
+                          ? "ring-2 ring-primary"
+                          : "opacity-60 hover:opacity-100"
+                      }`}
+                      style={{ backgroundColor: `${tag.color}20`, color: tag.color }}
+                      onClick={() => toggleTag(tag.id)}
+                    >
+                      <Checkbox
+                        checked={selectedTags.includes(tag.id)}
+                        className="h-4 w-4"
+                      />
+                      <span className="text-sm">{tag.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">

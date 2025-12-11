@@ -74,6 +74,66 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_post_tags: {
+        Row: {
+          blog_id: string
+          created_at: string | null
+          id: string
+          tag_id: string
+        }
+        Insert: {
+          blog_id: string
+          created_at?: string | null
+          id?: string
+          tag_id: string
+        }
+        Update: {
+          blog_id?: string
+          created_at?: string | null
+          id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_post_tags_blog_id_fkey"
+            columns: ["blog_id"]
+            isOneToOne: false
+            referencedRelation: "blogs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blog_post_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "blog_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blog_tags: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
       blogs: {
         Row: {
           category_id: string | null
@@ -88,6 +148,7 @@ export type Database = {
           sort_order: number | null
           title: string
           updated_at: string | null
+          view_count: number | null
         }
         Insert: {
           category_id?: string | null
@@ -102,6 +163,7 @@ export type Database = {
           sort_order?: number | null
           title: string
           updated_at?: string | null
+          view_count?: number | null
         }
         Update: {
           category_id?: string | null
@@ -116,6 +178,7 @@ export type Database = {
           sort_order?: number | null
           title?: string
           updated_at?: string | null
+          view_count?: number | null
         }
         Relationships: [
           {
@@ -764,6 +827,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_blog_view: { Args: { blog_slug: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user"
