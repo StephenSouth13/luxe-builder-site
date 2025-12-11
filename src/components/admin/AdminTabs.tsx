@@ -12,6 +12,7 @@ import AdminFooter from "./AdminFooter";
 import AdminSocial from "./AdminSocial";
 import AdminSubmissions from "./AdminSubmissions";
 import AdminChatbot from "./AdminChatbot";
+import AdminNavigationSettings from "./AdminNavigationSettings";
 import AdminStore from "./AdminStore";
 
 const AdminTabs = () => {
@@ -73,11 +74,13 @@ const AdminTabs = () => {
       </TabsContent>
 
       <TabsContent value="system">
-        <Tabs defaultValue="chatbot" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
+        <Tabs defaultValue="navigation" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsTrigger value="navigation">Điều hướng</TabsTrigger>
             <TabsTrigger value="chatbot">Chatbot</TabsTrigger>
             <TabsTrigger value="submissions">Tin nhắn</TabsTrigger>
           </TabsList>
+          <TabsContent value="navigation"><AdminNavigationSettings /></TabsContent>
           <TabsContent value="chatbot"><AdminChatbot /></TabsContent>
           <TabsContent value="submissions"><AdminSubmissions /></TabsContent>
         </Tabs>
