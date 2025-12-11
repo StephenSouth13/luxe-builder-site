@@ -37,6 +37,20 @@ const Header = () => {
     }
   });
 
+  const { data: navVisibility } = useQuery({
+    queryKey: ['navigation-settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('settings')
+        .select('value')
+        .eq('key', 'navigation_visibility')
+        .single();
+      
+      if (error && error.code !== 'PGRST116') return null;
+      return data?.value ? JSON.parse(data.value) : null;
+    }
+  });
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -45,14 +59,18 @@ const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navItems = [
-    { label: t("home"), path: "/" },
-    { label: t("about"), path: "/about" },
-    { label: t("projects"), path: "/projects" },
-    { label: "Blog", path: "/blog" },
-    { label: "Cửa hàng", path: "/store" },
-    { label: t("contact"), path: "/contact" },
+  const allNavItems = [
+    { key: "home", label: t("home"), path: "/" },
+    { key: "about", label: t("about"), path: "/about" },
+    { key: "projects", label: t("projects"), path: "/projects" },
+    { key: "blog", label: "Blog", path: "/blog" },
+    { key: "store", label: "Cửa hàng", path: "/store" },
+    { key: "contact", label: t("contact"), path: "/contact" },
   ];
+
+  const navItems = allNavItems.filter(
+    (item) => !navVisibility || navVisibility[item.key] !== false
+  );
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
