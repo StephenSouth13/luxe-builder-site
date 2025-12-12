@@ -231,6 +231,51 @@ export type Database = {
           },
         ]
       }
+      certificates: {
+        Row: {
+          created_at: string | null
+          credential_id: string | null
+          credential_url: string | null
+          description: string | null
+          expiry_date: string | null
+          id: string
+          image_url: string | null
+          issue_date: string | null
+          issuer: string
+          name: string
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          credential_id?: string | null
+          credential_url?: string | null
+          description?: string | null
+          expiry_date?: string | null
+          id?: string
+          image_url?: string | null
+          issue_date?: string | null
+          issuer: string
+          name: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          credential_id?: string | null
+          credential_url?: string | null
+          description?: string | null
+          expiry_date?: string | null
+          id?: string
+          image_url?: string | null
+          issue_date?: string | null
+          issuer?: string
+          name?: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       chatbot_training: {
         Row: {
           active: boolean | null

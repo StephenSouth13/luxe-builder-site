@@ -51,6 +51,20 @@ const Header = () => {
     }
   });
 
+  const { data: storeName = "Cửa hàng" } = useQuery({
+    queryKey: ['store-name'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('settings')
+        .select('value')
+        .eq('key', 'store_name')
+        .single();
+      
+      if (error && error.code !== 'PGRST116') return "Cửa hàng";
+      return data?.value || "Cửa hàng";
+    }
+  });
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -64,7 +78,7 @@ const Header = () => {
     { key: "about", label: t("about"), path: "/about" },
     { key: "projects", label: t("projects"), path: "/projects" },
     { key: "blog", label: "Blog", path: "/blog" },
-    { key: "store", label: "Cửa hàng", path: "/store" },
+    { key: "store", label: storeName, path: "/store" },
     { key: "contact", label: t("contact"), path: "/contact" },
   ];
 
