@@ -125,6 +125,32 @@ CREATE TABLE public.experiences (
 ALTER TABLE public.experiences ENABLE ROW LEVEL SECURITY;
 ```
 
+#### Certificates (Chứng chỉ)
+```sql
+CREATE TABLE public.certificates (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL,
+    issuer TEXT NOT NULL,
+    issue_date TEXT,
+    expiry_date TEXT,
+    credential_id TEXT,
+    credential_url TEXT,
+    description TEXT,
+    image_url TEXT,
+    sort_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+ALTER TABLE public.certificates ENABLE ROW LEVEL SECURITY;
+
+-- Trigger cho updated_at
+CREATE TRIGGER update_certificates_updated_at
+BEFORE UPDATE ON public.certificates
+FOR EACH ROW
+EXECUTE FUNCTION public.update_updated_at_column();
+```
+
 #### Education
 ```sql
 CREATE TABLE public.education (

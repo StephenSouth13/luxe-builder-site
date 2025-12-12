@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import AboutSection from "@/components/About";
+import Certificates from "@/components/Certificates";
 import Education from "@/components/Education";
 import Experience from "@/components/Experience";
 import Footer from "@/components/Footer";
@@ -17,6 +18,7 @@ const About = () => {
       <Header />
       <main className="pt-20">
         <AboutSection />
+        <Certificates />
         <Education />
         <Experience />
       </main>

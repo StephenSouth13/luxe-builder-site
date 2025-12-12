@@ -15,6 +15,8 @@ import AdminSubmissions from "./AdminSubmissions";
 import AdminChatbot from "./AdminChatbot";
 import AdminNavigationSettings from "./AdminNavigationSettings";
 import AdminStore from "./AdminStore";
+import AdminCertificates from "./AdminCertificates";
+import AdminStoreSettings from "./AdminStoreSettings";
 
 const AdminTabs = () => {
   return (
@@ -29,10 +31,11 @@ const AdminTabs = () => {
 
       <TabsContent value="content">
         <Tabs defaultValue="hero" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 mb-6">
+          <TabsList className="grid w-full grid-cols-4 md:grid-cols-7 mb-6">
             <TabsTrigger value="hero">Hero</TabsTrigger>
             <TabsTrigger value="about">Về tôi</TabsTrigger>
             <TabsTrigger value="skills">Kỹ năng</TabsTrigger>
+            <TabsTrigger value="certificates">Chứng chỉ</TabsTrigger>
             <TabsTrigger value="education">Học vấn</TabsTrigger>
             <TabsTrigger value="experiences">Kinh nghiệm</TabsTrigger>
             <TabsTrigger value="projects">Dự án</TabsTrigger>
@@ -40,6 +43,7 @@ const AdminTabs = () => {
           <TabsContent value="hero"><AdminHero /></TabsContent>
           <TabsContent value="about"><AdminAbout /></TabsContent>
           <TabsContent value="skills"><AdminSkills /></TabsContent>
+          <TabsContent value="certificates"><AdminCertificates /></TabsContent>
           <TabsContent value="education"><AdminEducation /></TabsContent>
           <TabsContent value="experiences"><AdminExperiences /></TabsContent>
           <TabsContent value="projects"><AdminProjects /></TabsContent>
@@ -60,7 +64,21 @@ const AdminTabs = () => {
       </TabsContent>
 
       <TabsContent value="store">
-        <AdminStore />
+        <Tabs defaultValue="dashboard" className="w-full">
+          <TabsList className="grid w-full grid-cols-5 mb-6">
+            <TabsTrigger value="dashboard">Doanh thu</TabsTrigger>
+            <TabsTrigger value="products">Sản phẩm</TabsTrigger>
+            <TabsTrigger value="categories">Danh mục</TabsTrigger>
+            <TabsTrigger value="orders">Đơn hàng</TabsTrigger>
+            <TabsTrigger value="settings">Cài đặt</TabsTrigger>
+          </TabsList>
+          <TabsContent value="dashboard">
+            <AdminStore />
+          </TabsContent>
+          <TabsContent value="settings">
+            <AdminStoreSettings />
+          </TabsContent>
+        </Tabs>
       </TabsContent>
 
       <TabsContent value="contact">
