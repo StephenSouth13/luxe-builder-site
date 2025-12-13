@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, X, GripVertical } from "lucide-react";
+import { Loader2, Plus, X, Pencil, Trash2 } from "lucide-react";
+import SortableList from "./SortableList";
 
 interface Education {
   id: string;
@@ -190,6 +191,26 @@ const AdminEducation = () => {
     }
   };
 
+  const handleReorder = async (reorderedItems: Education[]) => {
+    setEducation(reorderedItems);
+    
+    try {
+      for (let i = 0; i < reorderedItems.length; i++) {
+        await supabase
+          .from("education")
+          .update({ sort_order: i })
+          .eq("id", reorderedItems[i].id);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Lỗi",
+        description: "Không thể cập nhật thứ tự",
+        variant: "destructive",
+      });
+      fetchEducation();
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center p-8">
@@ -306,7 +327,7 @@ const AdminEducation = () => {
                         key={index}
                         className="flex items-center gap-2 p-2 bg-background rounded border"
                       >
-                        <GripVertical className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-muted-foreground">•</span>
                         <span className="flex-1 text-sm">{achievement}</span>
                         <Button
                           type="button"
@@ -334,57 +355,32 @@ const AdminEducation = () => {
             </div>
           )}
 
-          <div className="space-y-4">
-            {education.map((edu) => (
-              <div
-                key={edu.id}
-                className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-              >
+          <SortableList
+            items={education}
+            onReorder={handleReorder}
+            renderItem={(edu) => (
+              <div className="p-4 bg-background border rounded-lg">
                 <div className="flex justify-between items-start">
                   <div className="space-y-1 flex-1">
                     <h3 className="font-semibold">{edu.degree}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {edu.institution}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{edu.institution}</p>
                     {edu.field && (
-                      <p className="text-sm text-muted-foreground">
-                        Chuyên ngành: {edu.field}
-                      </p>
+                      <p className="text-sm text-muted-foreground">Chuyên ngành: {edu.field}</p>
                     )}
                     <p className="text-sm font-medium">{edu.year}</p>
-                    {edu.description && (
-                      <p className="text-sm text-muted-foreground mt-2">
-                        {edu.description}
-                      </p>
-                    )}
-                    {edu.achievements && edu.achievements.length > 0 && (
-                      <ul className="list-disc list-inside text-sm text-muted-foreground mt-2 space-y-1">
-                        {edu.achievements.map((achievement, index) => (
-                          <li key={index}>{achievement}</li>
-                        ))}
-                      </ul>
-                    )}
                   </div>
                   <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEdit(edu)}
-                    >
-                      Sửa
+                    <Button variant="ghost" size="icon" onClick={() => handleEdit(edu)}>
+                      <Pencil className="h-4 w-4" />
                     </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDelete(edu.id)}
-                    >
-                      Xóa
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(edu.id)}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            )}
+          />
         </CardContent>
       </Card>
     </div>

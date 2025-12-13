@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Edit, Trash2, X } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, X } from "lucide-react";
+import SortableList from "./SortableList";
 
 interface Experience {
   id: string;
@@ -163,6 +164,26 @@ const AdminExperiences = () => {
     }
   };
 
+  const handleReorder = async (reorderedItems: Experience[]) => {
+    setExperiences(reorderedItems);
+    
+    try {
+      for (let i = 0; i < reorderedItems.length; i++) {
+        await supabase
+          .from("experiences")
+          .update({ sort_order: i })
+          .eq("id", reorderedItems[i].id);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Lỗi",
+        description: "Không thể cập nhật thứ tự",
+        variant: "destructive",
+      });
+      fetchExperiences();
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center p-8">
@@ -261,12 +282,11 @@ const AdminExperiences = () => {
           </form>
         )}
 
-        <div className="space-y-3">
-          {experiences.map((exp) => (
-            <div
-              key={exp.id}
-              className="p-4 border border-gold/20 rounded-md space-y-2"
-            >
+        <SortableList
+          items={experiences}
+          onReorder={handleReorder}
+          renderItem={(exp) => (
+            <div className="p-4 bg-background border rounded-lg">
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="font-semibold">{exp.title}</h3>
@@ -275,25 +295,17 @@ const AdminExperiences = () => {
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleEdit(exp)}
-                  >
-                    <Edit className="h-4 w-4" />
+                  <Button variant="ghost" size="icon" onClick={() => handleEdit(exp)}>
+                    <Pencil className="h-4 w-4" />
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDelete(exp.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
+                  <Button variant="ghost" size="icon" onClick={() => handleDelete(exp.id)}>
+                    <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+          )}
+        />
       </CardContent>
     </Card>
   );

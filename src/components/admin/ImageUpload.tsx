@@ -27,8 +27,11 @@ const ImageUpload = ({
 }: ImageUploadProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  const displayImage = previewUrl || value;
 
   const getAspectClass = () => {
     switch (aspectRatio) {
@@ -62,6 +65,13 @@ const ImageUpload = ({
       return;
     }
 
+    // Show preview immediately
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewUrl(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
     setIsUploading(true);
 
     try {
@@ -79,12 +89,14 @@ const ImageUpload = ({
 
       if (data?.publicUrl) {
         onChange(data.publicUrl);
+        setPreviewUrl("");
         toast({
           title: "Thành công",
           description: "Đã tải ảnh lên",
         });
       }
     } catch (error: any) {
+      setPreviewUrl("");
       toast({
         title: "Lỗi tải ảnh",
         description: error.message || "Không thể tải ảnh lên",
@@ -123,6 +135,14 @@ const ImageUpload = ({
 
   const handleRemove = () => {
     onChange("");
+    setPreviewUrl("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const cancelPreview = () => {
+    setPreviewUrl("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -141,34 +161,54 @@ const ImageUpload = ({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        {value ? (
+        {displayImage ? (
           <div className="relative w-full h-full">
             <img
-              src={value}
+              src={displayImage}
               alt="Preview"
-              className="w-full h-full object-cover rounded-lg"
+              className={`w-full h-full object-cover rounded-lg ${isUploading ? 'opacity-50' : ''}`}
             />
-            <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
-              <Button
-                type="button"
-                size="sm"
-                variant="secondary"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isUploading}
-              >
-                <Upload className="h-4 w-4 mr-1" />
-                Đổi ảnh
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="destructive"
-                onClick={handleRemove}
-                disabled={isUploading}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
+            {isUploading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-lg">
+                <div className="text-center">
+                  <Loader2 className="h-8 w-8 text-white animate-spin mx-auto mb-2" />
+                  <span className="text-sm text-white">Đang tải lên...</span>
+                </div>
+              </div>
+            )}
+            {!isUploading && (
+              <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload className="h-4 w-4 mr-1" />
+                  Đổi ảnh
+                </Button>
+                {previewUrl ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={cancelPreview}
+                  >
+                    <X className="h-4 w-4" />
+                    Hủy
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="destructive"
+                    onClick={handleRemove}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         ) : (
           <div
