@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import ImageUpload from "./ImageUpload";
 
 const AdminHero = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -149,31 +150,21 @@ const AdminHero = () => {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="profileImageUrl">URL ảnh đại diện</Label>
-            <Input
-              id="profileImageUrl"
-              value={profileImageUrl}
-              onChange={(e) => setProfileImageUrl(e.target.value)}
-              placeholder="https://..."
-            />
-            {profileImageUrl && (
-              <img src={profileImageUrl} alt="Preview" className="mt-2 h-32 w-32 rounded-full object-cover" />
-            )}
-          </div>
+          <ImageUpload
+            label="Ảnh đại diện"
+            value={profileImageUrl}
+            onChange={setProfileImageUrl}
+            folder="hero"
+            aspectRatio="square"
+          />
 
-          <div className="space-y-2">
-            <Label htmlFor="backgroundImageUrl">URL ảnh nền</Label>
-            <Input
-              id="backgroundImageUrl"
-              value={backgroundImageUrl}
-              onChange={(e) => setBackgroundImageUrl(e.target.value)}
-              placeholder="https://..."
-            />
-            {backgroundImageUrl && (
-              <img src={backgroundImageUrl} alt="Preview" className="mt-2 h-32 w-full object-cover rounded" />
-            )}
-          </div>
+          <ImageUpload
+            label="Ảnh nền"
+            value={backgroundImageUrl}
+            onChange={setBackgroundImageUrl}
+            folder="hero"
+            aspectRatio="banner"
+          />
 
           <Button type="submit" disabled={isSaving}>
             {isSaving ? (

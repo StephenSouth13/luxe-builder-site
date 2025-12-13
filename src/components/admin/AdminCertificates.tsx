@@ -22,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import ImageUpload from "./ImageUpload";
 
 interface Certificate {
   id: string;
@@ -277,22 +278,14 @@ const AdminCertificates = () => {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="imageUrl">URL hình ảnh chứng chỉ</Label>
-                <Input
-                  id="imageUrl"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="https://..."
-                />
-                {imageUrl && (
-                  <img
-                    src={imageUrl}
-                    alt="Preview"
-                    className="mt-2 h-32 object-cover rounded-lg"
-                  />
-                )}
-              </div>
+              <ImageUpload
+                label="Hình ảnh chứng chỉ"
+                value={imageUrl}
+                onChange={setImageUrl}
+                folder="certificates"
+                aspectRatio="video"
+                placeholder="Tải ảnh chứng chỉ lên từ máy tính"
+              />
 
               <div className="space-y-2">
                 <Label htmlFor="description">Mô tả</Label>
@@ -348,7 +341,7 @@ const AdminCertificates = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {certificates.map((cert, index) => (
+              {certificates.map((cert) => (
                 <TableRow key={cert.id}>
                   <TableCell className="text-muted-foreground">
                     <GripVertical className="h-4 w-4" />

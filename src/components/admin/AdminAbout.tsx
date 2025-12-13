@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import ImageUpload from "./ImageUpload";
 
 const AdminAbout = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -131,15 +132,13 @@ const AdminAbout = () => {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="imageUrl">URL hình ảnh (không bắt buộc)</Label>
-            <Input
-              id="imageUrl"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="https://..."
-            />
-          </div>
+          <ImageUpload
+            label="Hình ảnh (không bắt buộc)"
+            value={imageUrl}
+            onChange={setImageUrl}
+            folder="about"
+            aspectRatio="video"
+          />
 
           <Button type="submit" disabled={isSaving}>
             {isSaving ? (
