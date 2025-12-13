@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Trash2, Plus } from "lucide-react";
+import SortableList from "./SortableList";
 
 interface Skill {
   id: string;
@@ -101,6 +101,26 @@ const AdminSkills = () => {
     }
   };
 
+  const handleReorder = async (reorderedItems: Skill[]) => {
+    setSkills(reorderedItems);
+    
+    try {
+      for (let i = 0; i < reorderedItems.length; i++) {
+        await supabase
+          .from("skills")
+          .update({ sort_order: i })
+          .eq("id", reorderedItems[i].id);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Lỗi",
+        description: "Không thể cập nhật thứ tự",
+        variant: "destructive",
+      });
+      fetchSkills();
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center p-8">
@@ -132,23 +152,22 @@ const AdminSkills = () => {
           </Button>
         </form>
 
-        <div className="space-y-2">
-          {skills.map((skill) => (
-            <div
-              key={skill.id}
-              className="flex items-center justify-between p-3 border border-gold/20 rounded-md"
-            >
+        <SortableList
+          items={skills}
+          onReorder={handleReorder}
+          renderItem={(skill) => (
+            <div className="flex items-center justify-between p-3 bg-background border rounded-lg">
               <span>{skill.name}</span>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => handleDelete(skill.id)}
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-4 w-4 text-destructive" />
               </Button>
             </div>
-          ))}
-        </div>
+          )}
+        />
       </CardContent>
     </Card>
   );

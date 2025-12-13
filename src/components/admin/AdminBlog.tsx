@@ -6,13 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Edit, Trash2, X, Eye } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2, X } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import ImageUpload from "./ImageUpload";
 
 interface Blog {
   id: string;
@@ -426,22 +426,14 @@ const AdminBlog = () => {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="image">Ảnh đại diện</Label>
-              <Input
-                id="image"
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-              />
-              {imagePreview && (
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="w-full h-48 object-cover rounded-md"
-                />
-              )}
-            </div>
+            <ImageUpload
+              label="Ảnh đại diện"
+              value={formData.image_url}
+              onChange={(url) => setFormData({ ...formData, image_url: url })}
+              folder="blogs"
+              aspectRatio="video"
+              placeholder="Tải ảnh đại diện blog lên"
+            />
 
             {/* Tags Selector */}
             {tags.length > 0 && (
