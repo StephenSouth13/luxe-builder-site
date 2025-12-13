@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, Loader2, Award, GripVertical } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Award } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -14,15 +14,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import ImageUpload from "./ImageUpload";
+import SortableList from "./SortableList";
 
 interface Certificate {
   id: string;
@@ -150,6 +143,33 @@ const AdminCertificates = () => {
       });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleReorder = async (reorderedItems: Certificate[]) => {
+    setCertificates(reorderedItems);
+    
+    try {
+      const updates = reorderedItems.map((item, index) => ({
+        id: item.id,
+        name: item.name,
+        issuer: item.issuer,
+        sort_order: index,
+      }));
+
+      for (const update of updates) {
+        await supabase
+          .from("certificates")
+          .update({ sort_order: update.sort_order })
+          .eq("id", update.id);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Lỗi",
+        description: "Không thể cập nhật thứ tự",
+        variant: "destructive",
+      });
+      fetchCertificates();
     }
   };
 
@@ -330,58 +350,45 @@ const AdminCertificates = () => {
             Chưa có chứng chỉ nào. Nhấn "Thêm chứng chỉ" để bắt đầu.
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-10">#</TableHead>
-                <TableHead>Tên chứng chỉ</TableHead>
-                <TableHead>Tổ chức cấp</TableHead>
-                <TableHead>Ngày cấp</TableHead>
-                <TableHead className="text-right">Thao tác</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {certificates.map((cert) => (
-                <TableRow key={cert.id}>
-                  <TableCell className="text-muted-foreground">
-                    <GripVertical className="h-4 w-4" />
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    <div className="flex items-center gap-3">
-                      {cert.image_url && (
-                        <img
-                          src={cert.image_url}
-                          alt={cert.name}
-                          className="h-10 w-10 object-cover rounded"
-                        />
-                      )}
-                      {cert.name}
+          <SortableList
+            items={certificates}
+            onReorder={handleReorder}
+            renderItem={(cert) => (
+              <div className="flex items-center justify-between p-3 bg-background border rounded-lg">
+                <div className="flex items-center gap-3">
+                  {cert.image_url && (
+                    <img
+                      src={cert.image_url}
+                      alt={cert.name}
+                      className="h-10 w-10 object-cover rounded"
+                    />
+                  )}
+                  <div>
+                    <div className="font-medium">{cert.name}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {cert.issuer} {cert.issue_date && `• ${cert.issue_date}`}
                     </div>
-                  </TableCell>
-                  <TableCell>{cert.issuer}</TableCell>
-                  <TableCell>{cert.issue_date || "-"}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => openEditDialog(cert)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(cert.id)}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => openEditDialog(cert)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDelete(cert.id)}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          />
         )}
       </CardContent>
     </Card>

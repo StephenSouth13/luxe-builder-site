@@ -10,9 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, BookOpen, ShoppingBag } from "lucide-react";
+import ImageUpload from "../ImageUpload";
 
 const AdminProducts = () => {
   const queryClient = useQueryClient();
@@ -351,15 +352,14 @@ const AdminProducts = () => {
                 </div>
               )}
 
-              <div>
-                <Label htmlFor="image">URL hình ảnh</Label>
-                <Input
-                  id="image"
-                  type="url"
-                  value={formData.image_url}
-                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                />
-              </div>
+              <ImageUpload
+                label={isCourse ? "Hình ảnh khóa học" : "Hình ảnh sản phẩm"}
+                value={formData.image_url}
+                onChange={(url) => setFormData({ ...formData, image_url: url })}
+                folder="products"
+                aspectRatio="video"
+                placeholder={isCourse ? "Tải ảnh khóa học lên" : "Tải ảnh sản phẩm lên"}
+              />
 
               <div className="flex items-center gap-4">
                 <div className="flex items-center space-x-2">
