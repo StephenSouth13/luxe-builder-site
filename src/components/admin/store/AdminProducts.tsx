@@ -14,6 +14,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, BookOpen, ShoppingBag } from "lucide-react";
 import ImageUpload from "../ImageUpload";
+import MultiImageUpload from "../MultiImageUpload";
 
 const AdminProducts = () => {
   const queryClient = useQueryClient();
@@ -32,6 +33,7 @@ const AdminProducts = () => {
     colors: "",
     sizes: "",
     image_url: "",
+    images: [] as string[],
     published: true,
     featured: false,
     product_type: "product"
@@ -100,7 +102,8 @@ const AdminProducts = () => {
         colors: data.colors ? data.colors.split(',').map((c: string) => c.trim()) : [],
         sizes: data.sizes ? data.sizes.split(',').map((s: string) => s.trim()) : [],
         category_id: data.category_id || null,
-        product_type: data.product_type
+        product_type: data.product_type,
+        images: data.images || []
       };
 
       if (editingProduct) {
@@ -151,6 +154,7 @@ const AdminProducts = () => {
       colors: "",
       sizes: "",
       image_url: "",
+      images: [],
       published: true,
       featured: false,
       product_type: "product"
@@ -172,6 +176,7 @@ const AdminProducts = () => {
       colors: product.colors?.join(', ') || "",
       sizes: product.sizes?.join(', ') || "",
       image_url: product.image_url || "",
+      images: product.images || [],
       published: product.published,
       featured: product.featured,
       product_type: product.product_type || "product"
@@ -353,13 +358,24 @@ const AdminProducts = () => {
               )}
 
               <ImageUpload
-                label={isCourse ? "Hình ảnh khóa học" : "Hình ảnh sản phẩm"}
+                label={isCourse ? "Hình ảnh khóa học" : "Hình ảnh chính"}
                 value={formData.image_url}
                 onChange={(url) => setFormData({ ...formData, image_url: url })}
                 folder="products"
                 aspectRatio="video"
-                placeholder={isCourse ? "Tải ảnh khóa học lên" : "Tải ảnh sản phẩm lên"}
+                placeholder={isCourse ? "Tải ảnh khóa học lên" : "Tải ảnh chính lên"}
               />
+
+              {!isCourse && (
+                <MultiImageUpload
+                  label="Ảnh gallery sản phẩm"
+                  value={formData.images}
+                  onChange={(urls) => setFormData({ ...formData, images: urls })}
+                  folder="products/gallery"
+                  maxImages={8}
+                  placeholder="Kéo thả hoặc click để thêm ảnh gallery"
+                />
+              )}
 
               <div className="flex items-center gap-4">
                 <div className="flex items-center space-x-2">
