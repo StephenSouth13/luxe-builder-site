@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { List } from "lucide-react";
+import { List, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface TOCItem {
   id: string;
@@ -15,6 +16,7 @@ interface TableOfContentsProps {
 const TableOfContents = ({ content }: TableOfContentsProps) => {
   const [headings, setHeadings] = useState<TOCItem[]>([]);
   const [activeId, setActiveId] = useState<string>("");
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     // Parse headings from HTML content
@@ -27,7 +29,9 @@ const TableOfContents = ({ content }: TableOfContentsProps) => {
       const id = `heading-${index}`;
       const text = el.textContent || "";
       const level = parseInt(el.tagName[1]);
-      items.push({ id, text, level });
+      if (text.trim()) {
+        items.push({ id, text: text.trim(), level });
+      }
     });
     
     setHeadings(items);
@@ -43,6 +47,14 @@ const TableOfContents = ({ content }: TableOfContentsProps) => {
       });
     }
 
+    const handleScroll = () => {
+      // Calculate reading progress
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollProgress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      setProgress(Math.min(100, Math.max(0, scrollProgress)));
+    };
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -51,7 +63,7 @@ const TableOfContents = ({ content }: TableOfContentsProps) => {
           }
         });
       },
-      { rootMargin: "-20% 0% -35% 0%" }
+      { rootMargin: "-20% 0% -60% 0%" }
     );
 
     headings.forEach(({ id }) => {
@@ -59,40 +71,93 @@ const TableOfContents = ({ content }: TableOfContentsProps) => {
       if (element) observer.observe(element);
     });
 
-    return () => observer.disconnect();
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, [headings]);
 
   if (headings.length === 0) return null;
 
+  const activeIndex = headings.findIndex((h) => h.id === activeId);
+
   return (
-    <div className="sticky top-24 p-4 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50">
-      <div className="flex items-center gap-2 mb-4 text-sm font-semibold text-foreground">
-        <List className="h-4 w-4" />
-        Mục lục
+    <div className="p-4 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 overflow-hidden">
+      {/* Progress Bar */}
+      <div className="h-1 bg-muted rounded-full mb-4 overflow-hidden">
+        <motion.div
+          className="h-full bg-gradient-to-r from-primary to-accent"
+          initial={{ width: 0 }}
+          animate={{ width: `${progress}%` }}
+          transition={{ duration: 0.1 }}
+        />
       </div>
-      <nav className="space-y-1">
-        {headings.map((heading) => (
-          <a
-            key={heading.id}
-            href={`#${heading.id}`}
-            className={cn(
-              "block text-sm py-1 transition-colors hover:text-primary",
-              heading.level === 2 && "pl-0",
-              heading.level === 3 && "pl-4",
-              activeId === heading.id
-                ? "text-primary font-medium"
-                : "text-muted-foreground"
-            )}
-            onClick={(e) => {
-              e.preventDefault();
-              document.getElementById(heading.id)?.scrollIntoView({
-                behavior: "smooth",
-              });
-            }}
-          >
-            {heading.text}
-          </a>
-        ))}
+
+      <div className="flex items-center gap-2 mb-4 text-sm font-semibold text-foreground">
+        <List className="h-4 w-4 text-primary" />
+        <span>Mục lục</span>
+        <span className="text-xs text-muted-foreground ml-auto">
+          {activeIndex + 1}/{headings.length}
+        </span>
+      </div>
+
+      <nav className="space-y-0.5 relative">
+        {/* Active indicator line */}
+        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-border/50 rounded-full" />
+        
+        {headings.map((heading, index) => {
+          const isActive = activeId === heading.id;
+          const isPast = activeIndex > index;
+
+          return (
+            <a
+              key={heading.id}
+              href={`#${heading.id}`}
+              className={cn(
+                "relative flex items-center text-sm py-1.5 transition-all duration-200",
+                heading.level === 1 && "pl-3 font-medium",
+                heading.level === 2 && "pl-3",
+                heading.level === 3 && "pl-6 text-xs",
+                isActive
+                  ? "text-primary font-medium"
+                  : isPast
+                  ? "text-muted-foreground"
+                  : "text-muted-foreground/80 hover:text-foreground"
+              )}
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById(heading.id)?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }}
+            >
+              {/* Active/Past indicator */}
+              <AnimatePresence>
+                {(isActive || isPast) && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                    className={cn(
+                      "absolute left-0 w-0.5 rounded-full",
+                      isActive ? "bg-primary h-full" : "bg-muted-foreground/30 h-full"
+                    )}
+                  />
+                )}
+              </AnimatePresence>
+
+              {isActive && (
+                <ChevronRight className="h-3 w-3 mr-1 text-primary flex-shrink-0" />
+              )}
+              
+              <span className="truncate">{heading.text}</span>
+            </a>
+          );
+        })}
       </nav>
     </div>
   );
