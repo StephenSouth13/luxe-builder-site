@@ -1,1 +1,4 @@
 project_id = "hcigjefjrtkroeitictp"
+
+[functions.publish-scheduled-blogs]
+verify_jwt = false
