@@ -17,6 +17,7 @@ import AdminNavigationSettings from "./AdminNavigationSettings";
 import AdminStore from "./AdminStore";
 import AdminCertificates from "./AdminCertificates";
 import AdminStoreSettings from "./AdminStoreSettings";
+import AdminThemeSettings from "./AdminThemeSettings";
 
 const AdminTabs = () => {
   return (
@@ -95,12 +96,14 @@ const AdminTabs = () => {
       </TabsContent>
 
       <TabsContent value="system">
-        <Tabs defaultValue="navigation" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6">
+        <Tabs defaultValue="theme" className="w-full">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
+            <TabsTrigger value="theme">Theme</TabsTrigger>
             <TabsTrigger value="navigation">Điều hướng</TabsTrigger>
             <TabsTrigger value="chatbot">Chatbot</TabsTrigger>
             <TabsTrigger value="submissions">Tin nhắn</TabsTrigger>
           </TabsList>
+          <TabsContent value="theme"><AdminThemeSettings /></TabsContent>
           <TabsContent value="navigation"><AdminNavigationSettings /></TabsContent>
           <TabsContent value="chatbot"><AdminChatbot /></TabsContent>
           <TabsContent value="submissions"><AdminSubmissions /></TabsContent>
