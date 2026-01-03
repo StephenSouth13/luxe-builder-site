@@ -10,8 +10,10 @@ import {
   Loader2, Plus, Edit, Trash2, X, Eye, EyeOff, Star, 
   FileText, Image as ImageIcon, Type, AlignLeft, Tags, 
   Palette, Save, ChevronDown, ChevronUp, LayoutGrid, List as ListIcon,
-  Clock, TrendingUp
+  Clock, TrendingUp, CalendarClock, Timer
 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -36,6 +38,7 @@ interface Blog {
   sort_order: number;
   created_at: string;
   view_count: number;
+  scheduled_at: string | null;
 }
 
 interface BlogCategory {
@@ -70,7 +73,10 @@ const AdminBlog = () => {
     category_id: "",
     featured: false,
     published: false,
+    scheduled_at: null as Date | null,
   });
+  const [scheduleMode, setScheduleMode] = useState<"now" | "schedule">("now");
+  const [scheduleTime, setScheduleTime] = useState("09:00");
   const [isSaving, setIsSaving] = useState(false);
   const [wordCount, setWordCount] = useState(0);
   const [readingTime, setReadingTime] = useState(0);
@@ -163,7 +169,13 @@ const AdminBlog = () => {
       category_id: blog.category_id || "",
       featured: blog.featured,
       published: blog.published,
+      scheduled_at: blog.scheduled_at ? new Date(blog.scheduled_at) : null,
     });
+    setScheduleMode(blog.scheduled_at ? "schedule" : "now");
+    if (blog.scheduled_at) {
+      const date = new Date(blog.scheduled_at);
+      setScheduleTime(`${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`);
+    }
     fetchBlogTags(blog.id);
     setEditorTab("content");
   };
@@ -180,7 +192,10 @@ const AdminBlog = () => {
       category_id: "",
       featured: false,
       published: false,
+      scheduled_at: null,
     });
+    setScheduleMode("now");
+    setScheduleTime("09:00");
     setEditorTab("content");
   };
 
@@ -196,7 +211,10 @@ const AdminBlog = () => {
       category_id: "",
       featured: false,
       published: false,
+      scheduled_at: null,
     });
+    setScheduleMode("now");
+    setScheduleTime("09:00");
   };
 
   const generateSlug = useCallback((title: string) => {
@@ -219,6 +237,15 @@ const AdminBlog = () => {
     try {
       const slug = formData.slug || generateSlug(formData.title);
 
+      // Calculate scheduled_at timestamp if in schedule mode
+      let scheduledTimestamp: string | null = null;
+      if (scheduleMode === "schedule" && formData.scheduled_at) {
+        const [hours, minutes] = scheduleTime.split(":").map(Number);
+        const scheduledDate = new Date(formData.scheduled_at);
+        scheduledDate.setHours(hours, minutes, 0, 0);
+        scheduledTimestamp = scheduledDate.toISOString();
+      }
+
       const saveData = {
         title: formData.title,
         slug: slug,
@@ -227,7 +254,8 @@ const AdminBlog = () => {
         image_url: formData.image_url || null,
         category_id: formData.category_id || null,
         featured: formData.featured,
-        published: formData.published,
+        published: scheduleMode === "now" ? formData.published : false,
+        scheduled_at: scheduledTimestamp,
       };
 
       let blogId = editingId;
@@ -595,6 +623,108 @@ const AdminBlog = () => {
               </Card>
             </Collapsible>
 
+            {/* Schedule Publishing */}
+            <Card className="border-border/50">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-medium flex items-center gap-2">
+                  <CalendarClock className="h-4 w-4 text-primary" />
+                  Lên lịch xuất bản
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant={scheduleMode === "now" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => {
+                      setScheduleMode("now");
+                      setFormData({ ...formData, scheduled_at: null });
+                    }}
+                    className="flex-1 gap-2"
+                  >
+                    <Eye className="h-4 w-4" />
+                    Xuất bản ngay
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={scheduleMode === "schedule" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setScheduleMode("schedule")}
+                    className="flex-1 gap-2"
+                  >
+                    <Timer className="h-4 w-4" />
+                    Hẹn giờ
+                  </Button>
+                </div>
+
+                {scheduleMode === "schedule" && (
+                  <div className="space-y-3 p-3 rounded-lg bg-muted/30">
+                    <div className="space-y-2">
+                      <Label className="text-sm">Chọn ngày</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start text-left font-normal"
+                          >
+                            <CalendarClock className="mr-2 h-4 w-4" />
+                            {formData.scheduled_at
+                              ? formData.scheduled_at.toLocaleDateString("vi-VN", {
+                                  weekday: "long",
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                })
+                              : "Chọn ngày xuất bản"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={formData.scheduled_at || undefined}
+                            onSelect={(date) =>
+                              setFormData({ ...formData, scheduled_at: date || null })
+                            }
+                            disabled={(date) => date < new Date()}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm">Giờ xuất bản</Label>
+                      <Input
+                        type="time"
+                        value={scheduleTime}
+                        onChange={(e) => setScheduleTime(e.target.value)}
+                        className="w-full"
+                      />
+                    </div>
+
+                    {formData.scheduled_at && (
+                      <div className="p-2 rounded bg-primary/10 text-sm">
+                        <p className="text-primary font-medium flex items-center gap-2">
+                          <Timer className="h-4 w-4" />
+                          Sẽ tự động xuất bản vào:
+                        </p>
+                        <p className="mt-1 text-foreground">
+                          {formData.scheduled_at.toLocaleDateString("vi-VN", {
+                            weekday: "long",
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })}{" "}
+                          lúc {scheduleTime}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             {/* Tags */}
             {tags.length > 0 && (
               <Card className="border-border/50">
@@ -763,7 +893,12 @@ const AdminBlog = () => {
                           <Star className="h-3 w-3 mr-1" /> Nổi bật
                         </Badge>
                       )}
-                      {!blog.published && (
+                      {blog.scheduled_at && !blog.published && (
+                        <Badge className="bg-blue-500 hover:bg-blue-600">
+                          <Timer className="h-3 w-3 mr-1" /> Đã lên lịch
+                        </Badge>
+                      )}
+                      {!blog.published && !blog.scheduled_at && (
                         <Badge variant="secondary">
                           <EyeOff className="h-3 w-3 mr-1" /> Nháp
                         </Badge>
@@ -853,7 +988,13 @@ const AdminBlog = () => {
                     {blog.featured && (
                       <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
                     )}
-                    {!blog.published && (
+                    {blog.scheduled_at && !blog.published && (
+                      <Badge className="text-xs bg-blue-500 hover:bg-blue-600">
+                        <Timer className="h-3 w-3 mr-1" /> 
+                        {new Date(blog.scheduled_at).toLocaleDateString("vi-VN")}
+                      </Badge>
+                    )}
+                    {!blog.published && !blog.scheduled_at && (
                       <Badge variant="secondary" className="text-xs">Nháp</Badge>
                     )}
                   </div>
