@@ -139,6 +139,114 @@ All colors MUST be HSL.
     --dark: 0 40% 15%;
   }
 
+  /* ============ SEASONAL THEMES ============ */
+
+  /* Spring - Fresh, hopeful, light */
+  .theme-spring {
+    --background: 335 30% 98%;
+    --foreground: 142 40% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 142 40% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 142 40% 15%;
+    --primary: 330 80% 65%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 82 60% 85%;
+    --secondary-foreground: 142 40% 15%;
+    --muted: 330 20% 94%;
+    --muted-foreground: 330 20% 40%;
+    --accent: 82 70% 45%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 330 25% 88%;
+    --input: 330 25% 88%;
+    --ring: 330 80% 65%;
+    --gold: 330 80% 65%;
+    --gold-light: 82 70% 55%;
+    --dark: 142 40% 15%;
+  }
+
+  /* Summer - Energetic, bright, ocean */
+  .theme-summer {
+    --background: 199 30% 97%;
+    --foreground: 199 50% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 199 50% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 199 50% 15%;
+    --primary: 199 90% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 45 95% 70%;
+    --secondary-foreground: 199 50% 15%;
+    --muted: 199 20% 94%;
+    --muted-foreground: 199 25% 40%;
+    --accent: 45 95% 55%;
+    --accent-foreground: 199 50% 15%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 199 25% 88%;
+    --input: 199 25% 88%;
+    --ring: 199 90% 55%;
+    --gold: 45 95% 55%;
+    --gold-light: 45 90% 65%;
+    --dark: 199 50% 15%;
+  }
+
+  /* Autumn - Warm, deep, emotional */
+  .theme-autumn {
+    --background: 20 15% 8%;
+    --foreground: 35 20% 92%;
+    --card: 20 15% 12%;
+    --card-foreground: 35 20% 92%;
+    --popover: 20 15% 12%;
+    --popover-foreground: 35 20% 92%;
+    --primary: 25 90% 48%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 30 60% 25%;
+    --secondary-foreground: 35 20% 92%;
+    --muted: 20 12% 18%;
+    --muted-foreground: 35 15% 55%;
+    --accent: 15 70% 35%;
+    --accent-foreground: 35 20% 92%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 20 15% 22%;
+    --input: 20 15% 22%;
+    --ring: 25 90% 48%;
+    --gold: 25 90% 48%;
+    --gold-light: 35 80% 55%;
+    --dark: 20 15% 8%;
+  }
+
+  /* Winter - Cold, elegant, frost */
+  .theme-winter {
+    --background: 210 25% 97%;
+    --foreground: 215 30% 20%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 30% 20%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 30% 20%;
+    --primary: 215 20% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 15% 92%;
+    --secondary-foreground: 215 30% 20%;
+    --muted: 210 18% 94%;
+    --muted-foreground: 215 15% 45%;
+    --accent: 200 30% 70%;
+    --accent-foreground: 215 30% 20%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 210 20% 88%;
+    --input: 210 20% 88%;
+    --ring: 215 20% 50%;
+    --gold: 215 20% 50%;
+    --gold-light: 200 25% 65%;
+    --dark: 215 30% 20%;
+  }
+
+  /* ============ FESTIVAL THEMES ============ */
+
   /* Tết / Lunar New Year - Red & Gold on Cream */
   .theme-tet {
     --background: 40 30% 96%;
@@ -215,6 +323,84 @@ All colors MUST be HSL.
     --gold: 24 95% 53%;
     --gold-light: 24 90% 63%;
     --dark: 30 15% 8%;
+  }
+
+  /* Valentine - Pink & Red romance */
+  .theme-valentine {
+    --background: 335 50% 97%;
+    --foreground: 335 50% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 335 50% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 335 50% 15%;
+    --primary: 330 80% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 350 70% 90%;
+    --secondary-foreground: 335 50% 15%;
+    --muted: 335 30% 94%;
+    --muted-foreground: 335 25% 45%;
+    --accent: 350 85% 45%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 335 30% 88%;
+    --input: 335 30% 88%;
+    --ring: 330 80% 55%;
+    --gold: 330 80% 55%;
+    --gold-light: 350 75% 65%;
+    --dark: 335 50% 15%;
+  }
+
+  /* Vietnam National Day - Red & Yellow minimal */
+  .theme-vietnam-national {
+    --background: 0 30% 97%;
+    --foreground: 0 70% 20%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 70% 20%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 70% 20%;
+    --primary: 0 85% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 45 95% 55%;
+    --secondary-foreground: 0 70% 20%;
+    --muted: 0 20% 94%;
+    --muted-foreground: 0 30% 45%;
+    --accent: 45 95% 50%;
+    --accent-foreground: 0 70% 20%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 25% 88%;
+    --input: 0 25% 88%;
+    --ring: 0 85% 50%;
+    --gold: 45 95% 50%;
+    --gold-light: 45 90% 60%;
+    --dark: 0 70% 20%;
+  }
+
+  /* New Year - Neon party on dark */
+  .theme-new-year {
+    --background: 260 20% 6%;
+    --foreground: 0 0% 98%;
+    --card: 260 18% 10%;
+    --card-foreground: 0 0% 98%;
+    --popover: 260 18% 10%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 265 85% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 45 95% 55%;
+    --secondary-foreground: 260 20% 10%;
+    --muted: 260 15% 18%;
+    --muted-foreground: 260 10% 60%;
+    --accent: 45 95% 55%;
+    --accent-foreground: 260 20% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 260 15% 22%;
+    --input: 260 15% 22%;
+    --ring: 265 85% 60%;
+    --gold: 45 95% 55%;
+    --gold-light: 45 90% 65%;
+    --dark: 260 20% 6%;
   }
 
   /* Light mode overrides - only for gold-black theme */

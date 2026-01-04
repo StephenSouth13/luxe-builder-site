@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { useColorTheme, themeConfigs, ColorTheme } from "@/hooks/useColorTheme";
-import { Palette, Sparkles, Check, Loader2 } from "lucide-react";
+import { useColorTheme, themeConfigs, ColorTheme, ThemeConfig } from "@/hooks/useColorTheme";
+import { Palette, Sparkles, Check, Loader2, Sun, Snowflake, Leaf, Flower2, PartyPopper } from "lucide-react";
 
 const AdminThemeSettings = () => {
   const { colorTheme, updateColorTheme, isLoading } = useColorTheme();
@@ -32,8 +31,9 @@ const AdminThemeSettings = () => {
     }
   };
 
-  const standardThemes = themeConfigs.filter(t => !t.isEvent);
-  const eventThemes = themeConfigs.filter(t => t.isEvent);
+  const standardThemes = themeConfigs.filter(t => t.category === "standard");
+  const seasonThemes = themeConfigs.filter(t => t.category === "season");
+  const festivalThemes = themeConfigs.filter(t => t.category === "festival");
 
   if (isLoading) {
     return (
@@ -45,18 +45,19 @@ const AdminThemeSettings = () => {
 
   return (
     <div className="space-y-6">
+      {/* Standard Themes */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Palette className="h-5 w-5" />
-            Theme màu sắc
+            Theme cơ bản
           </CardTitle>
           <CardDescription>
-            Chọn theme màu sắc cho toàn bộ website. Thay đổi sẽ được áp dụng ngay lập tức.
+            Các bảng màu cơ bản cho website.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {standardThemes.map((theme) => (
               <ThemeCard
                 key={theme.id}
@@ -70,26 +71,52 @@ const AdminThemeSettings = () => {
         </CardContent>
       </Card>
 
+      {/* Seasonal Themes */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5" />
-            Theme sự kiện
+            <Sun className="h-5 w-5" />
+            Theme theo mùa
           </CardTitle>
           <CardDescription>
-            Theme đặc biệt theo mùa và sự kiện lễ hội.
+            Thay đổi giao diện theo mùa trong năm với hiệu ứng đặc biệt.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {eventThemes.map((theme) => (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {seasonThemes.map((theme) => (
               <ThemeCard
                 key={theme.id}
                 theme={theme}
                 isActive={colorTheme === theme.id}
                 onClick={() => handleThemeChange(theme.id)}
                 disabled={saving}
-                isEvent
+              />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Festival Themes */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <PartyPopper className="h-5 w-5" />
+            Theme lễ hội
+          </CardTitle>
+          <CardDescription>
+            Theme đặc biệt cho các dịp lễ và sự kiện trong năm.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {festivalThemes.map((theme) => (
+              <ThemeCard
+                key={theme.id}
+                theme={theme}
+                isActive={colorTheme === theme.id}
+                onClick={() => handleThemeChange(theme.id)}
+                disabled={saving}
               />
             ))}
           </div>
@@ -100,14 +127,16 @@ const AdminThemeSettings = () => {
 };
 
 interface ThemeCardProps {
-  theme: typeof themeConfigs[0];
+  theme: ThemeConfig;
   isActive: boolean;
   onClick: () => void;
   disabled?: boolean;
-  isEvent?: boolean;
 }
 
-const ThemeCard = ({ theme, isActive, onClick, disabled, isEvent }: ThemeCardProps) => {
+const ThemeCard = ({ theme, isActive, onClick, disabled }: ThemeCardProps) => {
+  const isSeason = theme.category === "season";
+  const isFestival = theme.category === "festival";
+
   return (
     <button
       onClick={onClick}
@@ -121,26 +150,42 @@ const ThemeCard = ({ theme, isActive, onClick, disabled, isEvent }: ThemeCardPro
       {/* Preview colors */}
       <div className="flex gap-2 mb-3">
         <div
-          className="w-10 h-10 rounded-lg shadow-inner"
+          className="w-8 h-8 rounded-lg shadow-inner"
           style={{ backgroundColor: theme.preview.background }}
         />
         <div
-          className="w-10 h-10 rounded-lg shadow-inner"
+          className="w-8 h-8 rounded-lg shadow-inner"
           style={{ backgroundColor: theme.preview.primary }}
         />
+        {theme.preview.accent && (
+          <div
+            className="w-8 h-8 rounded-lg shadow-inner"
+            style={{ backgroundColor: theme.preview.accent }}
+          />
+        )}
       </div>
 
-      {/* Theme name */}
+      {/* Theme name with icon */}
       <div className="space-y-1">
-        <p className="font-medium text-sm">{theme.nameVi}</p>
+        <p className="font-medium text-sm flex items-center gap-1.5">
+          {theme.icon && <span>{theme.icon}</span>}
+          {theme.nameVi}
+        </p>
         <p className="text-xs text-muted-foreground">{theme.name}</p>
+        {theme.description && (
+          <p className="text-xs text-muted-foreground/70 mt-1">{theme.description}</p>
+        )}
       </div>
 
-      {/* Event badge */}
-      {isEvent && (
-        <Badge variant="secondary" className="absolute top-2 right-2 text-xs">
-          <Sparkles className="h-3 w-3 mr-1" />
-          Sự kiện
+      {/* Category badge */}
+      {(isSeason || isFestival) && (
+        <Badge 
+          variant="secondary" 
+          className={`absolute top-2 right-2 text-xs ${
+            isSeason ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"
+          }`}
+        >
+          {isSeason ? "Mùa" : "Lễ hội"}
         </Badge>
       )}
 
