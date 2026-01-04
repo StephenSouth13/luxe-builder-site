@@ -1,5 +1,7 @@
 import { useEffect, useState, createContext, useContext, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { motion, AnimatePresence } from "framer-motion";
+import { Sparkles, SparklesIcon } from "lucide-react";
 import ThemeParticles from "./ThemeParticles";
 
 type ColorTheme = 
@@ -22,18 +24,80 @@ type ColorTheme =
 interface ColorThemeContextType {
   colorTheme: ColorTheme;
   isLoading: boolean;
+  particlesEnabled: boolean;
+  toggleParticles: () => void;
 }
 
 const ColorThemeContext = createContext<ColorThemeContextType>({
   colorTheme: "gold-black",
   isLoading: true,
+  particlesEnabled: true,
+  toggleParticles: () => {},
 });
 
 export const useColorThemeContext = () => useContext(ColorThemeContext);
 
+// Check if theme has particles
+const themeHasParticles = (theme: ColorTheme): boolean => {
+  return ['spring', 'summer', 'autumn', 'winter', 'christmas', 'tet', 'valentine', 'new-year'].includes(theme);
+};
+
+// Particle Toggle Button Component
+const ParticleToggle = ({ enabled, onToggle, theme }: { enabled: boolean; onToggle: () => void; theme: ColorTheme }) => {
+  if (!themeHasParticles(theme)) return null;
+
+  return (
+    <motion.button
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.9 }}
+      onClick={onToggle}
+      className="fixed bottom-4 left-4 z-50 p-3 rounded-full bg-background/80 backdrop-blur-sm border border-border shadow-lg hover:bg-background transition-colors"
+      title={enabled ? "Tắt hiệu ứng" : "Bật hiệu ứng"}
+    >
+      <AnimatePresence mode="wait">
+        {enabled ? (
+          <motion.div
+            key="on"
+            initial={{ rotate: -180, opacity: 0 }}
+            animate={{ rotate: 0, opacity: 1 }}
+            exit={{ rotate: 180, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Sparkles className="w-5 h-5 text-primary" />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="off"
+            initial={{ rotate: -180, opacity: 0 }}
+            animate={{ rotate: 0, opacity: 1 }}
+            exit={{ rotate: 180, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <SparklesIcon className="w-5 h-5 text-muted-foreground" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.button>
+  );
+};
+
 export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
   const [colorTheme, setColorTheme] = useState<ColorTheme>("gold-black");
   const [isLoading, setIsLoading] = useState(true);
+  const [particlesEnabled, setParticlesEnabled] = useState(() => {
+    const saved = localStorage.getItem('particles-enabled');
+    return saved !== null ? saved === 'true' : true;
+  });
+
+  const toggleParticles = () => {
+    setParticlesEnabled(prev => {
+      const newValue = !prev;
+      localStorage.setItem('particles-enabled', String(newValue));
+      return newValue;
+    });
+  };
 
   useEffect(() => {
     const fetchTheme = async () => {
@@ -109,8 +173,9 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
   }, [colorTheme, isLoading]);
 
   return (
-    <ColorThemeContext.Provider value={{ colorTheme, isLoading }}>
-      <ThemeParticles theme={colorTheme} />
+    <ColorThemeContext.Provider value={{ colorTheme, isLoading, particlesEnabled, toggleParticles }}>
+      {particlesEnabled && <ThemeParticles theme={colorTheme} />}
+      <ParticleToggle enabled={particlesEnabled} onToggle={toggleParticles} theme={colorTheme} />
       {children}
     </ColorThemeContext.Provider>
   );
