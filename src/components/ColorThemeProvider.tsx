@@ -1,5 +1,6 @@
 import { useEffect, useState, createContext, useContext, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import ThemeParticles from "./ThemeParticles";
 
 type ColorTheme = 
   | "gold-black" 
@@ -7,9 +8,16 @@ type ColorTheme =
   | "blue-white" 
   | "purple-white"
   | "red-white"
+  | "spring"
+  | "summer"
+  | "autumn"
+  | "winter"
   | "tet" 
   | "christmas" 
-  | "halloween";
+  | "halloween"
+  | "valentine"
+  | "vietnam-national"
+  | "new-year";
 
 interface ColorThemeContextType {
   colorTheme: ColorTheme;
@@ -83,9 +91,16 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
         "theme-blue-white",
         "theme-purple-white",
         "theme-red-white",
+        "theme-spring",
+        "theme-summer",
+        "theme-autumn",
+        "theme-winter",
         "theme-tet",
         "theme-christmas",
-        "theme-halloween"
+        "theme-halloween",
+        "theme-valentine",
+        "theme-vietnam-national",
+        "theme-new-year"
       );
       
       // Add the new theme class
@@ -95,6 +110,7 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <ColorThemeContext.Provider value={{ colorTheme, isLoading }}>
+      <ThemeParticles theme={colorTheme} />
       {children}
     </ColorThemeContext.Provider>
   );
