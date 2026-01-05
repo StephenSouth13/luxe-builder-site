@@ -40,6 +40,7 @@ const Certificates = () => {
     fetchCertificates();
   }, []);
 
+  // Don't render empty section
   if (certificates.length === 0) return null;
 
   return (

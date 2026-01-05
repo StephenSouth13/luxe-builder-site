@@ -87,8 +87,11 @@ const Store = () => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data;
-    }
+      return data || [];
+    },
+    staleTime: 0, // Always refetch
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   // Extract unique brands from products

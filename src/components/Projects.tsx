@@ -113,6 +113,9 @@ const Projects = () => {
     );
   }
 
+  // Don't render empty section on homepage
+  if (isHomePage && projects.length === 0) return null;
+
   return (
     <section id="projects" className="py-20 bg-background">
       <motion.div

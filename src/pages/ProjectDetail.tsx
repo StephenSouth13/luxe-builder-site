@@ -4,13 +4,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, ArrowLeft, ExternalLink } from "lucide-react";
+import { Loader2, ArrowLeft, ExternalLink, FileText, Video, Download } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FloatingChat from "@/components/FloatingChat";
 import BackToTop from "@/components/BackToTop";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
+
+interface ProjectAttachment {
+  name: string;
+  url: string;
+  type: string;
+}
 
 interface Project {
   id: string;
@@ -21,6 +27,8 @@ interface Project {
   challenge?: string;
   solution?: string;
   image_url?: string;
+  video_url?: string;
+  attachments?: ProjectAttachment[];
   link?: string;
   technologies?: string[];
   metrics?: any;
@@ -94,7 +102,27 @@ const ProjectDetail = () => {
         console.warn("Project not found for", idOrSlug);
       }
 
-      setProject(data || null);
+      // Map data to ensure proper typing
+      const mappedProject: Project | null = data ? {
+        id: data.id,
+        title: data.title,
+        category: data.category,
+        description: data.description,
+        full_description: data.full_description || undefined,
+        challenge: data.challenge || undefined,
+        solution: data.solution || undefined,
+        image_url: data.image_url || undefined,
+        video_url: data.video_url || undefined,
+        attachments: Array.isArray(data.attachments) 
+          ? (data.attachments as unknown as ProjectAttachment[]) 
+          : [],
+        link: data.link || undefined,
+        technologies: data.technologies || undefined,
+        metrics: data.metrics,
+        slug: data.slug,
+      } : null;
+
+      setProject(mappedProject);
 
       // fetch related by category
       try {
@@ -241,6 +269,59 @@ const ProjectDetail = () => {
                       <p className="text-muted-foreground leading-relaxed">
                         {project.solution}
                       </p>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Video Section */}
+                {project.video_url && (
+                  <Card>
+                    <CardContent className="pt-6">
+                      <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
+                        <Video className="h-5 w-5" />
+                        Video dự án
+                      </h3>
+                      <div className="aspect-video rounded-lg overflow-hidden">
+                        <iframe
+                          src={project.video_url}
+                          title="Project Video"
+                          className="w-full h-full"
+                          allowFullScreen
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Attachments Section */}
+                {project.attachments && project.attachments.length > 0 && (
+                  <Card>
+                    <CardContent className="pt-6">
+                      <h3 className="text-xl font-semibold mb-3 flex items-center gap-2">
+                        <FileText className="h-5 w-5" />
+                        Tài liệu đính kèm
+                      </h3>
+                      <div className="space-y-2">
+                        {project.attachments.map((att, index) => (
+                          <a
+                            key={index}
+                            href={att.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between p-3 bg-accent/30 rounded-lg hover:bg-accent/50 transition-colors"
+                          >
+                            <div className="flex items-center gap-3">
+                              <FileText className="h-5 w-5 text-primary" />
+                              <span className="font-medium">{att.name}</span>
+                              <span className="text-xs text-muted-foreground uppercase bg-muted px-2 py-0.5 rounded">
+                                {att.type}
+                              </span>
+                            </div>
+                            <Download className="h-4 w-4 text-muted-foreground" />
+                          </a>
+                        ))}
+                      </div>
                     </CardContent>
                   </Card>
                 )}
