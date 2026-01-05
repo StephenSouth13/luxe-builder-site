@@ -7,10 +7,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Edit, Trash2, X, Upload, ExternalLink } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2, X, Upload, ExternalLink, FileText, Video, Paperclip } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
+
+interface ProjectAttachment {
+  name: string;
+  url: string;
+  type: string;
+}
 
 interface Project {
   id: string;
@@ -21,6 +27,8 @@ interface Project {
   challenge?: string;
   solution?: string;
   image_url: string | null;
+  video_url?: string | null;
+  attachments?: ProjectAttachment[];
   metrics: any;
   link: string | null;
   sort_order: number;
@@ -43,12 +51,16 @@ const AdminProjects = () => {
     challenge: "",
     solution: "",
     image_url: "",
+    video_url: "",
+    attachments: [] as ProjectAttachment[],
     metrics: "",
     link: "",
     featured: false,
     technologies: "",
     slug: "",
   });
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
+  const [uploadingAttachment, setUploadingAttachment] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
@@ -67,14 +79,23 @@ const AdminProjects = () => {
         .order("sort_order", { ascending: true });
 
       if (error) throw error;
-      setProjects(data || []);
+      // Map data to ensure proper typing
+      const mappedData: Project[] = (data || []).map((p: any) => ({
+        ...p,
+        attachments: Array.isArray(p.attachments) ? p.attachments : []
+      }));
+      setProjects(mappedData);
     } catch (error: any) {
       const msg = String(error?.message || "").toLowerCase();
       // If schema change (missing column) or relation missing, try a fallback without ordering
       if (msg.includes("does not exist") || msg.includes("relation") || msg.includes("column \"sort_order\"")) {
         try {
           const { data: fallback } = await supabase.from("projects").select("*");
-          setProjects(fallback || []);
+          const mappedFallback: Project[] = (fallback || []).map((p: any) => ({
+            ...p,
+            attachments: Array.isArray(p.attachments) ? p.attachments : []
+          }));
+          setProjects(mappedFallback);
           toast({
             title: "Lưu ý",
             description:
@@ -102,6 +123,8 @@ const AdminProjects = () => {
       challenge: project.challenge || "",
       solution: project.solution || "",
       image_url: project.image_url || "",
+      video_url: project.video_url || "",
+      attachments: project.attachments || [],
       metrics: JSON.stringify(project.metrics || []),
       link: project.link || "",
       featured: project.featured || false,
@@ -114,6 +137,7 @@ const AdminProjects = () => {
     setEditingId("new");
     setImageFile(null);
     setImagePreview("");
+    setAttachmentFile(null);
     setFormData({
       title: "",
       category: "",
@@ -122,6 +146,8 @@ const AdminProjects = () => {
       challenge: "",
       solution: "",
       image_url: "",
+      video_url: "",
+      attachments: [],
       metrics: "[]",
       link: "",
       featured: false,
@@ -225,6 +251,7 @@ const AdminProjects = () => {
     setEditingId(null);
     setImageFile(null);
     setImagePreview("");
+    setAttachmentFile(null);
     setFormData({
       title: "",
       category: "",
@@ -233,11 +260,56 @@ const AdminProjects = () => {
       challenge: "",
       solution: "",
       image_url: "",
+      video_url: "",
+      attachments: [],
       metrics: "[]",
       link: "",
       featured: false,
       technologies: "",
       slug: "",
+    });
+  };
+
+  const handleAttachmentUpload = async () => {
+    if (!attachmentFile) return;
+    setUploadingAttachment(true);
+    try {
+      const fileExt = attachmentFile.name.split(".").pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from("project-images")
+        .upload(`attachments/${fileName}`, attachmentFile);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage
+        .from("project-images")
+        .getPublicUrl(`attachments/${fileName}`);
+
+      const newAttachment: ProjectAttachment = {
+        name: attachmentFile.name,
+        url: data.publicUrl,
+        type: fileExt || "file"
+      };
+
+      setFormData({
+        ...formData,
+        attachments: [...formData.attachments, newAttachment]
+      });
+      setAttachmentFile(null);
+      toast({ title: "Thành công", description: "Đã tải lên file đính kèm" });
+    } catch (error: any) {
+      toast({ title: "Lỗi", description: error.message, variant: "destructive" });
+    } finally {
+      setUploadingAttachment(false);
+    }
+  };
+
+  const removeAttachment = (index: number) => {
+    setFormData({
+      ...formData,
+      attachments: formData.attachments.filter((_, i) => i !== index)
     });
   };
 
@@ -352,6 +424,8 @@ const AdminProjects = () => {
         challenge: formData.challenge || null,
         solution: formData.solution || null,
         image_url: imageUrl,
+        video_url: formData.video_url || null,
+        attachments: formData.attachments,
         metrics: metricsData,
         link: formData.link || null,
         featured: formData.featured,
@@ -611,6 +685,82 @@ const AdminProjects = () => {
                 rows={2}
                 placeholder='[{"label": "Tăng trưởng", "value": "200%"}]'
               />
+            </div>
+
+            {/* Video URL */}
+            <div className="space-y-2">
+              <Label htmlFor="video_url" className="flex items-center gap-2">
+                <Video className="h-4 w-4" />
+                Video URL (YouTube/Vimeo embed)
+              </Label>
+              <Input
+                id="video_url"
+                value={formData.video_url}
+                onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
+                placeholder="https://www.youtube.com/embed/VIDEO_ID"
+              />
+              <p className="text-xs text-muted-foreground">
+                Sử dụng URL embed từ YouTube hoặc Vimeo
+              </p>
+            </div>
+
+            {/* Attachments */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <Paperclip className="h-4 w-4" />
+                File đính kèm (PDF, tài liệu...)
+              </Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="file"
+                  accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx"
+                  onChange={(e) => setAttachmentFile(e.target.files?.[0] || null)}
+                  className="flex-1"
+                />
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={handleAttachmentUpload}
+                  disabled={!attachmentFile || uploadingAttachment}
+                >
+                  {uploadingAttachment ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Upload className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+              {formData.attachments.length > 0 && (
+                <div className="space-y-2 mt-2">
+                  {formData.attachments.map((att, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-2 bg-muted rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-primary" />
+                        <span className="text-sm truncate max-w-[200px]">{att.name}</span>
+                        <span className="text-xs text-muted-foreground uppercase">{att.type}</span>
+                      </div>
+                      <div className="flex gap-1">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => window.open(att.url, '_blank')}
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => removeAttachment(idx)}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">

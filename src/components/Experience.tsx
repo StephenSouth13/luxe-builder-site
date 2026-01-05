@@ -38,6 +38,9 @@ const Experience = () => {
     }
   };
 
+  // Don't render empty section
+  if (experiences.length === 0) return null;
+
   return (
     <section id="experience" className="py-20 lg:py-32">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">

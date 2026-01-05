@@ -718,6 +718,7 @@ export type Database = {
       }
       projects: {
         Row: {
+          attachments: Json | null
           category: string
           challenge: string | null
           created_at: string | null
@@ -734,8 +735,10 @@ export type Database = {
           technologies: string[] | null
           title: string
           updated_at: string | null
+          video_url: string | null
         }
         Insert: {
+          attachments?: Json | null
           category: string
           challenge?: string | null
           created_at?: string | null
@@ -752,8 +755,10 @@ export type Database = {
           technologies?: string[] | null
           title: string
           updated_at?: string | null
+          video_url?: string | null
         }
         Update: {
+          attachments?: Json | null
           category?: string
           challenge?: string | null
           created_at?: string | null
@@ -770,6 +775,7 @@ export type Database = {
           technologies?: string[] | null
           title?: string
           updated_at?: string | null
+          video_url?: string | null
         }
         Relationships: []
       }
