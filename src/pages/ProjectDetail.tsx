@@ -282,13 +282,32 @@ const ProjectDetail = () => {
                         Video dự án
                       </h3>
                       <div className="aspect-video rounded-lg overflow-hidden">
-                        <iframe
-                          src={project.video_url}
-                          title="Project Video"
-                          className="w-full h-full"
-                          allowFullScreen
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        />
+                        {project.video_url.includes('youtube.com') || project.video_url.includes('youtu.be') ? (
+                          <iframe
+                            src={`https://www.youtube.com/embed/${project.video_url.includes('youtu.be') 
+                              ? project.video_url.split('/').pop()?.split('?')[0]
+                              : new URLSearchParams(new URL(project.video_url).search).get('v')
+                            }`}
+                            title="Project Video"
+                            className="w-full h-full"
+                            allowFullScreen
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          />
+                        ) : project.video_url.includes('vimeo.com') ? (
+                          <iframe
+                            src={`https://player.vimeo.com/video/${project.video_url.split('/').pop()}`}
+                            title="Project Video"
+                            className="w-full h-full"
+                            allow="autoplay; fullscreen; picture-in-picture"
+                            allowFullScreen
+                          />
+                        ) : (
+                          <video 
+                            src={project.video_url} 
+                            controls 
+                            className="w-full h-full object-cover"
+                          />
+                        )}
                       </div>
                     </CardContent>
                   </Card>

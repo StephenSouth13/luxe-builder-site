@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, BookOpen, ShoppingBag } from "lucide-react";
+import { Plus, Pencil, Trash2, BookOpen, ShoppingBag, Video } from "lucide-react";
 import ImageUpload from "../ImageUpload";
 import MultiImageUpload from "../MultiImageUpload";
 
@@ -34,6 +34,7 @@ const AdminProducts = () => {
     sizes: "",
     image_url: "",
     images: [] as string[],
+    video_url: "",
     published: true,
     featured: false,
     product_type: "product"
@@ -103,7 +104,8 @@ const AdminProducts = () => {
         sizes: data.sizes ? data.sizes.split(',').map((s: string) => s.trim()) : [],
         category_id: data.category_id || null,
         product_type: data.product_type,
-        images: data.images || []
+        images: data.images || [],
+        video_url: data.video_url || null
       };
 
       if (editingProduct) {
@@ -155,6 +157,7 @@ const AdminProducts = () => {
       sizes: "",
       image_url: "",
       images: [],
+      video_url: "",
       published: true,
       featured: false,
       product_type: "product"
@@ -177,6 +180,7 @@ const AdminProducts = () => {
       sizes: product.sizes?.join(', ') || "",
       image_url: product.image_url || "",
       images: product.images || [],
+      video_url: product.video_url || "",
       published: product.published,
       featured: product.featured,
       product_type: product.product_type || "product"
@@ -376,6 +380,23 @@ const AdminProducts = () => {
                   placeholder="Kéo thả hoặc click để thêm ảnh gallery"
                 />
               )}
+
+              {/* Video URL */}
+              <div>
+                <Label htmlFor="video_url" className="flex items-center gap-2">
+                  <Video className="h-4 w-4" />
+                  Video URL (YouTube, Vimeo, hoặc link trực tiếp)
+                </Label>
+                <Input
+                  id="video_url"
+                  value={formData.video_url}
+                  onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Hỗ trợ: YouTube, Vimeo, hoặc link video trực tiếp (.mp4)
+                </p>
+              </div>
 
               <div className="flex items-center gap-4">
                 <div className="flex items-center space-x-2">
