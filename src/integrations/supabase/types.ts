@@ -487,30 +487,39 @@ export type Database = {
         Row: {
           background_image_url: string | null
           created_at: string | null
+          cv_file_url: string | null
           id: string
           name: string
           profile_image_url: string | null
           quote: string
+          show_contact_button: boolean | null
+          show_cv_button: boolean | null
           title: string
           updated_at: string | null
         }
         Insert: {
           background_image_url?: string | null
           created_at?: string | null
+          cv_file_url?: string | null
           id?: string
           name?: string
           profile_image_url?: string | null
           quote?: string
+          show_contact_button?: boolean | null
+          show_cv_button?: boolean | null
           title?: string
           updated_at?: string | null
         }
         Update: {
           background_image_url?: string | null
           created_at?: string | null
+          cv_file_url?: string | null
           id?: string
           name?: string
           profile_image_url?: string | null
           quote?: string
+          show_contact_button?: boolean | null
+          show_cv_button?: boolean | null
           title?: string
           updated_at?: string | null
         }
@@ -661,6 +670,7 @@ export type Database = {
           sort_order: number | null
           stock_quantity: number
           updated_at: string | null
+          video_url: string | null
         }
         Insert: {
           brand?: string | null
@@ -683,6 +693,7 @@ export type Database = {
           sort_order?: number | null
           stock_quantity?: number
           updated_at?: string | null
+          video_url?: string | null
         }
         Update: {
           brand?: string | null
@@ -705,6 +716,7 @@ export type Database = {
           sort_order?: number | null
           stock_quantity?: number
           updated_at?: string | null
+          video_url?: string | null
         }
         Relationships: [
           {

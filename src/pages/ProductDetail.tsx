@@ -13,7 +13,8 @@ import {
   Star,
   CheckCircle,
   GraduationCap,
-  Package
+  Package,
+  Play
 } from "lucide-react";
 import { toast } from "sonner";
 import SEOHead from "@/components/SEOHead";
@@ -168,11 +169,43 @@ const ProductDetail = () => {
           </Button>
 
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-            {/* Image Section */}
+            {/* Image/Video Section */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
             >
+              {/* Video Display */}
+              {(product as any).video_url && (
+                <Card className="overflow-hidden mb-4 border-border/50">
+                  <div className="relative aspect-video">
+                    {(product as any).video_url.includes('youtube.com') || (product as any).video_url.includes('youtu.be') ? (
+                      <iframe
+                        src={`https://www.youtube.com/embed/${(product as any).video_url.includes('youtu.be') 
+                          ? (product as any).video_url.split('/').pop()?.split('?')[0]
+                          : new URLSearchParams(new URL((product as any).video_url).search).get('v')
+                        }`}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    ) : (product as any).video_url.includes('vimeo.com') ? (
+                      <iframe
+                        src={`https://player.vimeo.com/video/${(product as any).video_url.split('/').pop()}`}
+                        className="w-full h-full"
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        allowFullScreen
+                      />
+                    ) : (
+                      <video 
+                        src={(product as any).video_url} 
+                        controls 
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                  </div>
+                </Card>
+              )}
+              
               {displayImage ? (
                 <Card className="overflow-hidden mb-4 border-border/50">
                   <div className="relative">
@@ -188,7 +221,7 @@ const ProductDetail = () => {
                     )}
                   </div>
                 </Card>
-              ) : (
+              ) : !((product as any).video_url) && (
                 <Card className="overflow-hidden mb-4 border-border/50">
                   <div className="w-full h-[400px] lg:h-[500px] bg-muted flex items-center justify-center">
                     {isCourse ? (

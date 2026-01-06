@@ -13,6 +13,9 @@ const Hero = () => {
     quote: "Kết nối – Thuyết phục – Bứt phá doanh số cùng đối tác chiến lược.",
     profile_image_url: null as string | null,
     background_image_url: null as string | null,
+    show_contact_button: true,
+    show_cv_button: true,
+    cv_file_url: null as string | null,
   });
 
   useEffect(() => {
@@ -33,6 +36,9 @@ const Hero = () => {
         quote: data.quote,
         profile_image_url: data.profile_image_url,
         background_image_url: data.background_image_url,
+        show_contact_button: data.show_contact_button !== false,
+        show_cv_button: data.show_cv_button !== false,
+        cv_file_url: data.cv_file_url,
       });
     }
   };
@@ -105,29 +111,35 @@ const Hero = () => {
           </motion.p>
 
           {/* CTA Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.9 }}
-            className="flex flex-col sm:flex-row gap-4 pt-4"
-          >
-            <Button
-              size="lg"
-              onClick={scrollToContact}
-              className="gold-gradient hover:opacity-90 transition-opacity text-background font-semibold px-8"
+          {(heroData.show_contact_button || heroData.show_cv_button) && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.9 }}
+              className="flex flex-col sm:flex-row gap-4 pt-4"
             >
-              Liên hệ ngay
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-primary text-primary hover:bg-primary/10 px-8"
-              onClick={() => window.open("/CV_TrinhBaLam.pdf", "_blank")}
-            >
-              <Download className="mr-2 h-5 w-5" />
-              Tải CV
-            </Button>
-          </motion.div>
+              {heroData.show_contact_button && (
+                <Button
+                  size="lg"
+                  onClick={scrollToContact}
+                  className="gold-gradient hover:opacity-90 transition-opacity text-background font-semibold px-8"
+                >
+                  Liên hệ ngay
+                </Button>
+              )}
+              {heroData.show_cv_button && (
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-primary text-primary hover:bg-primary/10 px-8"
+                  onClick={() => window.open(heroData.cv_file_url || "/CV_TrinhBaLam.pdf", "_blank")}
+                >
+                  <Download className="mr-2 h-5 w-5" />
+                  Tải CV
+                </Button>
+              )}
+            </motion.div>
+          )}
 
           {/* Scroll indicator */}
           <motion.div
