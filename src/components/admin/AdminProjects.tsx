@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { createClient } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -157,10 +156,8 @@ const AdminProjects = () => {
   };
 
   const runBackfillPrompt = async () => {
-    const key = window.prompt("Paste Supabase Service Role key (will not be stored), or cancel to abort:");
-    if (!key) return;
     if (!confirm("This will run a backfill that updates project slugs. Proceed?")) return;
-    await runBackfillWithKey(key);
+    await runBackfill();
   };
 
   const fetchSettings = async () => {
@@ -184,7 +181,7 @@ const AdminProjects = () => {
       const { error } = await sb.from("settings").upsert({ key: "projects_filters_enabled", value: v ? "true" : "false" }, { onConflict: ["key"] });
       if (error) throw error;
       setFiltersEnabled(v);
-      toast({ title: "Thành công", description: "Đã cập nhật cài đặt b�� lọc" });
+      toast({ title: "Thành công", description: "Đã cập nhật cài đặt bộ lọc" });
     } catch (err: any) {
       toast({ title: "Lỗi", description: err.message || "Không thể lưu cài đặt", variant: "destructive" });
     } finally {
@@ -192,58 +189,42 @@ const AdminProjects = () => {
     }
   };
 
-  const runBackfillWithKey = async (serviceKey: string) => {
+  const runBackfill = async () => {
     try {
       setIsSaving(true);
-      const admin = createClient(import.meta.env.VITE_SUPABASE_URL, serviceKey);
-      const { data: projects, error } = await admin.from('projects').select('id,title,slug');
-      if (error) throw error;
-      if (!projects || projects.length === 0) {
-        alert('No projects found');
-        setIsSaving(false);
+      
+      // Get the current session for authentication
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) {
+        toast({ title: "Lỗi", description: "Bạn cần đăng nhập để thực hiện thao tác này", variant: "destructive" });
         return;
       }
 
-      const sanitize = (s: string) =>
-        s
-          .toLowerCase()
-          .trim()
-          .replace(/[^a-z0-9\s-]/g, '')
-          .replace(/\s+/g, '-');
+      // Call the secure edge function
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/backfill-project-slugs`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`,
+        },
+      });
 
-      for (const p of projects) {
-        if (p.slug) continue;
-        let base = sanitize(p.title || `project-${p.id}`);
-        let candidate = base;
-        let i = 0;
-        while (true) {
-          const { data: existing, error: e } = await admin.from('projects').select('id').eq('slug', candidate).limit(1).maybeSingle();
-          if (e) {
-            // if slug column missing or other error, break
-            console.warn('backfill check error', e.message || e);
-            break;
-          }
-          if (!existing) break;
-          i += 1;
-          candidate = `${base}-${i}`;
-        }
+      const result = await response.json();
 
-        try {
-          const { error: upErr } = await admin.from('projects').update({ slug: candidate }).eq('id', p.id);
-          if (upErr) {
-            console.error('Failed update', p.id, upErr.message || upErr);
-          }
-        } catch (upErr) {
-          console.error('Update error', upErr);
-        }
+      if (!response.ok) {
+        throw new Error(result.error || "Backfill failed");
       }
 
-      alert('Backfill complete. Refresh to see changes.');
+      toast({ 
+        title: "Thành công", 
+        description: `Đã cập nhật slug cho ${result.updated_count} dự án` 
+      });
+      
+      await fetchProjects();
     } catch (err: any) {
-      alert('Backfill failed: ' + (err.message || String(err)));
+      toast({ title: "Lỗi", description: err.message || "Không thể thực hiện backfill", variant: "destructive" });
     } finally {
       setIsSaving(false);
-      await fetchProjects();
     }
   };
 
