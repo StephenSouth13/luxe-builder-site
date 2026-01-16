@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
-import { Send, Mail, Phone, MapPin } from "lucide-react";
+import { Send, Mail, Phone, MapPin, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,25 +26,18 @@ const Contact = () => {
     phone: "",
     message: ""
   });
-  // Default contact info (shown to public users since contacts table is admin-only)
-  const defaultContact: ContactRow = {
-    id: "default",
-    email: "lambatrinh0812@gmail.com",
-    phone: "+84 363974125",
-    location: "TP. Hồ Chí Minh, Việt Nam",
-    map_embed_url: null
-  };
-  
-  const [contact, setContact] = useState<ContactRow>(defaultContact);
+  const [contact, setContact] = useState<ContactRow | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       try {
         const { data, error } = await supabase.from("contacts").select("*").limit(1).maybeSingle();
-        // Only update if admin successfully fetches data (non-admins will get RLS error)
         if (data && !error) setContact(data as ContactRow);
       } catch (e) {
-        // Silently use default contact info for non-admin users
+        console.error("Failed to load contact info", e);
+      } finally {
+        setIsLoading(false);
       }
     };
     load();
@@ -70,11 +63,20 @@ const Contact = () => {
     }
   };
 
-  const contactInfo = [
-    { icon: Mail, label: "Email", value: contact?.email || "", href: contact?.email ? `mailto:${contact.email}` : null },
-    { icon: Phone, label: "Phone", value: contact?.phone || "", href: contact?.phone ? `tel:${contact.phone}` : null },
-    { icon: MapPin, label: "Location", value: contact?.location || "", href: null }
-  ].filter((i) => i.value);
+  if (isLoading) {
+    return (
+      <section id="contact" className="py-20 lg:py-32 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </section>
+    );
+  }
+
+  // Build contact info from CMS data only
+  const contactInfo = contact ? [
+    { icon: Mail, label: "Email", value: contact.email || "", href: contact.email ? `mailto:${contact.email}` : null },
+    { icon: Phone, label: "Phone", value: contact.phone || "", href: contact.phone ? `tel:${contact.phone}` : null },
+    { icon: MapPin, label: "Location", value: contact.location || "", href: null }
+  ].filter((i) => i.value) : [];
 
   return (
     <section id="contact" className="py-20 lg:py-32">

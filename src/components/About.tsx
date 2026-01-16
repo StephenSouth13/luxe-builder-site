@@ -1,8 +1,7 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
-import { BadgeInfo, Sparkles } from "lucide-react";
-import profileImage from "@/assets/profile.jpg";
+import { BadgeInfo, Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AboutRecord {
@@ -23,6 +22,7 @@ const About = () => {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [about, setAbout] = useState<AboutRecord | null>(null);
   const [skills, setSkills] = useState<Skill[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
@@ -35,12 +35,27 @@ const About = () => {
         if (skillsRes.data) setSkills(skillsRes.data as Skill[]);
       } catch (e) {
         console.error("Failed to load about/skills", e);
+      } finally {
+        setIsLoading(false);
       }
     };
     load();
   }, []);
 
-  const displayImage = about?.image_url || profileImage;
+  // Don't render if no data from CMS
+  if (isLoading) {
+    return (
+      <section id="about" className="py-20 lg:py-32 bg-secondary/30 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </section>
+    );
+  }
+
+  if (!about) {
+    return null;
+  }
+
+  const displayImage = about.image_url;
 
   return (
     <section id="about" className="py-20 lg:py-32 bg-secondary/30">
@@ -52,33 +67,35 @@ const About = () => {
           transition={{ duration: 0.8 }}
         >
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gradient text-center mb-12 lg:mb-16">
-            Về tôi
+            {about.headline || "Về tôi"}
           </h2>
 
           <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={isInView ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="flex justify-center"
-            >
-              <div className="relative">
-                <div className="absolute -inset-4 bg-gradient-to-r from-primary to-gold-light rounded-2xl blur-xl opacity-30" />
-                <img
-                  src={displayImage}
-                  alt="Ảnh hồ sơ"
-                  className="relative w-full max-w-md rounded-2xl shadow-2xl border-2 border-primary/20"
-                />
-              </div>
-            </motion.div>
+            {displayImage && (
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                animate={isInView ? { opacity: 1, x: 0 } : {}}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="flex justify-center"
+              >
+                <div className="relative">
+                  <div className="absolute -inset-4 bg-gradient-to-r from-primary to-gold-light rounded-2xl blur-xl opacity-30" />
+                  <img
+                    src={displayImage}
+                    alt="Ảnh hồ sơ"
+                    className="relative w-full max-w-md rounded-2xl shadow-2xl border-2 border-primary/20"
+                  />
+                </div>
+              </motion.div>
+            )}
 
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={isInView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="space-y-6"
+              className={`space-y-6 ${!displayImage ? 'md:col-span-2 max-w-3xl mx-auto' : ''}`}
             >
-              {about?.headline && (
+              {about.headline && (
                 <div className="flex items-center gap-2 text-primary">
                   <Sparkles className="h-5 w-5" />
                   <h3 className="text-xl font-semibold">{about.headline}</h3>
@@ -86,13 +103,7 @@ const About = () => {
               )}
 
               <p className="text-base sm:text-lg text-foreground/90 leading-relaxed">
-                {about?.description || (
-                  <>
-                    Với hơn <span className="font-semibold text-primary">8 năm kinh nghiệm</span> trong lĩnh vực kinh doanh và phát triển thị trường,
-                    tôi tập trung vào việc giúp doanh nghiệp xây dựng chiến lược bán hàng bền vững,
-                    mở rộng đối tác, và tăng trưởng doanh thu thông minh.
-                  </>
-                )}
+                {about.description}
               </p>
 
               {skills.length > 0 && (
