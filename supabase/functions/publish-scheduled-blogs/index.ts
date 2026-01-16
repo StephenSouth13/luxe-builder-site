@@ -6,6 +6,9 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+// Secret key for cron job authentication (optional - set via Supabase secrets)
+const CRON_SECRET = Deno.env.get("CRON_SECRET");
+
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -13,10 +16,61 @@ Deno.serve(async (req) => {
   }
 
   try {
-    console.log("Starting scheduled blog publishing check...");
-
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    // Check for cron secret header (for scheduled invocations)
+    const cronSecretHeader = req.headers.get("x-cron-secret");
+    const isCronJob = CRON_SECRET && cronSecretHeader === CRON_SECRET;
+
+    // If not a cron job, verify user authentication
+    if (!isCronJob) {
+      const authHeader = req.headers.get("Authorization");
+      if (!authHeader?.startsWith("Bearer ")) {
+        return new Response(
+          JSON.stringify({ error: "Unauthorized" }),
+          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Create client with user's auth to verify their identity
+      const userClient = createClient(supabaseUrl, supabaseAnonKey, {
+        global: { headers: { Authorization: authHeader } },
+      });
+
+      // Verify the user's claims
+      const token = authHeader.replace("Bearer ", "");
+      const { data: claimsData, error: claimsError } = await userClient.auth.getClaims(token);
+      
+      if (claimsError || !claimsData?.claims) {
+        return new Response(
+          JSON.stringify({ error: "Invalid token" }),
+          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const userId = claimsData.claims.sub;
+
+      // Check if user has admin role using service client
+      const adminCheckClient = createClient(supabaseUrl, supabaseServiceKey);
+      
+      const { data: roleData, error: roleError } = await adminCheckClient
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      if (roleError || !roleData) {
+        return new Response(
+          JSON.stringify({ error: "Admin access required" }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    console.log("Starting scheduled blog publishing check...");
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
