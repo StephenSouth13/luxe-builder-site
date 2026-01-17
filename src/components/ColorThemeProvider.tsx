@@ -1,7 +1,7 @@
 import { useEffect, useState, createContext, useContext, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, SparkleIcon } from "lucide-react";
+import { Sparkles, Sparkle } from "lucide-react";
 import ThemeParticles from "./ThemeParticles";
 
 type ColorTheme = 
@@ -75,7 +75,7 @@ const ParticleToggle = ({ enabled, onToggle, theme }: { enabled: boolean; onTogg
             exit={{ rotate: 180, opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <SparkleIcon className="w-5 h-5 text-muted-foreground" />
+            <Sparkle className="w-5 h-5 text-muted-foreground" />
           </motion.div>
         )}
       </AnimatePresence>
