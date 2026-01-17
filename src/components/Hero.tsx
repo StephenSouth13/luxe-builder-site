@@ -88,10 +88,8 @@ const Hero = () => {
         backgroundColor: !displayBackgroundImage ? "hsl(var(--background))" : undefined,
       }}
     >
-      {/* Subtle animated gradient overlay - only if no background image */}
-      {!displayBackgroundImage && (
-        <div className="absolute inset-0 bg-gradient-to-br from-background/50 via-transparent to-primary/10" />
-      )}
+      {/* Subtle gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-primary/5" />
 
       <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="flex flex-col items-center text-center space-y-8">
