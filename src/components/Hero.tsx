@@ -125,7 +125,7 @@ const Hero = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
-            className="text-xl sm:text-2xl lg:text-3xl font-semibold text-foreground/90"
+            className="text-xl sm:text-2xl lg:text-3xl font-semibold text-foreground"
           >
             {heroData.title}
           </motion.h2>
@@ -135,7 +135,7 @@ const Hero = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.7 }}
-            className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-3xl italic border-l-4 border-primary pl-4 sm:pl-6"
+            className="text-base sm:text-lg lg:text-xl text-foreground/80 max-w-3xl italic border-l-4 border-primary pl-4 sm:pl-6"
           >
             "{heroData.quote}"
           </motion.p>
