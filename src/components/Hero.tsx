@@ -115,7 +115,7 @@ const Hero = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-4xl sm:text-5xl lg:text-7xl font-bold text-gradient"
+            className="text-4xl sm:text-5xl lg:text-7xl font-bold text-gradient drop-shadow-lg"
           >
             {heroData.name}
           </motion.h1>
