@@ -48,7 +48,7 @@ const Education = () => {
         >
           <div className="flex items-center justify-center gap-3 mb-4">
             <GraduationCap className="h-8 w-8 text-primary" />
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gradient text-center">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
               Học vấn
             </h2>
           </div>
@@ -65,7 +65,7 @@ const Education = () => {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 className="relative"
               >
-                <div className="glass-card p-6 sm:p-8 hover:shadow-glow transition-all duration-300 group">
+                <div className="bg-card border border-border/50 rounded-xl p-6 sm:p-8 hover:border-primary/50 hover:shadow-xl transition-all duration-300 group">
                   {/* Timeline indicator */}
                   <div className="absolute left-0 top-8 w-1 h-full bg-gradient-to-b from-primary to-primary/20 -translate-x-8 hidden lg:block" />
                   <div className="absolute left-0 top-8 w-4 h-4 rounded-full bg-primary -translate-x-10 hidden lg:block" />

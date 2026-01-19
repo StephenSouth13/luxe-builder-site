@@ -125,27 +125,41 @@ const Projects = () => {
         transition={{ duration: 0.5 }}
         className="container mx-auto px-4"
       >
-        <div className="flex flex-col md:flex-row items-center justify-between mb-4">
-          <h2 className="text-3xl md:text-4xl font-bold">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
             {isHomePage ? t("featuredProjects") : t("allProjects")}
           </h2>
+          <p className="text-muted-foreground text-lg mb-6">
+            Khám phá những dự án tiêu biểu mà tôi đã thực hiện
+          </p>
           {!isHomePage && filtersEnabled && (
-            <div className="mt-4 md:mt-0">
-              <label className="text-sm mr-2">Lọc theo danh mục:</label>
-              <select value={selectedCategory || ""} onChange={(e) => setSelectedCategory(e.target.value || null)} className="bg-card border-border px-3 py-2 rounded">
-                <option value="">Tất cả</option>
-                {Array.from(new Set(projects.map(p => p.category).filter(Boolean))).map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
+            <div className="flex flex-wrap justify-center gap-3">
+              <button
+                onClick={() => setSelectedCategory(null)}
+                className={`px-4 py-2 rounded-full transition-all ${
+                  selectedCategory === null
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary hover:bg-secondary/80"
+                }`}
+              >
+                Tất cả
+              </button>
+              {Array.from(new Set(projects.map(p => p.category).filter(Boolean))).map((c) => (
+                <button
+                  key={c}
+                  onClick={() => setSelectedCategory(c)}
+                  className={`px-4 py-2 rounded-full transition-all ${
+                    selectedCategory === c
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-secondary hover:bg-secondary/80"
+                  }`}
+                >
+                  {c}
+                </button>
+              ))}
             </div>
           )}
         </div>
-        {isHomePage && (
-          <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-12">
-            Khám phá những dự án tiêu biểu mà tôi đã thực hiện
-          </p>
-        )}
 
         <div className={`grid gap-6 md:gap-8 max-w-7xl mx-auto ${
           isHomePage 

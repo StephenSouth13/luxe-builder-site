@@ -153,8 +153,8 @@ const ProductDetail = () => {
   return (
     <>
       <Header />
-      <div className="min-h-screen pt-20 px-4 pb-20">
-        <SEOHead 
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-20 px-4 pb-20">
+        <SEOHead
           title={`${product.name} - ${isCourse ? 'Khóa học' : 'Cửa hàng'}`}
           description={product.description || ""}
         />
@@ -285,7 +285,7 @@ const ProductDetail = () => {
                   </div>
                 )}
                 
-                <h1 className="text-3xl lg:text-4xl font-bold mb-4">{product.name}</h1>
+                <h1 className="text-3xl lg:text-4xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">{product.name}</h1>
                 
                 {/* Price Section */}
                 <div className="flex items-center gap-4 mb-4">

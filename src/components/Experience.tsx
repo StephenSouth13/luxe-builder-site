@@ -42,7 +42,7 @@ const Experience = () => {
   if (experiences.length === 0) return null;
 
   return (
-    <section id="experience" className="py-20 lg:py-32">
+    <section id="experience" className="py-20 lg:py-32 bg-gradient-to-br from-background via-background to-primary/5">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           ref={ref}
@@ -50,9 +50,12 @@ const Experience = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gradient text-center mb-12 lg:mb-16">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
             Kinh nghiệm
           </h2>
+          <p className="text-center text-muted-foreground mb-12 lg:mb-16 max-w-2xl mx-auto">
+            Hành trình phát triển sự nghiệp chuyên môn
+          </p>
 
           <div className="relative">
             {/* Timeline line */}

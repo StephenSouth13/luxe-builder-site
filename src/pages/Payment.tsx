@@ -129,23 +129,29 @@ const Payment = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen pt-20 px-4">
-        <div className="max-w-4xl mx-auto text-center py-20">
-          <h1 className="text-3xl font-bold mb-4">Vui lòng đăng nhập</h1>
-          <Button onClick={() => navigate('/admin')}>Đăng nhập</Button>
+      <>
+        <Header />
+        <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-20 px-4">
+          <div className="max-w-4xl mx-auto text-center py-20">
+            <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">Vui lòng đăng nhập</h1>
+            <Button onClick={() => navigate('/admin')}>Đăng nhập</Button>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen pt-20 px-4">
-        <div className="max-w-4xl mx-auto text-center py-20">
-          <h1 className="text-3xl font-bold mb-4">Giỏ hàng trống</h1>
-          <Button onClick={() => navigate('/cart')}>Quay lại giỏ hàng</Button>
+      <>
+        <Header />
+        <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-20 px-4">
+          <div className="max-w-4xl mx-auto text-center py-20">
+            <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">Giỏ hàng trống</h1>
+            <Button onClick={() => navigate('/cart')}>Quay lại giỏ hàng</Button>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -171,13 +177,13 @@ const Payment = () => {
   return (
     <>
       <Header />
-      <div className="min-h-screen pt-20 px-4 pb-20">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-20 px-4 pb-20">
         <SEOHead
-        title="Thanh toán - Cửa hàng"
-        description="Hoàn tất đơn hàng của bạn"
-      />
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">Thanh toán</h1>
+          title="Thanh toán - Cửa hàng"
+          description="Hoàn tất đơn hàng của bạn"
+        />
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-4xl font-bold mb-8 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">Thanh toán</h1>
 
         <form onSubmit={handleSubmit} className="grid lg:grid-cols-2 gap-8">
           <Card className="p-6">
