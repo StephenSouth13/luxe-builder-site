@@ -66,9 +66,12 @@ const About = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gradient text-center mb-12 lg:mb-16">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
             {about.headline || "Về tôi"}
           </h2>
+          <p className="text-center text-muted-foreground text-lg mb-12 lg:mb-16 max-w-2xl mx-auto">
+            Tìm hiểu thêm về hành trình và đam mê của tôi
+          </p>
 
           <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
             {displayImage && (

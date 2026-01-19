@@ -252,7 +252,7 @@ const Store = () => {
   return (
     <>
       <Header />
-      <div className="min-h-screen pt-20 px-4 pb-20">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-20 px-4 pb-20">
         <SEOHead
           title="Cửa hàng - Sản phẩm & Khóa học"
           description="Khám phá các sản phẩm chất lượng và khóa học giúp bạn phát triển kỹ năng"
@@ -268,7 +268,7 @@ const Store = () => {
               <Sparkles className="h-4 w-4" />
               <span className="text-sm font-medium">Khám phá ngay</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gradient">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
               {productType === 'course' ? 'Khóa học' : productType === 'product' ? 'Sản phẩm' : 'Cửa hàng'}
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">

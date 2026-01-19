@@ -82,13 +82,13 @@ const Cart = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen pt-20 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-20 px-4">
         <SEOHead 
           title="Giỏ hàng - Cửa hàng"
           description="Xem giỏ hàng của bạn"
         />
         <div className="max-w-4xl mx-auto text-center py-20">
-          <h1 className="text-3xl font-bold mb-4">Vui lòng đăng nhập</h1>
+          <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">Vui lòng đăng nhập</h1>
           <p className="text-muted-foreground mb-6">Bạn cần đăng nhập để xem giỏ hàng</p>
           <Button onClick={() => navigate('/admin')}>Đăng nhập</Button>
         </div>
@@ -98,9 +98,9 @@ const Cart = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen pt-20 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-20 px-4">
         <div className="max-w-4xl mx-auto text-center py-20">
-          <p>Đang tải...</p>
+          <p className="text-muted-foreground">Đang tải...</p>
         </div>
       </div>
     );
@@ -108,13 +108,13 @@ const Cart = () => {
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen pt-20 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-20 px-4">
         <SEOHead 
           title="Giỏ hàng - Cửa hàng"
           description="Giỏ hàng của bạn đang trống"
         />
         <div className="max-w-4xl mx-auto text-center py-20">
-          <h1 className="text-3xl font-bold mb-4">Giỏ hàng trống</h1>
+          <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">Giỏ hàng trống</h1>
           <p className="text-muted-foreground mb-6">Chưa có sản phẩm nào trong giỏ hàng</p>
           <Button onClick={() => navigate('/')}>Tiếp tục mua sắm</Button>
         </div>
@@ -123,13 +123,13 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-screen pt-20 px-4 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-20 px-4 pb-20">
       <SEOHead 
         title="Giỏ hàng - Cửa hàng"
         description="Xem và quản lý giỏ hàng của bạn"
       />
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">Giỏ hàng của bạn</h1>
+        <h1 className="text-4xl font-bold mb-8 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">Giỏ hàng của bạn</h1>
         
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">

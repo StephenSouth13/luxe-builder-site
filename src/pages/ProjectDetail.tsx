@@ -175,7 +175,7 @@ const ProjectDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 text-foreground">
       <Header />
       <main className="pt-20">
         <div className="container mx-auto px-4 py-16">
@@ -225,7 +225,7 @@ const ProjectDetail = () => {
               <div className="space-y-8">
                 <div>
                   <Badge className="mb-3">{project.category}</Badge>
-                  <h1 className="text-4xl font-bold mb-4">{project.title}</h1>
+                  <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">{project.title}</h1>
                   <p className="text-lg text-muted-foreground">{project.description}</p>
                 </div>
 
