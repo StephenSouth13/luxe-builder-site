@@ -86,6 +86,8 @@ const About = () => {
                   <img
                     src={displayImage}
                     alt="Ảnh hồ sơ"
+                    loading="lazy"
+                    decoding="async"
                     className="relative w-full max-w-md rounded-2xl shadow-2xl border-2 border-primary/20"
                   />
                 </div>
