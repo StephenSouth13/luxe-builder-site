@@ -87,9 +87,9 @@ const Cart = () => {
           title="Giỏ hàng - Cửa hàng"
           description="Xem giỏ hàng của bạn"
         />
-        <div className="max-w-4xl mx-auto text-center py-20">
-          <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">Vui lòng đăng nhập</h1>
-          <p className="text-muted-foreground mb-6">Bạn cần đăng nhập để xem giỏ hàng</p>
+        <div className="max-w-4xl mx-auto text-center py-12 sm:py-20">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">Vui lòng đăng nhập</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mb-6">Bạn cần đăng nhập để xem giỏ hàng</p>
           <Button onClick={() => navigate('/admin')}>Đăng nhập</Button>
         </div>
       </div>
@@ -113,9 +113,9 @@ const Cart = () => {
           title="Giỏ hàng - Cửa hàng"
           description="Giỏ hàng của bạn đang trống"
         />
-        <div className="max-w-4xl mx-auto text-center py-20">
-          <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">Giỏ hàng trống</h1>
-          <p className="text-muted-foreground mb-6">Chưa có sản phẩm nào trong giỏ hàng</p>
+        <div className="max-w-4xl mx-auto text-center py-12 sm:py-20">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">Giỏ hàng trống</h1>
+          <p className="text-sm sm:text-base text-muted-foreground mb-6">Chưa có sản phẩm nào trong giỏ hàng</p>
           <Button onClick={() => navigate('/')}>Tiếp tục mua sắm</Button>
         </div>
       </div>
@@ -129,33 +129,33 @@ const Cart = () => {
         description="Xem và quản lý giỏ hàng của bạn"
       />
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">Giỏ hàng của bạn</h1>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">Giỏ hàng của bạn</h1>
         
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-4">
+        <div className="grid lg:grid-cols-3 gap-6 sm:gap-8">
+          <div className="lg:col-span-2 space-y-3 sm:space-y-4">
             {cartItems.map((item) => {
               const product = item.products;
               const discountedPrice = product.price * (1 - (product.discount_percent || 0) / 100);
               
               return (
-                <Card key={item.id} className="p-4">
-                  <div className="flex gap-4">
+                <Card key={item.id} className="p-3 sm:p-4">
+                  <div className="flex gap-3 sm:gap-4">
                     {product.image_url && (
                       <img 
                         src={product.image_url} 
                         alt={product.name}
-                        className="w-24 h-24 object-cover rounded"
+                        className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded flex-shrink-0"
                       />
                     )}
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-lg">{product.name}</h3>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-sm sm:text-lg line-clamp-2">{product.name}</h3>
                       {item.selected_color && (
-                        <p className="text-sm text-muted-foreground">Màu: {item.selected_color}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">Màu: {item.selected_color}</p>
                       )}
                       {item.selected_size && (
-                        <p className="text-sm text-muted-foreground">Size: {item.selected_size}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">Size: {item.selected_size}</p>
                       )}
-                      <div className="mt-2 flex items-center gap-4">
+                      <div className="mt-2 flex flex-wrap items-center gap-2 sm:gap-4">
                         <div className="flex items-center gap-2">
                           <Button
                             size="sm"
@@ -197,13 +197,13 @@ const Cart = () => {
                         </Button>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right flex-shrink-0">
                       {product.discount_percent > 0 && (
-                        <p className="text-sm text-muted-foreground line-through">
+                        <p className="text-xs sm:text-sm text-muted-foreground line-through">
                           {product.price.toLocaleString()}đ
                         </p>
                       )}
-                      <p className="text-lg font-bold">
+                      <p className="text-sm sm:text-lg font-bold">
                         {discountedPrice.toLocaleString()}đ
                       </p>
                     </div>
@@ -214,14 +214,14 @@ const Cart = () => {
           </div>
 
           <div className="lg:col-span-1">
-            <Card className="p-6 sticky top-24">
-              <h2 className="text-xl font-bold mb-4">Tổng đơn hàng</h2>
-              <div className="space-y-2 mb-6">
-                <div className="flex justify-between">
+            <Card className="p-4 sm:p-6 sticky top-24">
+              <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Tổng đơn hàng</h2>
+              <div className="space-y-2 mb-4 sm:mb-6">
+                <div className="flex justify-between text-sm sm:text-base">
                   <span>Tạm tính:</span>
                   <span>{calculateTotal().toLocaleString()}đ</span>
                 </div>
-                <div className="flex justify-between text-lg font-bold pt-2 border-t">
+                <div className="flex justify-between text-base sm:text-lg font-bold pt-2 border-t">
                   <span>Tổng cộng:</span>
                   <span className="text-primary">{calculateTotal().toLocaleString()}đ</span>
                 </div>

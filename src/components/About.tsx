@@ -110,18 +110,18 @@ const About = () => {
               </p>
 
               {skills.length > 0 && (
-                <div className="grid grid-cols-2 gap-4 pt-6">
+                <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 sm:gap-4 pt-4 sm:pt-6">
                   {skills.map((skill, index) => (
                     <motion.div
                       key={skill.id}
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={isInView ? { opacity: 1, scale: 1 } : {}}
                       transition={{ duration: 0.5, delay: 0.6 + index * 0.08 }}
-                      className="group relative p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/20"
+                      className="group relative p-4 sm:p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/20"
                     >
                       <div className="absolute inset-0 bg-gradient-to-br from-primary to-gold-light opacity-0 group-hover:opacity-5 rounded-xl transition-opacity duration-300" />
-                      <BadgeInfo className="h-8 w-8 text-primary mb-3" />
-                      <h3 className="font-semibold text-sm sm:text-base text-foreground">
+                      <BadgeInfo className="h-6 w-6 sm:h-8 sm:w-8 text-primary mb-2 sm:mb-3" />
+                      <h3 className="font-semibold text-xs sm:text-sm md:text-base text-foreground">
                         {skill.name}
                       </h3>
                     </motion.div>

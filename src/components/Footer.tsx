@@ -68,17 +68,17 @@ const Footer = () => {
     <footer className="relative bg-background border-t border-primary/20">
       <div className="absolute top-0 left-0 right-0 h-1 gold-gradient" />
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8 sm:space-y-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="flex flex-col items-center space-y-6"
+          className="flex flex-col items-center space-y-4 sm:space-y-6"
         >
-          <div className="text-2xl font-bold text-gradient">Trịnh Bá Lâm</div>
+          <div className="text-xl sm:text-2xl font-bold text-gradient">Trịnh Bá Lâm</div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
             {(socials.length > 0 ? socials : [
               { id: "fallback-linkedin", provider: "linkedin", url: "https://linkedin.com", sort_order: 0 },
               { id: "fallback-facebook", provider: "facebook", url: "https://facebook.com", sort_order: 1 },
