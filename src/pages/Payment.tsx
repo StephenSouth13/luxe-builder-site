@@ -132,8 +132,8 @@ const Payment = () => {
       <>
         <Header />
         <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-20 px-4">
-          <div className="max-w-4xl mx-auto text-center py-20">
-            <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">Vui lòng đăng nhập</h1>
+          <div className="max-w-4xl mx-auto text-center py-12 sm:py-20">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">Vui lòng đăng nhập</h1>
             <Button onClick={() => navigate('/admin')}>Đăng nhập</Button>
           </div>
         </div>
@@ -146,8 +146,8 @@ const Payment = () => {
       <>
         <Header />
         <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 pt-20 px-4">
-          <div className="max-w-4xl mx-auto text-center py-20">
-            <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">Giỏ hàng trống</h1>
+          <div className="max-w-4xl mx-auto text-center py-12 sm:py-20">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">Giỏ hàng trống</h1>
             <Button onClick={() => navigate('/cart')}>Quay lại giỏ hàng</Button>
           </div>
         </div>
@@ -183,12 +183,12 @@ const Payment = () => {
           description="Hoàn tất đơn hàng của bạn"
         />
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold mb-8 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">Thanh toán</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">Thanh toán</h1>
 
-        <form onSubmit={handleSubmit} className="grid lg:grid-cols-2 gap-8">
-          <Card className="p-6">
-            <h2 className="text-xl font-bold mb-4">Thông tin giao hàng</h2>
-            <div className="space-y-4">
+        <form onSubmit={handleSubmit} className="grid lg:grid-cols-2 gap-6 sm:gap-8">
+          <Card className="p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Thông tin giao hàng</h2>
+            <div className="space-y-3 sm:space-y-4">
               <div>
                 <Label htmlFor="name">Họ và tên *</Label>
                 <Input

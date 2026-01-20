@@ -77,18 +77,18 @@ const BlogsSection = () => {
   if (blogs.length === 0) return null;
 
   return (
-    <section className="py-20 px-4 bg-secondary/30">
+    <section className="py-16 sm:py-20 px-4 bg-secondary/30">
       <div className="container mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
             Blog
           </h2>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-base sm:text-lg">
             Chia sẻ kiến thức và kinh nghiệm
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
           {blogs.map((blog) => (
             <Link
               key={blog.id}
@@ -97,7 +97,7 @@ const BlogsSection = () => {
             >
                 <Card key={blog.id} className="h-full overflow-hidden transition-all hover:shadow-xl hover:scale-[1.02] border-border/50 hover:border-primary/50 flex flex-col">
                   {blog.image_url && (
-                    <div className="relative h-48 overflow-hidden">
+                    <div className="relative h-40 sm:h-48 overflow-hidden">
                       <img
                         src={blog.image_url}
                         alt={blog.title}
@@ -106,17 +106,17 @@ const BlogsSection = () => {
                       <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
                     </div>
                   )}
-                  <CardContent className="p-4 flex flex-col flex-1">
-                    <div className="flex-1 space-y-3">
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <CardContent className="p-3 sm:p-4 flex flex-col flex-1">
+                    <div className="flex-1 space-y-2 sm:space-y-3">
+                      <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-muted-foreground">
                         <Calendar className="h-3 w-3" />
                         <span>{formatDate(blog.created_at)}</span>
                       </div>
-                      <h3 className="text-lg font-semibold group-hover:text-primary transition-colors line-clamp-2">
+                      <h3 className="text-base sm:text-lg font-semibold group-hover:text-primary transition-colors line-clamp-2">
                         {blog.title}
                       </h3>
                       {blog.excerpt && (
-                        <p className="text-sm text-muted-foreground line-clamp-2">
+                        <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
                           {blog.excerpt}
                         </p>
                       )}
