@@ -199,6 +199,9 @@ const ProjectDetail = () => {
                     <img
                       src={project.image_url}
                       alt={project.title}
+                      loading="eager"
+                      fetchPriority="high"
+                      decoding="async"
                       className="w-full h-auto object-cover"
                     />
                   </div>
@@ -361,7 +364,7 @@ const ProjectDetail = () => {
                       {related.map((r) => (
                         <Card key={r.id} className="p-2">
                           {r.image_url && (
-                            <img src={r.image_url} alt={r.title} className="w-full h-28 object-cover rounded" />
+                            <img src={r.image_url} alt={r.title} loading="lazy" decoding="async" className="w-full h-28 object-cover rounded" />
                           )}
                           <CardContent>
                             <h4 className="font-semibold truncate">{r.title}</h4>

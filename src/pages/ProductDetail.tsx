@@ -212,6 +212,9 @@ const ProductDetail = () => {
                     <img 
                       src={displayImage} 
                       alt={product.name}
+                      loading="eager"
+                      fetchPriority="high"
+                      decoding="async"
                       className="w-full h-[400px] lg:h-[500px] object-cover"
                     />
                     {isCourse && (
@@ -248,6 +251,8 @@ const ProductDetail = () => {
                       <img 
                         src={img} 
                         alt={`${product.name} ${idx + 1}`}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-20 object-cover"
                       />
                     </Card>

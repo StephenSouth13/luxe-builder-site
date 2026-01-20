@@ -105,6 +105,9 @@ const Hero = () => {
               <img
                 src={displayProfileImage}
                 alt={heroData.name}
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
                 className="relative w-40 h-40 sm:w-48 sm:h-48 lg:w-56 lg:h-56 rounded-full object-cover border-4 border-primary glow-gold"
               />
             </motion.div>

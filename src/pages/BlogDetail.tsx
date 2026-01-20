@@ -221,6 +221,9 @@ const BlogDetail = () => {
               <img
                 src={blog.image_url}
                 alt={blog.title}
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/20" />
