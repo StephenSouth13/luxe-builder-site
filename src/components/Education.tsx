@@ -3,6 +3,7 @@ import { useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { GraduationCap, Award } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useSectionLabels } from "@/hooks/useSectionLabels";
 
 interface EducationItem {
   id: string;
@@ -19,6 +20,7 @@ const Education = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [education, setEducation] = useState<EducationItem[]>([]);
+  const { getLabel } = useSectionLabels();
 
   useEffect(() => {
     const fetchEducation = async () => {
@@ -49,7 +51,7 @@ const Education = () => {
           <div className="flex items-center justify-center gap-3 mb-4">
             <GraduationCap className="h-8 w-8 text-primary" />
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              Học vấn
+              {getLabel("education")}
             </h2>
           </div>
           <p className="text-center text-muted-foreground mb-12 lg:mb-16 max-w-2xl mx-auto">

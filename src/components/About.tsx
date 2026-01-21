@@ -3,6 +3,7 @@ import { useInView } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import { BadgeInfo, Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useSectionLabels } from "@/hooks/useSectionLabels";
 
 interface AboutRecord {
   id: string;
@@ -23,6 +24,7 @@ const About = () => {
   const [about, setAbout] = useState<AboutRecord | null>(null);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { getLabel } = useSectionLabels();
 
   useEffect(() => {
     const load = async () => {
@@ -67,7 +69,7 @@ const About = () => {
           transition={{ duration: 0.8 }}
         >
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-            {about.headline || "Về tôi"}
+            {about.headline || getLabel("about")}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 lg:mb-16 max-w-2xl mx-auto">
             Tìm hiểu thêm về hành trình và đam mê của tôi

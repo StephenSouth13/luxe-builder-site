@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Calendar } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSectionLabels } from "@/hooks/useSectionLabels";
 
 interface Blog {
   id: string;
@@ -18,6 +19,7 @@ interface Blog {
 const BlogsSection = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { getLabel } = useSectionLabels();
 
   useEffect(() => {
     fetchBlogs();
@@ -81,7 +83,7 @@ const BlogsSection = () => {
       <div className="container mx-auto">
         <div className="text-center mb-8 sm:mb-12">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-            Blog
+            {getLabel("blogs")}
           </h2>
           <p className="text-muted-foreground text-base sm:text-lg">
             Chia sẻ kiến thức và kinh nghiệm

@@ -5,13 +5,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Save, Menu, Eye, EyeOff, Layout, Layers } from "lucide-react";
+import { Save, Menu, Eye, EyeOff, Layout, Layers, Pencil, RotateCcw } from "lucide-react";
 
 interface NavigationItem {
   key: string;
   label: string;
+  defaultLabel: string;
   path: string;
   visible: boolean;
 }
@@ -19,34 +21,37 @@ interface NavigationItem {
 interface SectionItem {
   key: string;
   label: string;
+  defaultLabel: string;
   description: string;
   visible: boolean;
 }
 
 const defaultNavItems: NavigationItem[] = [
-  { key: "home", label: "Trang chủ", path: "/", visible: true },
-  { key: "about", label: "Giới thiệu", path: "/about", visible: true },
-  { key: "projects", label: "Dự án", path: "/projects", visible: true },
-  { key: "blog", label: "Blog", path: "/blog", visible: true },
-  { key: "store", label: "Cửa hàng", path: "/store", visible: true },
-  { key: "contact", label: "Liên hệ", path: "/contact", visible: true },
+  { key: "home", label: "Trang chủ", defaultLabel: "Trang chủ", path: "/", visible: true },
+  { key: "about", label: "Giới thiệu", defaultLabel: "Giới thiệu", path: "/about", visible: true },
+  { key: "projects", label: "Dự án", defaultLabel: "Dự án", path: "/projects", visible: true },
+  { key: "blog", label: "Blog", defaultLabel: "Blog", path: "/blog", visible: true },
+  { key: "store", label: "Cửa hàng", defaultLabel: "Cửa hàng", path: "/store", visible: true },
+  { key: "contact", label: "Liên hệ", defaultLabel: "Liên hệ", path: "/contact", visible: true },
 ];
 
 const defaultSectionItems: SectionItem[] = [
-  { key: "hero", label: "Hero Banner", description: "Phần giới thiệu đầu trang", visible: true },
-  { key: "about", label: "Giới thiệu", description: "Phần về tôi", visible: true },
-  { key: "experience", label: "Kinh nghiệm", description: "Kinh nghiệm làm việc", visible: true },
-  { key: "education", label: "Học vấn", description: "Quá trình học tập", visible: true },
-  { key: "projects", label: "Dự án", description: "Các dự án nổi bật", visible: true },
-  { key: "certificates", label: "Chứng chỉ", description: "Các chứng chỉ đạt được", visible: true },
-  { key: "blogs", label: "Blog", description: "Bài viết mới nhất", visible: true },
-  { key: "contact", label: "Liên hệ", description: "Thông tin liên hệ", visible: true },
+  { key: "hero", label: "Hero Banner", defaultLabel: "Hero Banner", description: "Phần giới thiệu đầu trang", visible: true },
+  { key: "about", label: "Giới thiệu", defaultLabel: "Giới thiệu", description: "Phần về tôi", visible: true },
+  { key: "experience", label: "Kinh nghiệm", defaultLabel: "Kinh nghiệm", description: "Kinh nghiệm làm việc", visible: true },
+  { key: "education", label: "Học vấn", defaultLabel: "Học vấn", description: "Quá trình học tập", visible: true },
+  { key: "projects", label: "Dự án", defaultLabel: "Dự án", description: "Các dự án nổi bật", visible: true },
+  { key: "certificates", label: "Chứng chỉ", defaultLabel: "Chứng chỉ", description: "Các chứng chỉ đạt được", visible: true },
+  { key: "blogs", label: "Blog", defaultLabel: "Blog", description: "Bài viết mới nhất", visible: true },
+  { key: "contact", label: "Liên hệ", defaultLabel: "Liên hệ", description: "Thông tin liên hệ", visible: true },
 ];
 
 const AdminNavigationSettings = () => {
   const queryClient = useQueryClient();
   const [navItems, setNavItems] = useState<NavigationItem[]>(defaultNavItems);
   const [sectionItems, setSectionItems] = useState<SectionItem[]>(defaultSectionItems);
+  const [editingNav, setEditingNav] = useState<string | null>(null);
+  const [editingSection, setEditingSection] = useState<string | null>(null);
 
   const { data: savedNavSettings, isLoading: isLoadingNav } = useQuery({
     queryKey: ["navigation-settings"],
@@ -55,6 +60,22 @@ const AdminNavigationSettings = () => {
         .from("settings")
         .select("*")
         .eq("key", "navigation_visibility")
+        .single();
+
+      if (error && error.code !== "PGRST116") {
+        throw error;
+      }
+      return data?.value ? JSON.parse(data.value) : null;
+    },
+  });
+
+  const { data: savedNavLabels, isLoading: isLoadingNavLabels } = useQuery({
+    queryKey: ["navigation-labels"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("*")
+        .eq("key", "navigation_labels")
         .single();
 
       if (error && error.code !== "PGRST116") {
@@ -80,27 +101,45 @@ const AdminNavigationSettings = () => {
     },
   });
 
+  const { data: savedSectionLabels, isLoading: isLoadingSectionLabels } = useQuery({
+    queryKey: ["section-labels"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("*")
+        .eq("key", "section_labels")
+        .single();
+
+      if (error && error.code !== "PGRST116") {
+        throw error;
+      }
+      return data?.value ? JSON.parse(data.value) : null;
+    },
+  });
+
   useEffect(() => {
-    if (savedNavSettings) {
+    if (savedNavSettings || savedNavLabels) {
       setNavItems(
         defaultNavItems.map((item) => ({
           ...item,
-          visible: savedNavSettings[item.key] !== false,
+          visible: savedNavSettings ? savedNavSettings[item.key] !== false : true,
+          label: savedNavLabels?.[item.key] || item.defaultLabel,
         }))
       );
     }
-  }, [savedNavSettings]);
+  }, [savedNavSettings, savedNavLabels]);
 
   useEffect(() => {
-    if (savedSectionSettings) {
+    if (savedSectionSettings || savedSectionLabels) {
       setSectionItems(
         defaultSectionItems.map((item) => ({
           ...item,
-          visible: savedSectionSettings[item.key] !== false,
+          visible: savedSectionSettings ? savedSectionSettings[item.key] !== false : true,
+          label: savedSectionLabels?.[item.key] || item.defaultLabel,
         }))
       );
     }
-  }, [savedSectionSettings]);
+  }, [savedSectionSettings, savedSectionLabels]);
 
   const saveNavMutation = useMutation({
     mutationFn: async (items: NavigationItem[]) => {
@@ -112,13 +151,22 @@ const AdminNavigationSettings = () => {
         {}
       );
 
-      const { data: existing } = await supabase
+      const labelsMap = items.reduce(
+        (acc, item) => ({
+          ...acc,
+          [item.key]: item.label,
+        }),
+        {}
+      );
+
+      // Save visibility
+      const { data: existingVisibility } = await supabase
         .from("settings")
         .select("id")
         .eq("key", "navigation_visibility")
         .single();
 
-      if (existing) {
+      if (existingVisibility) {
         const { error } = await supabase
           .from("settings")
           .update({ value: JSON.stringify(visibilityMap), updated_at: new Date().toISOString() })
@@ -131,9 +179,31 @@ const AdminNavigationSettings = () => {
         });
         if (error) throw error;
       }
+
+      // Save labels
+      const { data: existingLabels } = await supabase
+        .from("settings")
+        .select("id")
+        .eq("key", "navigation_labels")
+        .single();
+
+      if (existingLabels) {
+        const { error } = await supabase
+          .from("settings")
+          .update({ value: JSON.stringify(labelsMap), updated_at: new Date().toISOString() })
+          .eq("key", "navigation_labels");
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("settings").insert({
+          key: "navigation_labels",
+          value: JSON.stringify(labelsMap),
+        });
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["navigation-settings"] });
+      queryClient.invalidateQueries({ queryKey: ["navigation-labels"] });
       toast({
         title: "Đã lưu",
         description: "Cài đặt menu đã được cập nhật",
@@ -158,13 +228,22 @@ const AdminNavigationSettings = () => {
         {}
       );
 
-      const { data: existing } = await supabase
+      const labelsMap = items.reduce(
+        (acc, item) => ({
+          ...acc,
+          [item.key]: item.label,
+        }),
+        {}
+      );
+
+      // Save visibility
+      const { data: existingVisibility } = await supabase
         .from("settings")
         .select("id")
         .eq("key", "section_visibility")
         .single();
 
-      if (existing) {
+      if (existingVisibility) {
         const { error } = await supabase
           .from("settings")
           .update({ value: JSON.stringify(visibilityMap), updated_at: new Date().toISOString() })
@@ -177,9 +256,31 @@ const AdminNavigationSettings = () => {
         });
         if (error) throw error;
       }
+
+      // Save labels
+      const { data: existingLabels } = await supabase
+        .from("settings")
+        .select("id")
+        .eq("key", "section_labels")
+        .single();
+
+      if (existingLabels) {
+        const { error } = await supabase
+          .from("settings")
+          .update({ value: JSON.stringify(labelsMap), updated_at: new Date().toISOString() })
+          .eq("key", "section_labels");
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("settings").insert({
+          key: "section_labels",
+          value: JSON.stringify(labelsMap),
+        });
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["section-visibility"] });
+      queryClient.invalidateQueries({ queryKey: ["section-labels"] });
       toast({
         title: "Đã lưu",
         description: "Cài đặt sections đã được cập nhật",
@@ -210,15 +311,47 @@ const AdminNavigationSettings = () => {
     );
   };
 
+  const updateNavLabel = (key: string, newLabel: string) => {
+    setNavItems((prev) =>
+      prev.map((item) =>
+        item.key === key ? { ...item, label: newLabel } : item
+      )
+    );
+  };
+
+  const updateSectionLabel = (key: string, newLabel: string) => {
+    setSectionItems((prev) =>
+      prev.map((item) =>
+        item.key === key ? { ...item, label: newLabel } : item
+      )
+    );
+  };
+
+  const resetNavLabel = (key: string) => {
+    const defaultItem = defaultNavItems.find(item => item.key === key);
+    if (defaultItem) {
+      updateNavLabel(key, defaultItem.defaultLabel);
+    }
+  };
+
+  const resetSectionLabel = (key: string) => {
+    const defaultItem = defaultSectionItems.find(item => item.key === key);
+    if (defaultItem) {
+      updateSectionLabel(key, defaultItem.defaultLabel);
+    }
+  };
+
   const handleSaveNav = () => {
     saveNavMutation.mutate(navItems);
+    setEditingNav(null);
   };
 
   const handleSaveSections = () => {
     saveSectionMutation.mutate(sectionItems);
+    setEditingSection(null);
   };
 
-  if (isLoadingNav || isLoadingSections) {
+  if (isLoadingNav || isLoadingSections || isLoadingNavLabels || isLoadingSectionLabels) {
     return (
       <div className="p-8 flex items-center justify-center">
         <div className="animate-pulse flex flex-col items-center gap-2">
@@ -250,7 +383,7 @@ const AdminNavigationSettings = () => {
               Quản lý Menu Điều hướng
             </CardTitle>
             <CardDescription>
-              Bật/tắt các mục menu hiển thị trên header của website
+              Bật/tắt và đổi tên các mục menu hiển thị trên header của website
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -264,8 +397,8 @@ const AdminNavigationSettings = () => {
                       : 'bg-muted/30 border-border/50'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
                       item.visible ? 'bg-primary/10' : 'bg-muted'
                     }`}>
                       {item.visible ? (
@@ -274,10 +407,47 @@ const AdminNavigationSettings = () => {
                         <EyeOff className="h-4 w-4 text-muted-foreground" />
                       )}
                     </div>
-                    <div>
-                      <Label className={`text-base font-medium ${!item.visible && 'text-muted-foreground'}`}>
-                        {item.label}
-                      </Label>
+                    <div className="flex-1 min-w-0">
+                      {editingNav === item.key ? (
+                        <div className="flex items-center gap-2">
+                          <Input
+                            value={item.label}
+                            onChange={(e) => updateNavLabel(item.key, e.target.value)}
+                            className="h-8 text-sm"
+                            autoFocus
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') setEditingNav(null);
+                              if (e.key === 'Escape') {
+                                resetNavLabel(item.key);
+                                setEditingNav(null);
+                              }
+                            }}
+                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 shrink-0"
+                            onClick={() => resetNavLabel(item.key)}
+                            title="Reset về mặc định"
+                          >
+                            <RotateCcw className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <Label className={`text-base font-medium ${!item.visible && 'text-muted-foreground'}`}>
+                            {item.label}
+                          </Label>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => setEditingNav(item.key)}
+                          >
+                            <Pencil className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      )}
                       <p className="text-sm text-muted-foreground">{item.path}</p>
                     </div>
                   </div>
@@ -308,7 +478,7 @@ const AdminNavigationSettings = () => {
               Quản lý Sections Trang chủ
             </CardTitle>
             <CardDescription>
-              Bật/tắt các phần hiển thị trên trang chủ của website
+              Bật/tắt và đổi tên các phần hiển thị trên trang chủ của website
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -322,8 +492,8 @@ const AdminNavigationSettings = () => {
                       : 'bg-muted/30 border-border/50'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
                       item.visible ? 'bg-primary/10' : 'bg-muted'
                     }`}>
                       {item.visible ? (
@@ -332,10 +502,47 @@ const AdminNavigationSettings = () => {
                         <EyeOff className="h-4 w-4 text-muted-foreground" />
                       )}
                     </div>
-                    <div>
-                      <Label className={`text-base font-medium ${!item.visible && 'text-muted-foreground'}`}>
-                        {item.label}
-                      </Label>
+                    <div className="flex-1 min-w-0">
+                      {editingSection === item.key ? (
+                        <div className="flex items-center gap-2">
+                          <Input
+                            value={item.label}
+                            onChange={(e) => updateSectionLabel(item.key, e.target.value)}
+                            className="h-8 text-sm"
+                            autoFocus
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') setEditingSection(null);
+                              if (e.key === 'Escape') {
+                                resetSectionLabel(item.key);
+                                setEditingSection(null);
+                              }
+                            }}
+                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 shrink-0"
+                            onClick={() => resetSectionLabel(item.key)}
+                            title="Reset về mặc định"
+                          >
+                            <RotateCcw className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <Label className={`text-base font-medium ${!item.visible && 'text-muted-foreground'}`}>
+                            {item.label}
+                          </Label>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => setEditingSection(item.key)}
+                          >
+                            <Pencil className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      )}
                       <p className="text-sm text-muted-foreground">{item.description}</p>
                     </div>
                   </div>

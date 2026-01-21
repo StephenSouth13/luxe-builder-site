@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Award, ExternalLink, Calendar } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useSectionLabels } from "@/hooks/useSectionLabels";
 
 interface Certificate {
   id: string;
@@ -24,6 +25,7 @@ const Certificates = () => {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const { getLabel } = useSectionLabels();
 
   useEffect(() => {
     const fetchCertificates = async () => {
@@ -53,7 +55,7 @@ const Certificates = () => {
           className="text-center mb-8 sm:mb-12"
         >
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-            Chứng chỉ & Bằng cấp
+            {getLabel("certificates")}
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
             Các chứng chỉ chuyên môn và bằng cấp đã đạt được
