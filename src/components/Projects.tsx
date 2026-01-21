@@ -7,6 +7,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useSectionLabels } from "@/hooks/useSectionLabels";
 
 interface Project {
   id: string;
@@ -24,6 +25,7 @@ const Projects = () => {
   const { t } = useLanguage();
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { getLabel } = useSectionLabels();
 
   const isHomePage = location.pathname === "/";
   const { toast } = useToast();
@@ -127,7 +129,7 @@ const Projects = () => {
       >
         <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-            {isHomePage ? t("featuredProjects") : t("allProjects")}
+            {isHomePage ? getLabel("projects") : t("allProjects")}
           </h2>
           <p className="text-muted-foreground text-lg mb-6">
             Khám phá những dự án tiêu biểu mà tôi đã thực hiện

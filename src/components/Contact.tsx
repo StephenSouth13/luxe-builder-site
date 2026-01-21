@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useSectionLabels } from "@/hooks/useSectionLabels";
 
 interface ContactRow {
   id: string;
@@ -28,6 +29,7 @@ const Contact = () => {
   });
   const [contact, setContact] = useState<ContactRow | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { getLabel } = useSectionLabels();
 
   useEffect(() => {
     const load = async () => {
@@ -88,7 +90,7 @@ const Contact = () => {
           transition={{ duration: 0.8 }}
         >
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-            Liên hệ
+            {getLabel("contact")}
           </h2>
           <p className="text-center text-muted-foreground text-lg mb-12 lg:mb-16">
             Hãy kết nối và cùng nhau tạo nên những giá trị bền vững

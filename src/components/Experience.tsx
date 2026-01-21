@@ -3,6 +3,7 @@ import { useInView } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import { Calendar, MapPin, Award } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useSectionLabels } from "@/hooks/useSectionLabels";
 
 interface Experience {
   id: string;
@@ -19,6 +20,7 @@ const Experience = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [experiences, setExperiences] = useState<Experience[]>([]);
+  const { getLabel } = useSectionLabels();
 
   useEffect(() => {
     fetchExperiences();
@@ -51,7 +53,7 @@ const Experience = () => {
           transition={{ duration: 0.8 }}
         >
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-            Kinh nghiệm
+            {getLabel("experience")}
           </h2>
           <p className="text-center text-muted-foreground mb-12 lg:mb-16 max-w-2xl mx-auto">
             Hành trình phát triển sự nghiệp chuyên môn

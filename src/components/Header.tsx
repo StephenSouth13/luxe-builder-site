@@ -51,6 +51,20 @@ const Header = () => {
     }
   });
 
+  const { data: navLabels } = useQuery({
+    queryKey: ['navigation-labels'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('settings')
+        .select('value')
+        .eq('key', 'navigation_labels')
+        .single();
+      
+      if (error && error.code !== 'PGRST116') return null;
+      return data?.value ? JSON.parse(data.value) : null;
+    }
+  });
+
   const { data: storeName = "Cửa hàng" } = useQuery({
     queryKey: ['store-name'],
     queryFn: async () => {
@@ -93,13 +107,23 @@ const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Default labels with translations
+  const defaultLabels: Record<string, string> = {
+    home: t("home"),
+    about: t("about"),
+    projects: t("projects"),
+    blog: "Blog",
+    store: storeName,
+    contact: t("contact"),
+  };
+
   const allNavItems = [
-    { key: "home", label: t("home"), path: "/" },
-    { key: "about", label: t("about"), path: "/about" },
-    { key: "projects", label: t("projects"), path: "/projects" },
-    { key: "blog", label: "Blog", path: "/blog" },
-    { key: "store", label: storeName, path: "/store" },
-    { key: "contact", label: t("contact"), path: "/contact" },
+    { key: "home", label: navLabels?.home || defaultLabels.home, path: "/" },
+    { key: "about", label: navLabels?.about || defaultLabels.about, path: "/about" },
+    { key: "projects", label: navLabels?.projects || defaultLabels.projects, path: "/projects" },
+    { key: "blog", label: navLabels?.blog || defaultLabels.blog, path: "/blog" },
+    { key: "store", label: navLabels?.store || defaultLabels.store, path: "/store" },
+    { key: "contact", label: navLabels?.contact || defaultLabels.contact, path: "/contact" },
   ];
 
   const navItems = allNavItems.filter(
