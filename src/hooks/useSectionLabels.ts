@@ -20,7 +20,7 @@ export const useSectionLabels = () => {
         .from("settings")
         .select("value")
         .eq("key", "section_labels")
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== "PGRST116") return null;
       return data?.value ? JSON.parse(data.value) : null;
