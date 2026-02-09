@@ -13,8 +13,7 @@ const Footer = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const sb: any = supabase;
-        const { data } = await sb
+        const { data } = await supabase
           .from("footer_links")
           .select("*")
           .order("section", { ascending: true })
@@ -25,8 +24,7 @@ const Footer = () => {
       }
 
       try {
-        const sb: any = supabase;
-        const { data } = await sb.from("social_links").select("*").order("sort_order", { ascending: true });
+        const { data } = await supabase.from("social_links").select("*").order("sort_order", { ascending: true });
         setSocials(data || []);
       } catch {
         setSocials([]);
@@ -35,22 +33,6 @@ const Footer = () => {
     load();
   }, []);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const sb: any = supabase;
-        const { data } = await sb
-          .from("footer_links")
-          .select("*")
-          .order("section", { ascending: true })
-          .order("sort_order", { ascending: true });
-        setLinks(data || []);
-      } catch {
-        setLinks([]);
-      }
-    };
-    load();
-  }, []);
 
   const sections = useMemo(() => {
     const map = new Map<string, FooterLink[]>();
