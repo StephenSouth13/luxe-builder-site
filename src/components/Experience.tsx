@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import { Calendar, MapPin, Award } from "lucide-react";
+import { ExperienceSkeleton } from "@/components/skeletons/SectionSkeletons";
 import { supabase } from "@/integrations/supabase/client";
 import { useSectionLabels } from "@/hooks/useSectionLabels";
 
@@ -20,6 +21,7 @@ const Experience = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [experiences, setExperiences] = useState<Experience[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { getLabel } = useSectionLabels();
 
   useEffect(() => {
@@ -37,10 +39,12 @@ const Experience = () => {
       if (data) setExperiences(data);
     } catch (error) {
       console.error("Error fetching experiences:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Don't render empty section
+  if (isLoading) return <ExperienceSkeleton />;
   if (experiences.length === 0) return null;
 
   return (

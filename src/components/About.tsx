@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
-import { BadgeInfo, Sparkles, Loader2 } from "lucide-react";
+import { BadgeInfo, Sparkles } from "lucide-react";
+import { AboutSkeleton } from "@/components/skeletons/SectionSkeletons";
 import { supabase } from "@/integrations/supabase/client";
 import { useSectionLabels } from "@/hooks/useSectionLabels";
 
@@ -46,11 +47,7 @@ const About = () => {
 
   // Don't render if no data from CMS
   if (isLoading) {
-    return (
-      <section id="about" className="py-20 lg:py-32 bg-secondary/30 flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </section>
-    );
+    return <AboutSkeleton />;
   }
 
   if (!about) {

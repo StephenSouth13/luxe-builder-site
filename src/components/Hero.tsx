@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowDown, Download, Loader2 } from "lucide-react";
+import { ArrowDown, Download } from "lucide-react";
+import { HeroSkeleton } from "@/components/skeletons/SectionSkeletons";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -54,11 +55,7 @@ const Hero = () => {
 
   // Show loading state
   if (isLoading) {
-    return (
-      <section className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </section>
-    );
+    return <HeroSkeleton />;
   }
 
   // If no data from CMS, show placeholder message

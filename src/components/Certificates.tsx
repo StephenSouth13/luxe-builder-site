@@ -7,6 +7,7 @@ import { Award, ExternalLink, Calendar } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useSectionLabels } from "@/hooks/useSectionLabels";
+import { CertificatesSkeleton } from "@/components/skeletons/SectionSkeletons";
 
 interface Certificate {
   id: string;
@@ -23,19 +24,24 @@ interface Certificate {
 
 const Certificates = () => {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { getLabel } = useSectionLabels();
 
   useEffect(() => {
     const fetchCertificates = async () => {
-      const { data, error } = await supabase
-        .from("certificates")
-        .select("*")
-        .order("sort_order", { ascending: true });
+      try {
+        const { data, error } = await supabase
+          .from("certificates")
+          .select("*")
+          .order("sort_order", { ascending: true });
 
-      if (!error && data) {
-        setCertificates(data);
+        if (!error && data) {
+          setCertificates(data);
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -43,6 +49,7 @@ const Certificates = () => {
   }, []);
 
   // Don't render empty section
+  if (isLoading) return <CertificatesSkeleton />;
   if (certificates.length === 0) return null;
 
   return (

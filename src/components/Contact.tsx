@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
-import { Send, Mail, Phone, MapPin, Loader2 } from "lucide-react";
+import { Send, Mail, Phone, MapPin } from "lucide-react";
+import { ContactSkeleton } from "@/components/skeletons/SectionSkeletons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -66,11 +67,7 @@ const Contact = () => {
   };
 
   if (isLoading) {
-    return (
-      <section id="contact" className="py-20 lg:py-32 flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </section>
-    );
+    return <ContactSkeleton />;
   }
 
   // Build contact info from CMS data only
