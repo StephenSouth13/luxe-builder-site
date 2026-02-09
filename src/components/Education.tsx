@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { GraduationCap, Award } from "lucide-react";
+import { EducationSkeleton } from "@/components/skeletons/SectionSkeletons";
 import { supabase } from "@/integrations/supabase/client";
 import { useSectionLabels } from "@/hooks/useSectionLabels";
 
@@ -20,23 +21,29 @@ const Education = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [education, setEducation] = useState<EducationItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { getLabel } = useSectionLabels();
 
   useEffect(() => {
     const fetchEducation = async () => {
-      const { data, error } = await supabase
-        .from("education")
-        .select("*")
-        .order("sort_order", { ascending: true });
+      try {
+        const { data, error } = await supabase
+          .from("education")
+          .select("*")
+          .order("sort_order", { ascending: true });
 
-      if (!error && data) {
-        setEducation(data);
+        if (!error && data) {
+          setEducation(data);
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchEducation();
   }, []);
 
+  if (isLoading) return <EducationSkeleton />;
   if (education.length === 0) return null;
 
   return (

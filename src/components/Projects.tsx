@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/
 import { supabase } from "@/integrations/supabase/client";
 import { Link, useLocation } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Loader2 } from "lucide-react";
+import { ProjectsSkeleton } from "@/components/skeletons/SectionSkeletons";
 import { useToast } from "@/hooks/use-toast";
 import { useSectionLabels } from "@/hooks/useSectionLabels";
 
@@ -104,15 +104,7 @@ const Projects = () => {
   };
 
   if (isLoading) {
-    return (
-      <section id="projects" className="py-20 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-center items-center min-h-[400px]">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        </div>
-      </section>
-    );
+    return <ProjectsSkeleton />;
   }
 
   // Don't render empty section on homepage
