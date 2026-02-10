@@ -1,12 +1,5 @@
-# Sitemap
-Sitemap: https://trinhbalam.id.vn/sitemap.xml
-
-# Allow all bots
+# Robots.txt
 User-agent: *
 Allow: /
-
-# Crawl delay for respectful crawling
 Crawl-delay: 1
-
-# Disallow admin routes
 Disallow: /admin

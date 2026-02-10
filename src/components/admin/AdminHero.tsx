@@ -264,7 +264,7 @@ const AdminHero = () => {
                   </div>
                 )}
                 <p className="text-xs text-muted-foreground">
-                  Nếu không upload, sẽ sử dụng file mặc định /CV_TrinhBaLam.pdf
+                  Upload file CV của bạn (PDF)
                 </p>
               </div>
             )}
