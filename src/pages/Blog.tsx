@@ -88,8 +88,8 @@ const Blog = () => {
   return (
     <>
       <SEOHead 
-        title="Blog - Trịnh Bá Lâm"
-        description="Chia sẻ kiến thức, kinh nghiệm và câu chuyện từ Trịnh Bá Lâm về phát triển web, công nghệ và cuộc sống."
+        title="Blog"
+        description="Chia sẻ kiến thức, kinh nghiệm và câu chuyện về công nghệ và cuộc sống."
       />
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-background to-primary/5">
         <Header />

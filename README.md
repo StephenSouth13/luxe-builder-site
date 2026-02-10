@@ -1,74 +1,85 @@
-# Portfolio Website - Trịnh Bá Lâm
+# Portfolio CMS
 
-Trang web portfolio cá nhân với React, TypeScript, Tailwind CSS và Lovable Cloud.
+Website portfolio cá nhân với Admin CMS đầy đủ. Dễ dàng nhân bản cho bất kỳ ai.
 
-## 🚀 Demo & Admin
+## 🚀 Tech Stack
 
-- **Website**: https://luxe-builder-site.vercel.app
-- **Admin Panel**: https://luxe-builder-site.vercel.app/admin
-
-**Tài khoản admin mặc định**:
-- Email: `admin@trinhbalam.com`
-- Password: `Admin@123456`
+- React 18 + TypeScript + Vite
+- Tailwind CSS + shadcn/ui
+- Supabase (Auth, Database, Storage)
+- Framer Motion
 
 ## ⚙️ Cài đặt & Chạy
 
 ```bash
-# Clone repository
 git clone <repository-url>
 cd <project-folder>
-
-# Cài đặt dependencies
 npm install
-
-# Chạy development
 npm run dev
 ```
 
-## 🔐 Environment Variables
+## 🗄️ Setup Database (Supabase)
 
-Tạo file `.env`:
+Chạy các file SQL theo thứ tự trong **Supabase SQL Editor**:
 
-```env
-VITE_SUPABASE_PROJECT_ID="hcigjefjrtkroeitictp"
-VITE_SUPABASE_PUBLISHABLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjaWdqZWZqcnRrcm9laXRpY3RwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA5MDE4MDUsImV4cCI6MjA3NjQ3NzgwNX0.o0rzJlzrYCPjflqB7KiQZGr9sl5WhZSDRGAeVS84Xfk"
-VITE_SUPABASE_URL="https://hcigjefjrtkroeitictp.supabase.co"
-```
+| Thứ tự | File | Mô tả |
+|--------|------|--------|
+| 1 | `sql/001_schema.sql` | Tạo tất cả tables, functions, indexes |
+| 2 | `sql/002_rls_policies.sql` | Thiết lập Row Level Security |
+| 3 | `sql/003_storage.sql` | Tạo storage bucket cho upload ảnh |
+| 4 | `sql/004_seed_admin.sql` | Gán quyền admin (chạy sau khi đăng ký) |
+
+### Hướng dẫn chi tiết:
+
+1. Tạo project mới trên [supabase.com](https://supabase.com)
+2. Vào **SQL Editor** → chạy lần lượt `001` → `002` → `003`
+3. Cập nhật `.env`:
+   ```env
+   VITE_SUPABASE_PROJECT_ID="your-project-id"
+   VITE_SUPABASE_PUBLISHABLE_KEY="your-anon-key"
+   VITE_SUPABASE_URL="https://your-project-id.supabase.co"
+   ```
+4. Chạy app → vào `/admin` → đăng ký tài khoản
+5. Lấy UUID của user vừa tạo:
+   ```sql
+   SELECT id, email FROM auth.users;
+   ```
+6. Chạy `004_seed_admin.sql` (thay `YOUR_USER_UUID` bằng UUID thật)
+
+## 🎨 Tính năng Admin CMS
+
+- **Hero**: Tên, chức danh, ảnh profile, ảnh nền, CV
+- **Về tôi**: Tiêu đề, mô tả, hình ảnh
+- **Kỹ năng**: Danh sách kỹ năng
+- **Kinh nghiệm**: Timeline kinh nghiệm
+- **Học vấn**: Quá trình học tập
+- **Chứng chỉ**: Chứng chỉ & credentials
+- **Dự án**: Portfolio dự án với chi tiết
+- **Blog**: Bài viết với categories, tags, lượt xem
+- **Store**: Sản phẩm & đơn hàng
+- **Liên hệ**: Email, phone, Google Maps
+- **Chatbot**: Training chatbot tự động
+- **Giao diện**: Theme, logo, navigation, footer
+
+## 🗺️ Google Maps
+
+1. Vào [Google Maps](https://www.google.com/maps)
+2. Tìm địa điểm → Share → Embed a map
+3. Copy URL hoặc dán cả thẻ iframe vào Admin > Liên hệ
 
 ## 📦 Deploy lên Vercel
 
 1. Push code lên GitHub
 2. Import vào Vercel
-3. Thêm Environment Variables từ file `.env`
+3. Thêm Environment Variables
 4. Deploy
 
-**Fix lỗi 404**: File `vercel.json` đã được tạo sẵn để xử lý routing.
+File `vercel.json` đã có sẵn để xử lý SPA routing.
 
-## 🎨 Tính năng Admin CMS
+## 📧 Tùy chỉnh SEO
 
-- **Về tôi**: Cập nhật thông tin, hình ảnh
-- **Kỹ năng**: Quản lý danh sách kỹ năng
-- **Kinh nghiệm**: Timeline kinh nghiệm (theo mốc thời gian)
-- **Dự án**: Quản lý portfolio dự án
-- **Liên hệ**: Email, phone, địa chỉ, Google Maps
-
-## 🗺️ Google Maps Setup
-
-1. Vào [Google Maps](https://www.google.com/maps)
-2. Tìm địa điểm → Share → Embed a map
-3. Copy URL trong `src="..."`
-4. Paste vào Admin > Liên hệ > Google Maps Embed URL
-
-## 🛠️ Tech Stack
-
-- React 18 + TypeScript + Vite
-- Tailwind CSS + shadcn/ui
-- Lovable Cloud (Supabase)
-- Framer Motion
-
-## 📧 Liên hệ
-
-Email: trinhbalam@gmail.com
-
----
-
+Sửa các file sau cho phù hợp:
+- `index.html` - Meta tags mặc định
+- `src/components/SEOHead.tsx` - Dynamic SEO
+- `public/robots.txt` - Crawl rules
+- `public/sitemap.xml` - Sitemap URLs

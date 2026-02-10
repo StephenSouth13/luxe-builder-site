@@ -10,21 +10,19 @@ interface SEOHeadProps {
 }
 
 const SEOHead = ({ 
-  title = "Trịnh Bá Lâm - Sales & Business Development Expert",
-  description = "Portfolio of Trịnh Bá Lâm - Sales & Business Development Expert with 8+ years of experience in market expansion, strategic partnerships, and revenue growth across diverse industries.",
-  keywords = "Trịnh Bá Lâm, Sales Expert, Business Development, Market Expansion, Strategic Partnerships, Revenue Growth, Vietnam Sales Leader, B2B Sales, Commercial Strategy",
-  image = "/profile.jpg",
+  title = "Portfolio CMS",
+  description = "Personal portfolio website with full CMS admin panel.",
+  keywords = "portfolio, CMS, personal website",
+  image = "/placeholder.svg",
   type = "website"
 }: SEOHeadProps) => {
   const location = useLocation();
-  const baseUrl = "https://trinhbalam.id.vn";
+  const baseUrl = window.location.origin;
   const currentUrl = `${baseUrl}${location.pathname}`;
 
   useEffect(() => {
-    // Update document title
     document.title = title;
 
-    // Update or create meta tags
     const updateMetaTag = (name: string, content: string, isProperty = false) => {
       const attribute = isProperty ? "property" : "name";
       let element = document.querySelector(`meta[${attribute}="${name}"]`);
@@ -38,34 +36,22 @@ const SEOHead = ({
       element.setAttribute("content", content);
     };
 
-    // Basic meta tags
     updateMetaTag("description", description);
     updateMetaTag("keywords", keywords);
-    updateMetaTag("author", "Trịnh Bá Lâm");
 
-    // Open Graph tags
     updateMetaTag("og:title", title, true);
     updateMetaTag("og:description", description, true);
     updateMetaTag("og:type", type, true);
     updateMetaTag("og:url", currentUrl, true);
     updateMetaTag("og:image", `${baseUrl}${image}`, true);
-    updateMetaTag("og:site_name", "Trịnh Bá Lâm Portfolio", true);
-    updateMetaTag("og:locale", "vi_VN", true);
 
-    // Twitter Card tags
     updateMetaTag("twitter:card", "summary_large_image");
     updateMetaTag("twitter:title", title);
     updateMetaTag("twitter:description", description);
     updateMetaTag("twitter:image", `${baseUrl}${image}`);
 
-    // Additional SEO tags
     updateMetaTag("robots", "index, follow");
-    updateMetaTag("language", "Vietnamese");
-    updateMetaTag("revisit-after", "7 days");
-    updateMetaTag("geo.region", "VN");
-    updateMetaTag("geo.placename", "Vietnam");
 
-    // Canonical link
     let canonicalLink = document.querySelector('link[rel="canonical"]');
     if (!canonicalLink) {
       canonicalLink = document.createElement("link");
@@ -74,36 +60,13 @@ const SEOHead = ({
     }
     canonicalLink.setAttribute("href", currentUrl);
 
-    // JSON-LD structured data
     const structuredData = {
       "@context": "https://schema.org",
       "@type": "Person",
-      "name": "Trịnh Bá Lâm",
-      "jobTitle": "Sales & Business Development Expert",
+      "name": title.split(" - ")[0] || "Portfolio",
       "description": description,
       "url": baseUrl,
       "image": `${baseUrl}${image}`,
-      "address": {
-        "@type": "PostalAddress",
-        "addressCountry": "VN"
-      },
-      "sameAs": [
-        // Social media links will be dynamically added from database
-      ],
-      "knowsAbout": [
-        "Sales Management",
-        "Business Development",
-        "Market Expansion",
-        "Strategic Partnerships",
-        "Revenue Growth",
-        "Team Leadership",
-        "B2B Sales",
-        "Commercial Strategy"
-      ],
-      "alumniOf": {
-        "@type": "EducationalOrganization",
-        "name": "University Education"
-      }
     };
 
     let scriptTag = document.querySelector('script[type="application/ld+json"]');
