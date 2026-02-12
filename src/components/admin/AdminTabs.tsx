@@ -17,6 +17,7 @@ import AdminChatbot from "./AdminChatbot";
 import AdminNavigationSettings from "./AdminNavigationSettings";
 import AdminStore from "./AdminStore";
 import AdminCertificates from "./AdminCertificates";
+import AdminVouchers from "./AdminVouchers";
 import AdminStoreSettings from "./AdminStoreSettings";
 import AdminThemeSettings from "./AdminThemeSettings";
 import AdminLogoSettings from "./AdminLogoSettings";
@@ -43,7 +44,8 @@ import {
   Package,
   Tag,
   ClipboardList,
-  Cog
+  Cog,
+  Ticket
 } from "lucide-react";
 
 const AdminTabs = () => {
@@ -169,12 +171,19 @@ const AdminTabs = () => {
                   <Cog className="h-4 w-4" />
                   Cài đặt
                 </TabsTrigger>
+                <TabsTrigger value="vouchers" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
+                  <Ticket className="h-4 w-4" />
+                  Voucher
+                </TabsTrigger>
               </TabsList>
               <TabsContent value="dashboard">
                 <AdminStore />
               </TabsContent>
               <TabsContent value="settings">
                 <AdminStoreSettings />
+              </TabsContent>
+              <TabsContent value="vouchers">
+                <AdminVouchers />
               </TabsContent>
             </Tabs>
           </CardContent>
