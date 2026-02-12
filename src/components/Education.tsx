@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
-import { useInView } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { GraduationCap, Award } from "lucide-react";
 import { EducationSkeleton } from "@/components/skeletons/SectionSkeletons";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,8 +17,6 @@ interface EducationItem {
 }
 
 const Education = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [education, setEducation] = useState<EducationItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { getLabel } = useSectionLabels();
@@ -31,15 +28,11 @@ const Education = () => {
           .from("education")
           .select("*")
           .order("sort_order", { ascending: true });
-
-        if (!error && data) {
-          setEducation(data);
-        }
+        if (!error && data) setEducation(data);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchEducation();
   }, []);
 
@@ -50,9 +43,9 @@ const Education = () => {
     <section className="py-20 lg:py-32 bg-muted/30">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
-          ref={ref}
           initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.8 }}
         >
           <div className="flex items-center justify-center gap-3 mb-4">
@@ -70,12 +63,12 @@ const Education = () => {
               <motion.div
                 key={edu.id}
                 initial={{ opacity: 0, x: -50 }}
-                animate={isInView ? { opacity: 1, x: 0 } : {}}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 className="relative"
               >
                 <div className="bg-card border border-border/50 rounded-xl p-6 sm:p-8 hover:border-primary/50 hover:shadow-xl transition-all duration-300 group">
-                  {/* Timeline indicator */}
                   <div className="absolute left-0 top-8 w-1 h-full bg-gradient-to-b from-primary to-primary/20 -translate-x-8 hidden lg:block" />
                   <div className="absolute left-0 top-8 w-4 h-4 rounded-full bg-primary -translate-x-10 hidden lg:block" />
 
@@ -115,7 +108,8 @@ const Education = () => {
                           <motion.li
                             key={i}
                             initial={{ opacity: 0, x: -20 }}
-                            animate={isInView ? { opacity: 1, x: 0 } : {}}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
                             transition={{ duration: 0.4, delay: index * 0.1 + i * 0.05 }}
                             className="flex items-start gap-2 text-sm text-muted-foreground"
                           >

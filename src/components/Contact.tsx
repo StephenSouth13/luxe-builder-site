@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
-import { useInView } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Send, Mail, Phone, MapPin } from "lucide-react";
 import { ContactSkeleton } from "@/components/skeletons/SectionSkeletons";
 import { Button } from "@/components/ui/button";
@@ -19,8 +18,6 @@ interface ContactRow {
 }
 
 const Contact = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
@@ -66,11 +63,8 @@ const Contact = () => {
     }
   };
 
-  if (isLoading) {
-    return <ContactSkeleton />;
-  }
+  if (isLoading) return <ContactSkeleton />;
 
-  // Build contact info from CMS data only
   const contactInfo = contact ? [
     { icon: Mail, label: "Email", value: contact.email || "", href: contact.email ? `mailto:${contact.email}` : null },
     { icon: Phone, label: "Phone", value: contact.phone || "", href: contact.phone ? `tel:${contact.phone}` : null },
@@ -81,9 +75,9 @@ const Contact = () => {
     <section id="contact" className="py-20 lg:py-32 bg-gradient-to-br from-background via-background to-primary/5">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
-          ref={ref}
           initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.8 }}
         >
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
@@ -96,7 +90,8 @@ const Contact = () => {
           <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
-              animate={isInView ? { opacity: 1, x: 0 } : {}}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
               className="space-y-8"
             >
@@ -113,8 +108,9 @@ const Contact = () => {
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, x: -20 }}
-                    animate={isInView ? { opacity: 1, x: 0 } : {}}
-                    transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
                     className="flex items-start gap-4 group"
                   >
                     <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
@@ -123,10 +119,7 @@ const Contact = () => {
                     <div>
                       <p className="text-sm text-muted-foreground mb-1">{info.label}</p>
                       {info.href ? (
-                        <a
-                          href={info.href}
-                          className="font-medium hover:text-primary transition-colors"
-                        >
+                        <a href={info.href} className="font-medium hover:text-primary transition-colors">
                           {info.value}
                         </a>
                       ) : (
@@ -168,74 +161,28 @@ const Contact = () => {
 
             <motion.div
               initial={{ opacity: 0, x: 50 }}
-              animate={isInView ? { opacity: 1, x: 0 } : {}}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium mb-2">
-                    Họ và tên
-                  </label>
-                  <Input
-                    id="name"
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Nguyễn Văn A"
-                    className="bg-card border-border focus:border-primary"
-                  />
+                  <label htmlFor="name" className="block text-sm font-medium mb-2">Họ và tên</label>
+                  <Input id="name" type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Nguyễn Văn A" className="bg-card border-border focus:border-primary" />
                 </div>
-
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium mb-2">
-                    Email
-                  </label>
-                  <Input
-                    id="email"
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="email@example.com"
-                    className="bg-card border-border focus:border-primary"
-                  />
+                  <label htmlFor="email" className="block text-sm font-medium mb-2">Email</label>
+                  <Input id="email" type="email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="email@example.com" className="bg-card border-border focus:border-primary" />
                 </div>
-
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium mb-2">
-                    Số điện thoại
-                  </label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="+84 123 456 789"
-                    className="bg-card border-border focus:border-primary"
-                  />
+                  <label htmlFor="phone" className="block text-sm font-medium mb-2">Số điện thoại</label>
+                  <Input id="phone" type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="+84 123 456 789" className="bg-card border-border focus:border-primary" />
                 </div>
-
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium mb-2">
-                    Tin nhắn
-                  </label>
-                  <Textarea
-                    id="message"
-                    required
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="Nội dung tin nhắn..."
-                    rows={6}
-                    className="bg-card border-border focus:border-primary resize-none"
-                  />
+                  <label htmlFor="message" className="block text-sm font-medium mb-2">Tin nhắn</label>
+                  <Textarea id="message" required value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} placeholder="Nội dung tin nhắn..." rows={6} className="bg-card border-border focus:border-primary resize-none" />
                 </div>
-
-                <Button
-                  type="submit"
-                  className="w-full gold-gradient hover:opacity-90 transition-opacity text-background font-semibold"
-                  size="lg"
-                >
+                <Button type="submit" className="w-full gold-gradient hover:opacity-90 transition-opacity text-background font-semibold" size="lg">
                   <Send className="mr-2 h-5 w-5" />
                   Gửi tin nhắn
                 </Button>

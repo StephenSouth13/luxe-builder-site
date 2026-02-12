@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
-import { useInView } from "framer-motion";
-import { useRef, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { BadgeInfo, Sparkles } from "lucide-react";
 import { AboutSkeleton } from "@/components/skeletons/SectionSkeletons";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,8 +19,6 @@ interface Skill {
 }
 
 const About = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [about, setAbout] = useState<AboutRecord | null>(null);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,14 +42,8 @@ const About = () => {
     load();
   }, []);
 
-  // Don't render if no data from CMS
-  if (isLoading) {
-    return <AboutSkeleton />;
-  }
-
-  if (!about) {
-    return null;
-  }
+  if (isLoading) return <AboutSkeleton />;
+  if (!about) return null;
 
   const displayImage = about.image_url;
 
@@ -60,9 +51,9 @@ const About = () => {
     <section id="about" className="py-20 lg:py-32 bg-secondary/30">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
-          ref={ref}
           initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.8 }}
         >
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
@@ -76,7 +67,8 @@ const About = () => {
             {displayImage && (
               <motion.div
                 initial={{ opacity: 0, x: -50 }}
-                animate={isInView ? { opacity: 1, x: 0 } : {}}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
                 transition={{ duration: 0.8, delay: 0.2 }}
                 className="flex justify-center"
               >
@@ -95,7 +87,8 @@ const About = () => {
 
             <motion.div
               initial={{ opacity: 0, x: 50 }}
-              animate={isInView ? { opacity: 1, x: 0 } : {}}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.4 }}
               className={`space-y-6 ${!displayImage ? 'md:col-span-2 max-w-3xl mx-auto' : ''}`}
             >
@@ -116,8 +109,9 @@ const About = () => {
                     <motion.div
                       key={skill.id}
                       initial={{ opacity: 0, scale: 0.8 }}
-                      animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                      transition={{ duration: 0.5, delay: 0.6 + index * 0.08 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.2 + index * 0.08 }}
                       className="group relative p-4 sm:p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/20"
                     >
                       <div className="absolute inset-0 bg-gradient-to-br from-primary to-gold-light opacity-0 group-hover:opacity-5 rounded-xl transition-opacity duration-300" />

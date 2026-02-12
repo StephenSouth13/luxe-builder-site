@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { useInView } from "framer-motion";
-import { useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Award, ExternalLink, Calendar } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -25,8 +23,6 @@ interface Certificate {
 const Certificates = () => {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
   const { getLabel } = useSectionLabels();
 
   useEffect(() => {
@@ -36,28 +32,24 @@ const Certificates = () => {
           .from("certificates")
           .select("*")
           .order("sort_order", { ascending: true });
-
-        if (!error && data) {
-          setCertificates(data);
-        }
+        if (!error && data) setCertificates(data);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchCertificates();
   }, []);
 
-  // Don't render empty section
   if (isLoading) return <CertificatesSkeleton />;
   if (certificates.length === 0) return null;
 
   return (
-    <section ref={ref} className="py-12 sm:py-16 px-4 bg-muted/30">
+    <section className="py-12 sm:py-16 px-4 bg-muted/30">
       <div className="container mx-auto max-w-6xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6 }}
           className="text-center mb-8 sm:mb-12"
         >
@@ -74,7 +66,8 @@ const Certificates = () => {
             <motion.div
               key={cert.id}
               initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
             >
               <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow group">
