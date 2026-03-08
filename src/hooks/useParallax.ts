@@ -1,15 +1,24 @@
-import { useRef } from "react";
-import { useScroll, useTransform, MotionValue } from "framer-motion";
+import { useRef, useState, useEffect } from "react";
+import { useScroll, useTransform, useMotionValue } from "framer-motion";
 
 export const useParallax = (speed: number = 0.2) => {
-  const ref = useRef<HTMLElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
+  const [isAttached, setIsAttached] = useState(false);
 
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
+  useEffect(() => {
+    if (ref.current) setIsAttached(true);
+  }, []);
 
-  const y = useTransform(scrollYProgress, [0, 1], [-50 * speed, 50 * speed]);
+  const fallback = useMotionValue(0);
 
-  return { ref, y, scrollYProgress };
+  const { scrollYProgress } = useScroll(
+    isAttached && ref.current
+      ? { target: ref, offset: ["start end", "end start"] }
+      : undefined
+  );
+
+  const progress = isAttached ? scrollYProgress : fallback;
+  const y = useTransform(progress, [0, 1], [-50 * speed, 50 * speed]);
+
+  return { ref, y, scrollYProgress: progress };
 };
