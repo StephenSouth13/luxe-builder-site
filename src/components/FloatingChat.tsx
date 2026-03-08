@@ -1,20 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Send, Bot, User, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
-
-interface ChatbotTraining {
-  id: string;
-  keywords: string[];
-  question: string;
-  answer: string;
-  language: string;
-  priority: number;
-  active: boolean;
-}
 
 interface ChatMessage {
   text: string;
@@ -22,144 +11,162 @@ interface ChatMessage {
   timestamp: Date;
 }
 
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
+
 const FloatingChat = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [language, setLanguage] = useState<"vi" | "en">("vi");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState("");
-  const [trainings, setTrainings] = useState<ChatbotTraining[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Initialize welcome message
   useEffect(() => {
     setMessages([createWelcomeMessage(language)]);
   }, [language]);
 
-  // Fetch trainings
   useEffect(() => {
-    fetchTrainings();
-  }, []);
+    fetchSuggestions();
+  }, [language]);
 
-  // Update suggested questions when language or trainings change
-  useEffect(() => {
-    const questions = trainings
-      .filter((t) => t.language === language && t.active)
-      .sort((a, b) => b.priority - a.priority)
-      .slice(0, 4)
-      .map((t) => t.question);
-    setSuggestedQuestions(questions);
-  }, [trainings, language]);
-
-  // Auto-scroll to bottom
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, isTyping]);
 
-  // Focus input when opened
   useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 300);
-    }
+    if (isOpen) setTimeout(() => inputRef.current?.focus(), 300);
   }, [isOpen]);
 
   const createWelcomeMessage = (lang: "vi" | "en"): ChatMessage => ({
     text: lang === "vi"
-      ? "Xin chào! 👋 Tôi là trợ lý ảo. Hãy hỏi tôi bất cứ điều gì!"
-      : "Hello! 👋 I'm a virtual assistant. Ask me anything!",
+      ? "Xin chào! 👋 Tôi là trợ lý AI thông minh. Hãy hỏi tôi bất cứ điều gì!"
+      : "Hello! 👋 I'm an AI assistant. Ask me anything!",
     isBot: true,
     timestamp: new Date(),
   });
 
-  const fetchTrainings = async () => {
+  const fetchSuggestions = async () => {
     const { data } = await supabase
       .from("chatbot_training")
-      .select("*")
+      .select("question")
       .eq("active", true)
-      .order("priority", { ascending: false });
-    if (data) setTrainings(data);
+      .eq("language", language)
+      .order("priority", { ascending: false })
+      .limit(4);
+    if (data) setSuggestedQuestions(data.map((t) => t.question));
   };
 
-  const normalizeText = (text: string): string => {
-    return text
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/đ/g, "d")
-      .replace(/[^a-z0-9\s]/g, "")
-      .trim();
+  const getConversationHistory = (): { role: string; content: string }[] => {
+    return messages
+      .filter((m) => m.text !== createWelcomeMessage(language).text)
+      .map((m) => ({
+        role: m.isBot ? "assistant" : "user",
+        content: m.text,
+      }));
   };
 
-  const findBestAnswer = useCallback(
-    (userInput: string): string => {
-      const normalized = normalizeText(userInput);
-      const words = normalized.split(/\s+/);
-      const relevant = trainings.filter((t) => t.language === language);
-
-      let bestMatch: ChatbotTraining | null = null;
-      let bestScore = 0;
-
-      for (const training of relevant) {
-        let matchCount = 0;
-        let exactMatch = false;
-
-        for (const keyword of training.keywords) {
-          const normKeyword = normalizeText(keyword);
-          if (normalized.includes(normKeyword)) {
-            matchCount++;
-            if (normalized === normKeyword) exactMatch = true;
-          }
-          // Also check individual words
-          for (const word of words) {
-            if (word.length >= 3 && normKeyword.includes(word)) {
-              matchCount += 0.5;
-            }
-          }
-        }
-
-        if (matchCount > 0) {
-          // Score = keyword matches * priority weight
-          const score = matchCount * (1 + training.priority * 0.5) + (exactMatch ? 10 : 0);
-          if (score > bestScore) {
-            bestScore = score;
-            bestMatch = training;
-          }
-        }
-      }
-
-      if (bestMatch) return bestMatch.answer;
-
-      return language === "vi"
-        ? "Cảm ơn bạn đã liên hệ! 😊 Tôi chưa có câu trả lời cho câu hỏi này. Vui lòng điền form liên hệ để được hỗ trợ tốt nhất."
-        : "Thank you for reaching out! 😊 I don't have an answer for this yet. Please fill out the contact form for the best support.";
-    },
-    [trainings, language]
-  );
-
-  const handleSend = (text?: string) => {
+  const handleSend = async (text?: string) => {
     const msg = text || inputValue.trim();
-    if (!msg) return;
+    if (!msg || isTyping) return;
 
     const userMessage: ChatMessage = { text: msg, isBot: false, timestamp: new Date() };
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
     setIsTyping(true);
 
-    // Simulate typing delay
-    const delay = 400 + Math.random() * 600;
-    setTimeout(() => {
-      const botResponse: ChatMessage = {
-        text: findBestAnswer(msg),
-        isBot: true,
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, botResponse]);
+    try {
+      const resp = await fetch(CHAT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          message: msg,
+          language,
+          conversationHistory: getConversationHistory(),
+        }),
+      });
+
+      if (!resp.ok || !resp.body) {
+        throw new Error(`Error ${resp.status}`);
+      }
+
+      // Stream response
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let assistantText = "";
+      let botMsgAdded = false;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex: number;
+        while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
+          let line = buffer.slice(0, newlineIndex);
+          buffer = buffer.slice(newlineIndex + 1);
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (!line.startsWith("data: ")) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") break;
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) {
+              assistantText += content;
+              setMessages((prev) => {
+                if (!botMsgAdded) {
+                  botMsgAdded = true;
+                  return [...prev, { text: assistantText, isBot: true, timestamp: new Date() }];
+                }
+                return prev.map((m, i) =>
+                  i === prev.length - 1 && m.isBot ? { ...m, text: assistantText } : m
+                );
+              });
+            }
+          } catch {
+            // partial JSON, wait for more
+          }
+        }
+      }
+
+      if (!botMsgAdded) {
+        // Fallback if no streaming content received
+        setMessages((prev) => [
+          ...prev,
+          {
+            text: language === "vi"
+              ? "Xin lỗi, tôi gặp sự cố. Vui lòng thử lại!"
+              : "Sorry, something went wrong. Please try again!",
+            isBot: true,
+            timestamp: new Date(),
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error("Chat error:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: language === "vi"
+            ? "Xin lỗi, tôi gặp sự cố. Vui lòng thử lại!"
+            : "Sorry, something went wrong. Please try again!",
+          isBot: true,
+          timestamp: new Date(),
+        },
+      ]);
+    } finally {
       setIsTyping(false);
-    }, delay);
+    }
   };
 
   const toggleLanguage = () => {
@@ -188,10 +195,10 @@ const FloatingChat = () => {
                 </div>
                 <div>
                   <span className="font-semibold text-background text-sm block leading-tight">
-                    {language === "vi" ? "Trợ lý ảo" : "Virtual Assistant"}
+                    {language === "vi" ? "Trợ lý AI" : "AI Assistant"}
                   </span>
                   <span className="text-background/70 text-[10px]">
-                    {language === "vi" ? "Luôn sẵn sàng hỗ trợ" : "Always ready to help"}
+                    {language === "vi" ? "Trả lời thông minh bằng AI" : "Smart AI-powered answers"}
                   </span>
                 </div>
               </div>
@@ -250,13 +257,8 @@ const FloatingChat = () => {
                 </motion.div>
               ))}
 
-              {/* Typing indicator */}
-              {isTyping && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex gap-2 items-center"
-                >
+              {isTyping && !messages[messages.length - 1]?.isBot && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-2 items-center">
                   <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
                     <Bot className="h-3 w-3 text-primary" />
                   </div>
@@ -335,11 +337,7 @@ const FloatingChat = () => {
           size="icon"
           className="h-14 w-14 rounded-full gold-gradient hover:opacity-90 transition-opacity shadow-lg glow-gold"
         >
-          {isOpen ? (
-            <X className="h-6 w-6 text-background" />
-          ) : (
-            <MessageCircle className="h-6 w-6 text-background" />
-          )}
+          {isOpen ? <X className="h-6 w-6 text-background" /> : <MessageCircle className="h-6 w-6 text-background" />}
         </Button>
       </motion.div>
     </>
