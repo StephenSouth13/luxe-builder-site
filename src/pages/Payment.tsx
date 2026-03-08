@@ -116,7 +116,7 @@ const Payment = () => {
         .insert({
           user_id: user.id,
           ...formData,
-          total_amount: total,
+          total_amount: finalTotal,
           status: 'pending'
         })
         .select()
