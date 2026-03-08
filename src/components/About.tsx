@@ -124,7 +124,7 @@ const About = () => {
         <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
           <SectionTitle />
           <div className="max-w-4xl mx-auto">
-            <div className="rounded-2xl border border-border/50 bg-card shadow-xl overflow-hidden">
+            <div className="rounded-2xl glass-strong shadow-xl overflow-hidden glow-card">
               {displayImage && (
                 <div className="h-64 overflow-hidden">
                   <img src={displayImage} alt="Ảnh hồ sơ" loading="lazy" className="w-full h-full object-cover" />
