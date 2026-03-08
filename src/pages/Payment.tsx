@@ -201,7 +201,7 @@ const Payment = () => {
     );
   }
 
-  const calculateTotal = () => {
+  const calculateSubtotal = () => {
     return cartItems.reduce((total, item) => {
       const product = item.products;
       const price = product.price * (1 - (product.discount_percent || 0) / 100);
@@ -209,7 +209,22 @@ const Payment = () => {
     }, 0);
   };
 
-  const totalAmount = calculateTotal();
+  const calculateDiscount = () => {
+    if (!appliedVoucher) return 0;
+    const subtotal = calculateSubtotal();
+    if (appliedVoucher.discount_type === 'percent') {
+      return subtotal * (appliedVoucher.discount_value / 100);
+    }
+    return Math.min(appliedVoucher.discount_value, subtotal);
+  };
+
+  const calculateFinalTotal = () => {
+    return Math.max(0, calculateSubtotal() - calculateDiscount());
+  };
+
+  const subtotalAmount = calculateSubtotal();
+  const discountAmount = calculateDiscount();
+  const totalAmount = calculateFinalTotal();
   
   // Generate VietQR payment string
   const bankInfo = {
