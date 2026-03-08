@@ -313,9 +313,47 @@ const Payment = () => {
                     </div>
                   );
                 })}
-                <div className="flex justify-between font-bold text-lg pt-2 border-t">
-                  <span>Tổng cộng:</span>
-                  <span className="text-primary">{calculateTotal().toLocaleString()}đ</span>
+                <div className="border-t pt-2 space-y-1">
+                  <div className="flex justify-between text-sm">
+                    <span>Tạm tính:</span>
+                    <span>{subtotalAmount.toLocaleString()}đ</span>
+                  </div>
+                  {appliedVoucher && (
+                    <div className="flex justify-between text-sm text-green-600">
+                      <span>Giảm giá ({appliedVoucher.code}):</span>
+                      <span>-{discountAmount.toLocaleString()}đ</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between font-bold text-lg">
+                    <span>Tổng cộng:</span>
+                    <span className="text-primary">{totalAmount.toLocaleString()}đ</span>
+                  </div>
+                </div>
+
+                {/* Voucher input */}
+                <div className="pt-3 border-t mt-2">
+                  <Label htmlFor="voucher" className="text-sm font-medium">Mã giảm giá</Label>
+                  <div className="flex gap-2 mt-1">
+                    <Input
+                      id="voucher"
+                      placeholder="Nhập mã voucher"
+                      value={voucherCode}
+                      onChange={(e) => { setVoucherCode(e.target.value.toUpperCase()); setVoucherError(""); }}
+                      disabled={!!appliedVoucher}
+                      className="flex-1"
+                    />
+                    {appliedVoucher ? (
+                      <Button type="button" variant="outline" size="sm" onClick={() => { setAppliedVoucher(null); setVoucherCode(""); toast.info("Đã hủy mã giảm giá"); }}>
+                        Hủy
+                      </Button>
+                    ) : (
+                      <Button type="button" variant="secondary" size="sm" onClick={handleApplyVoucher}>
+                        Áp dụng
+                      </Button>
+                    )}
+                  </div>
+                  {voucherError && <p className="text-sm text-destructive mt-1">{voucherError}</p>}
+                  {appliedVoucher && <p className="text-sm text-green-600 mt-1">✓ Đã áp dụng mã {appliedVoucher.code}</p>}
                 </div>
               </div>
             </Card>
