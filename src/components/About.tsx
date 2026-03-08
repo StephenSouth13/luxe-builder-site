@@ -144,8 +144,8 @@ const About = () => {
 
   // Magazine
   return (
-    <section id="about" className="py-20 lg:py-32 bg-secondary/30">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="about" ref={parallaxRef} className="py-20 lg:py-32 parallax-section noise-overlay mesh-gradient">
+      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
           <SectionTitle />
           <div className="grid lg:grid-cols-5 gap-10 items-start">
