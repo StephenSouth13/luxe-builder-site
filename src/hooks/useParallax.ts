@@ -11,13 +11,13 @@ export const useParallax = (speed: number = 0.2) => {
 
   const fallback = useMotionValue(0);
 
-  const { scrollYProgress } = useScroll(
+  const scroll = useScroll(
     isAttached && ref.current
       ? { target: ref, offset: ["start end", "end start"] }
-      : undefined
+      : { target: ref, offset: ["start end", "end start"] }
   );
 
-  const progress = isAttached ? scrollYProgress : fallback;
+  const progress = isAttached ? (scroll?.scrollYProgress ?? fallback) : fallback;
   const y = useTransform(progress, [0, 1], [-50 * speed, 50 * speed]);
 
   return { ref, y, scrollYProgress: progress };
