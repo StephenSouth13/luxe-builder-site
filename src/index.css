@@ -727,6 +727,17 @@ All colors MUST be HSL.
   @apply bg-primary/5 backdrop-blur-xl border border-primary/10 shadow-lg shadow-primary/5;
 }
 
+/* When glassmorphism is OFF */
+[data-glass="off"] .glass,
+[data-glass="off"] .glass-strong,
+[data-glass="off"] .glass-subtle,
+[data-glass="off"] .glass-primary {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
 /* ========== Parallax helpers ========== */
 .parallax-section {
   position: relative;
@@ -748,6 +759,16 @@ All colors MUST be HSL.
   will-change: transform;
 }
 
+/* When parallax is OFF, hide parallax-bg children */
+[data-parallax="off"] .parallax-bg {
+  display: none;
+}
+
+/* When orbs are OFF, hide orb children inside parallax-bg */
+[data-orbs="off"] .parallax-bg {
+  display: none;
+}
+
 /* ========== Floating / glow effects ========== */
 .glow-primary {
   box-shadow: 0 0 20px hsl(var(--primary) / 0.15), 0 0 60px hsl(var(--primary) / 0.05);
@@ -758,6 +779,14 @@ All colors MUST be HSL.
 }
 .glow-card:hover {
   box-shadow: 0 8px 32px hsl(var(--primary) / 0.12), 0 0 0 1px hsl(var(--primary) / 0.08);
+}
+
+/* When glow is OFF */
+[data-glow="off"] .glow-card:hover {
+  box-shadow: none !important;
+}
+[data-glow="off"] .glow-primary {
+  box-shadow: none !important;
 }
 
 /* ========== Mesh gradient backgrounds ========== */
@@ -776,6 +805,12 @@ All colors MUST be HSL.
     radial-gradient(at 50% 0%, hsl(var(--primary) / 0.08) 0%, transparent 60%);
 }
 
+/* When mesh gradient is OFF */
+[data-mesh="off"] .mesh-gradient,
+[data-mesh="off"] .mesh-gradient-strong {
+  background-image: none !important;
+}
+
 /* ========== Noise texture ========== */
 .noise-overlay::after {
   content: '';
@@ -785,6 +820,11 @@ All colors MUST be HSL.
   pointer-events: none;
   opacity: 0.03;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* When noise is OFF */
+[data-noise="off"] .noise-overlay::after {
+  display: none !important;
 }
 
 /* ========== Shimmer effect ========== */
