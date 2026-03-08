@@ -7,18 +7,22 @@ export type ColorTheme =
   | "blue-white" 
   | "purple-white"
   | "red-white"
-  // Seasons
   | "spring"
   | "summer"
   | "autumn"
   | "winter"
-  // Festivals
   | "tet" 
   | "christmas" 
   | "halloween"
   | "valentine"
   | "vietnam-national"
-  | "new-year";
+  | "new-year"
+  | "ocean-dark"
+  | "rose-gold"
+  | "cyber-neon"
+  | "forest-dark"
+  | "sunset-warm"
+  | "midnight-blue";
 
 export type ThemeCategory = "standard" | "season" | "festival";
 
@@ -72,6 +76,60 @@ export const themeConfigs: ThemeConfig[] = [
     nameVi: "Đỏ & Trắng",
     preview: { primary: "#EF4444", background: "#FAFAFA" },
     category: "standard"
+  },
+  {
+    id: "ocean-dark",
+    name: "Ocean Dark",
+    nameVi: "Đại dương tối",
+    preview: { primary: "#2DD4BF", background: "#0A1628", accent: "#33B89C" },
+    category: "standard",
+    icon: "🌊",
+    description: "Sâu thẳm, bí ẩn, thanh lịch"
+  },
+  {
+    id: "rose-gold",
+    name: "Rose Gold",
+    nameVi: "Hồng vàng",
+    preview: { primary: "#D4768C", background: "#F5EDED", accent: "#C8944A" },
+    category: "standard",
+    icon: "🌹",
+    description: "Sang trọng, nữ tính, quý phái"
+  },
+  {
+    id: "cyber-neon",
+    name: "Cyber Neon",
+    nameVi: "Neon công nghệ",
+    preview: { primary: "#00FF00", background: "#0A0A14", accent: "#9933FF" },
+    category: "standard",
+    icon: "⚡",
+    description: "Tương lai, mạnh mẽ, bắt mắt"
+  },
+  {
+    id: "forest-dark",
+    name: "Forest Dark",
+    nameVi: "Rừng thẳm",
+    preview: { primary: "#3DA36E", background: "#0D1A12", accent: "#7AAB40" },
+    category: "standard",
+    icon: "🌲",
+    description: "Tự nhiên, bình yên, huyền bí"
+  },
+  {
+    id: "sunset-warm",
+    name: "Sunset Warm",
+    nameVi: "Hoàng hôn",
+    preview: { primary: "#E8652B", background: "#FAF5F0", accent: "#D44070" },
+    category: "standard",
+    icon: "🌅",
+    description: "Ấm áp, rực rỡ, năng lượng"
+  },
+  {
+    id: "midnight-blue",
+    name: "Midnight Blue",
+    nameVi: "Xanh đêm",
+    preview: { primary: "#4A8FD9", background: "#0B1120", accent: "#33B5D9" },
+    category: "standard",
+    icon: "🌙",
+    description: "Thanh lịch, chuyên nghiệp, sâu lắng"
   },
   // Seasonal themes
   {
@@ -201,19 +259,14 @@ export const useColorTheme = () => {
 
   const applyTheme = (theme: ColorTheme) => {
     const root = document.documentElement;
-    
-    // Remove all theme classes first
     const allThemes = themeConfigs.map(t => `theme-${t.id}`);
     root.classList.remove(...allThemes);
-    
-    // Add the new theme class
     root.classList.add(`theme-${theme}`);
   };
 
   const updateColorTheme = async (newTheme: ColorTheme) => {
     setColorTheme(newTheme);
     
-    // Save to database
     const { data: existing } = await supabase
       .from("settings")
       .select("id")

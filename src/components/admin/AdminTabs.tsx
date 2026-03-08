@@ -1,5 +1,4 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
 import AdminHero from "./AdminHero";
 import AdminAbout from "./AdminAbout";
 import AdminSkills from "./AdminSkills";
@@ -21,235 +20,132 @@ import AdminVouchers from "./AdminVouchers";
 import AdminStoreSettings from "./AdminStoreSettings";
 import AdminThemeSettings from "./AdminThemeSettings";
 import AdminLogoSettings from "./AdminLogoSettings";
+import AdminScrollEffects from "./AdminScrollEffects";
 import { 
-  FileText, 
-  Newspaper, 
-  Store, 
-  Phone, 
-  Settings,
-  User,
-  Briefcase,
-  GraduationCap,
-  Award,
-  FolderKanban,
-  Palette,
-  Image,
-  Navigation,
-  MessageSquare,
-  Mail,
-  Share2,
-  Info,
-  Link as LinkIcon,
-  BarChart3,
-  Package,
-  Tag,
-  ClipboardList,
-  Cog,
-  Ticket
+  FileText, Newspaper, Store, Phone, Settings,
+  User, Briefcase, GraduationCap, Award, FolderKanban,
+  Palette, Image, Navigation, MessageSquare, Mail,
+  Share2, Info, Link as LinkIcon, BarChart3, Package,
+  Tag, ClipboardList, Cog, Ticket, Wand2
 } from "lucide-react";
+
+const SubTab = ({ value, icon: Icon, label }: { value: string; icon: any; label: string }) => (
+  <TabsTrigger 
+    value={value} 
+    className="flex items-center gap-1.5 px-3 py-1.5 text-xs border rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary transition-all"
+  >
+    <Icon className="h-3.5 w-3.5" />
+    <span className="hidden sm:inline">{label}</span>
+  </TabsTrigger>
+);
 
 const AdminTabs = () => {
   return (
     <Tabs defaultValue="content" className="w-full">
-      <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 mb-6 h-auto p-1 bg-muted/50">
-        <TabsTrigger value="content" className="flex items-center gap-2 py-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-          <FileText className="h-4 w-4" />
-          <span className="hidden sm:inline">Nội dung</span>
-        </TabsTrigger>
-        <TabsTrigger value="blog" className="flex items-center gap-2 py-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-          <Newspaper className="h-4 w-4" />
-          <span className="hidden sm:inline">Blog</span>
-        </TabsTrigger>
-        <TabsTrigger value="store" className="flex items-center gap-2 py-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-          <Store className="h-4 w-4" />
-          <span className="hidden sm:inline">Cửa hàng</span>
-        </TabsTrigger>
-        <TabsTrigger value="contact" className="flex items-center gap-2 py-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-          <Phone className="h-4 w-4" />
-          <span className="hidden sm:inline">Liên hệ</span>
-        </TabsTrigger>
-        <TabsTrigger value="system" className="flex items-center gap-2 py-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-          <Settings className="h-4 w-4" />
-          <span className="hidden sm:inline">Hệ thống</span>
-        </TabsTrigger>
+      <TabsList className="grid w-full grid-cols-5 mb-4 h-auto p-0.5 bg-muted/40 rounded-lg">
+        {[
+          { value: "content", icon: FileText, label: "Nội dung" },
+          { value: "blog", icon: Newspaper, label: "Blog" },
+          { value: "store", icon: Store, label: "Cửa hàng" },
+          { value: "contact", icon: Phone, label: "Liên hệ" },
+          { value: "system", icon: Settings, label: "Hệ thống" },
+        ].map(tab => (
+          <TabsTrigger 
+            key={tab.value} 
+            value={tab.value} 
+            className="flex items-center gap-1.5 py-2 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md transition-all"
+          >
+            <tab.icon className="h-4 w-4" />
+            <span className="hidden md:inline">{tab.label}</span>
+          </TabsTrigger>
+        ))}
       </TabsList>
 
+      {/* Content */}
       <TabsContent value="content" className="mt-0">
-        <Card className="border-0 shadow-sm">
-          <CardContent className="p-4 md:p-6">
-            <Tabs defaultValue="hero" className="w-full">
-              <TabsList className="w-full flex flex-wrap justify-start gap-1 h-auto bg-transparent p-0 mb-6">
-                <TabsTrigger value="hero" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <User className="h-4 w-4" />
-                  Hero
-                </TabsTrigger>
-                <TabsTrigger value="about" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <Info className="h-4 w-4" />
-                  Về tôi
-                </TabsTrigger>
-                <TabsTrigger value="skills" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <Award className="h-4 w-4" />
-                  Kỹ năng
-                </TabsTrigger>
-                <TabsTrigger value="certificates" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <Award className="h-4 w-4" />
-                  Chứng chỉ
-                </TabsTrigger>
-                <TabsTrigger value="education" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <GraduationCap className="h-4 w-4" />
-                  Học vấn
-                </TabsTrigger>
-                <TabsTrigger value="experiences" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <Briefcase className="h-4 w-4" />
-                  Kinh nghiệm
-                </TabsTrigger>
-                <TabsTrigger value="projects" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <FolderKanban className="h-4 w-4" />
-                  Dự án
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="hero"><AdminHero /></TabsContent>
-              <TabsContent value="about"><AdminAbout /></TabsContent>
-              <TabsContent value="skills"><AdminSkills /></TabsContent>
-              <TabsContent value="certificates"><AdminCertificates /></TabsContent>
-              <TabsContent value="education"><AdminEducation /></TabsContent>
-              <TabsContent value="experiences"><AdminExperiences /></TabsContent>
-              <TabsContent value="projects"><AdminProjects /></TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+        <Tabs defaultValue="hero" className="w-full">
+          <TabsList className="w-full flex flex-wrap justify-start gap-1 h-auto bg-transparent p-0 mb-4">
+            <SubTab value="hero" icon={User} label="Hero" />
+            <SubTab value="about" icon={Info} label="Về tôi" />
+            <SubTab value="skills" icon={Award} label="Kỹ năng" />
+            <SubTab value="certificates" icon={Award} label="Chứng chỉ" />
+            <SubTab value="education" icon={GraduationCap} label="Học vấn" />
+            <SubTab value="experiences" icon={Briefcase} label="Kinh nghiệm" />
+            <SubTab value="projects" icon={FolderKanban} label="Dự án" />
+          </TabsList>
+          <TabsContent value="hero"><AdminHero /></TabsContent>
+          <TabsContent value="about"><AdminAbout /></TabsContent>
+          <TabsContent value="skills"><AdminSkills /></TabsContent>
+          <TabsContent value="certificates"><AdminCertificates /></TabsContent>
+          <TabsContent value="education"><AdminEducation /></TabsContent>
+          <TabsContent value="experiences"><AdminExperiences /></TabsContent>
+          <TabsContent value="projects"><AdminProjects /></TabsContent>
+        </Tabs>
       </TabsContent>
 
+      {/* Blog */}
       <TabsContent value="blog" className="mt-0">
-        <Card className="border-0 shadow-sm">
-          <CardContent className="p-4 md:p-6">
-            <Tabs defaultValue="posts" className="w-full">
-              <TabsList className="w-full flex flex-wrap justify-start gap-1 h-auto bg-transparent p-0 mb-6">
-                <TabsTrigger value="posts" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <FileText className="h-4 w-4" />
-                  Bài viết
-                </TabsTrigger>
-                <TabsTrigger value="categories" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <Tag className="h-4 w-4" />
-                  Danh mục
-                </TabsTrigger>
-                <TabsTrigger value="tags" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <Tag className="h-4 w-4" />
-                  Tags
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="posts"><AdminBlog /></TabsContent>
-              <TabsContent value="categories"><AdminBlogCategories /></TabsContent>
-              <TabsContent value="tags"><AdminBlogTags /></TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+        <Tabs defaultValue="posts" className="w-full">
+          <TabsList className="w-full flex flex-wrap justify-start gap-1 h-auto bg-transparent p-0 mb-4">
+            <SubTab value="posts" icon={FileText} label="Bài viết" />
+            <SubTab value="categories" icon={Tag} label="Danh mục" />
+            <SubTab value="tags" icon={Tag} label="Tags" />
+          </TabsList>
+          <TabsContent value="posts"><AdminBlog /></TabsContent>
+          <TabsContent value="categories"><AdminBlogCategories /></TabsContent>
+          <TabsContent value="tags"><AdminBlogTags /></TabsContent>
+        </Tabs>
       </TabsContent>
 
+      {/* Store */}
       <TabsContent value="store" className="mt-0">
-        <Card className="border-0 shadow-sm">
-          <CardContent className="p-4 md:p-6">
-            <Tabs defaultValue="dashboard" className="w-full">
-              <TabsList className="w-full flex flex-wrap justify-start gap-1 h-auto bg-transparent p-0 mb-6">
-                <TabsTrigger value="dashboard" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <BarChart3 className="h-4 w-4" />
-                  Doanh thu
-                </TabsTrigger>
-                <TabsTrigger value="products" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <Package className="h-4 w-4" />
-                  Sản phẩm
-                </TabsTrigger>
-                <TabsTrigger value="categories" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <Tag className="h-4 w-4" />
-                  Danh mục
-                </TabsTrigger>
-                <TabsTrigger value="orders" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <ClipboardList className="h-4 w-4" />
-                  Đơn hàng
-                </TabsTrigger>
-                <TabsTrigger value="settings" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <Cog className="h-4 w-4" />
-                  Cài đặt
-                </TabsTrigger>
-                <TabsTrigger value="vouchers" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <Ticket className="h-4 w-4" />
-                  Voucher
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="dashboard">
-                <AdminStore />
-              </TabsContent>
-              <TabsContent value="settings">
-                <AdminStoreSettings />
-              </TabsContent>
-              <TabsContent value="vouchers">
-                <AdminVouchers />
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+        <Tabs defaultValue="dashboard" className="w-full">
+          <TabsList className="w-full flex flex-wrap justify-start gap-1 h-auto bg-transparent p-0 mb-4">
+            <SubTab value="dashboard" icon={BarChart3} label="Doanh thu" />
+            <SubTab value="products" icon={Package} label="Sản phẩm" />
+            <SubTab value="categories" icon={Tag} label="Danh mục" />
+            <SubTab value="orders" icon={ClipboardList} label="Đơn hàng" />
+            <SubTab value="settings" icon={Cog} label="Cài đặt" />
+            <SubTab value="vouchers" icon={Ticket} label="Voucher" />
+          </TabsList>
+          <TabsContent value="dashboard"><AdminStore /></TabsContent>
+          <TabsContent value="settings"><AdminStoreSettings /></TabsContent>
+          <TabsContent value="vouchers"><AdminVouchers /></TabsContent>
+        </Tabs>
       </TabsContent>
 
+      {/* Contact */}
       <TabsContent value="contact" className="mt-0">
-        <Card className="border-0 shadow-sm">
-          <CardContent className="p-4 md:p-6">
-            <Tabs defaultValue="social" className="w-full">
-              <TabsList className="w-full flex flex-wrap justify-start gap-1 h-auto bg-transparent p-0 mb-6">
-                <TabsTrigger value="social" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <Share2 className="h-4 w-4" />
-                  Mạng xã hội
-                </TabsTrigger>
-                <TabsTrigger value="contact" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <Mail className="h-4 w-4" />
-                  Thông tin
-                </TabsTrigger>
-                <TabsTrigger value="footer" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <LinkIcon className="h-4 w-4" />
-                  Footer
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="social"><AdminSocial /></TabsContent>
-              <TabsContent value="contact"><AdminContact /></TabsContent>
-              <TabsContent value="footer"><AdminFooter /></TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+        <Tabs defaultValue="social" className="w-full">
+          <TabsList className="w-full flex flex-wrap justify-start gap-1 h-auto bg-transparent p-0 mb-4">
+            <SubTab value="social" icon={Share2} label="Mạng xã hội" />
+            <SubTab value="contact" icon={Mail} label="Thông tin" />
+            <SubTab value="footer" icon={LinkIcon} label="Footer" />
+          </TabsList>
+          <TabsContent value="social"><AdminSocial /></TabsContent>
+          <TabsContent value="contact"><AdminContact /></TabsContent>
+          <TabsContent value="footer"><AdminFooter /></TabsContent>
+        </Tabs>
       </TabsContent>
 
+      {/* System */}
       <TabsContent value="system" className="mt-0">
-        <Card className="border-0 shadow-sm">
-          <CardContent className="p-4 md:p-6">
-            <Tabs defaultValue="theme" className="w-full">
-              <TabsList className="w-full flex flex-wrap justify-start gap-1 h-auto bg-transparent p-0 mb-6">
-                <TabsTrigger value="theme" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <Palette className="h-4 w-4" />
-                  Theme
-                </TabsTrigger>
-                <TabsTrigger value="logo" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <Image className="h-4 w-4" />
-                  Logo
-                </TabsTrigger>
-                <TabsTrigger value="navigation" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <Navigation className="h-4 w-4" />
-                  Điều hướng
-                </TabsTrigger>
-                <TabsTrigger value="chatbot" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <MessageSquare className="h-4 w-4" />
-                  Chatbot
-                </TabsTrigger>
-                <TabsTrigger value="submissions" className="flex items-center gap-2 px-4 py-2 border rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
-                  <Mail className="h-4 w-4" />
-                  Tin nhắn
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="theme"><AdminThemeSettings /></TabsContent>
-              <TabsContent value="logo"><AdminLogoSettings /></TabsContent>
-              <TabsContent value="navigation"><AdminNavigationSettings /></TabsContent>
-              <TabsContent value="chatbot"><AdminChatbot /></TabsContent>
-              <TabsContent value="submissions"><AdminSubmissions /></TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+        <Tabs defaultValue="theme" className="w-full">
+          <TabsList className="w-full flex flex-wrap justify-start gap-1 h-auto bg-transparent p-0 mb-4">
+            <SubTab value="theme" icon={Palette} label="Theme" />
+            <SubTab value="scroll" icon={Wand2} label="Hiệu ứng" />
+            <SubTab value="logo" icon={Image} label="Logo" />
+            <SubTab value="navigation" icon={Navigation} label="Điều hướng" />
+            <SubTab value="chatbot" icon={MessageSquare} label="Chatbot" />
+            <SubTab value="submissions" icon={Mail} label="Tin nhắn" />
+          </TabsList>
+          <TabsContent value="theme"><AdminThemeSettings /></TabsContent>
+          <TabsContent value="scroll"><AdminScrollEffects /></TabsContent>
+          <TabsContent value="logo"><AdminLogoSettings /></TabsContent>
+          <TabsContent value="navigation"><AdminNavigationSettings /></TabsContent>
+          <TabsContent value="chatbot"><AdminChatbot /></TabsContent>
+          <TabsContent value="submissions"><AdminSubmissions /></TabsContent>
+        </Tabs>
       </TabsContent>
     </Tabs>
   );
