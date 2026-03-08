@@ -7,10 +7,12 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import SEOHead from "@/components/SEOHead";
 import Header from "@/components/Header";
 import { QRCodeSVG } from "qrcode.react";
+import { Tag, Ticket, ChevronDown, ChevronUp } from "lucide-react";
 
 const Payment = () => {
   const navigate = useNavigate();
