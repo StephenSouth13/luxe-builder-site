@@ -3,21 +3,24 @@ import { useScroll, useTransform, useMotionValue } from "framer-motion";
 
 export const useParallax = (speed: number = 0.2) => {
   const ref = useRef<HTMLDivElement>(null);
-  const [isAttached, setIsAttached] = useState(false);
-
-  useEffect(() => {
-    if (ref.current) setIsAttached(true);
-  }, []);
-
+  const [isHydrated, setIsHydrated] = useState(false);
   const fallback = useMotionValue(0);
 
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      setIsHydrated(Boolean(ref.current));
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
   const scroll = useScroll(
-    isAttached && ref.current
+    isHydrated
       ? { target: ref, offset: ["start end", "end start"] }
-      : { target: ref, offset: ["start end", "end start"] }
+      : { offset: ["start end", "end start"] }
   );
 
-  const progress = isAttached ? (scroll?.scrollYProgress ?? fallback) : fallback;
+  const progress = isHydrated ? scroll.scrollYProgress : fallback;
   const y = useTransform(progress, [0, 1], [-50 * speed, 50 * speed]);
 
   return { ref, y, scrollYProgress: progress };
