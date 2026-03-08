@@ -17,6 +17,7 @@ const BlogsSection = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { getLabel } = useSectionLabels();
   const { layouts } = useLayoutTemplate();
+  const { ref: parallaxRef, y: parallaxY } = useParallax(0.1);
 
   useEffect(() => { fetchBlogs(); }, []);
 
