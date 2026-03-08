@@ -5,6 +5,7 @@ import { AboutSkeleton } from "@/components/skeletons/SectionSkeletons";
 import { supabase } from "@/integrations/supabase/client";
 import { useSectionLabels } from "@/hooks/useSectionLabels";
 import { useLayoutTemplate, AboutLayout } from "@/hooks/useLayoutTemplate";
+import { useParallax } from "@/hooks/useParallax";
 
 interface AboutRecord { id: string; headline: string; description: string; image_url: string | null; }
 interface Skill { id: string; name: string; sort_order: number | null; }
@@ -15,6 +16,7 @@ const About = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { getLabel } = useSectionLabels();
   const { layouts } = useLayoutTemplate();
+  const { ref: parallaxRef, y: parallaxY } = useParallax(0.12);
 
   useEffect(() => {
     const load = async () => {
@@ -41,7 +43,7 @@ const About = () => {
       {skills.map((skill, index) => (
         <motion.div key={skill.id} initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.2 + index * 0.08 }}
-          className="group relative p-4 sm:p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/20">
+          className="group relative p-4 sm:p-6 rounded-xl glass-strong hover:border-primary/50 transition-all duration-300 glow-card">
           <div className="absolute inset-0 bg-gradient-to-br from-primary to-gold-light opacity-0 group-hover:opacity-5 rounded-xl transition-opacity duration-300" />
           <BadgeInfo className="h-6 w-6 sm:h-8 sm:w-8 text-primary mb-2 sm:mb-3" />
           <h3 className="font-semibold text-xs sm:text-sm md:text-base text-foreground">{skill.name}</h3>
@@ -63,8 +65,12 @@ const About = () => {
 
   // Side-by-side (default)
   if (layout === "side-by-side") return (
-    <section id="about" className="py-20 lg:py-32 bg-secondary/30">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="about" ref={parallaxRef} className="py-20 lg:py-32 parallax-section noise-overlay mesh-gradient">
+      <motion.div style={{ y: parallaxY }} className="parallax-bg">
+        <div className="absolute top-10 -right-20 w-80 h-80 rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute bottom-20 -left-10 w-64 h-64 rounded-full bg-accent/4 blur-3xl" />
+      </motion.div>
+      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.8 }}>
           <SectionTitle />
           <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -90,8 +96,8 @@ const About = () => {
 
   // Full-width
   if (layout === "full-width") return (
-    <section id="about" className="py-20 lg:py-32 bg-secondary/30">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
+    <section id="about" ref={parallaxRef} className="py-20 lg:py-32 parallax-section noise-overlay mesh-gradient">
+      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
         <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
           <SectionTitle />
           {displayImage && (
@@ -113,12 +119,12 @@ const About = () => {
 
   // Card-based
   if (layout === "card-based") return (
-    <section id="about" className="py-20 lg:py-32 bg-secondary/30">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="about" ref={parallaxRef} className="py-20 lg:py-32 parallax-section noise-overlay mesh-gradient">
+      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
           <SectionTitle />
           <div className="max-w-4xl mx-auto">
-            <div className="rounded-2xl border border-border/50 bg-card shadow-xl overflow-hidden">
+            <div className="rounded-2xl glass-strong shadow-xl overflow-hidden glow-card">
               {displayImage && (
                 <div className="h-64 overflow-hidden">
                   <img src={displayImage} alt="Ảnh hồ sơ" loading="lazy" className="w-full h-full object-cover" />
@@ -138,8 +144,8 @@ const About = () => {
 
   // Magazine
   return (
-    <section id="about" className="py-20 lg:py-32 bg-secondary/30">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="about" ref={parallaxRef} className="py-20 lg:py-32 parallax-section noise-overlay mesh-gradient">
+      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}>
           <SectionTitle />
           <div className="grid lg:grid-cols-5 gap-10 items-start">

@@ -8,37 +8,24 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useSectionLabels } from "@/hooks/useSectionLabels";
+import { useParallax } from "@/hooks/useParallax";
 
-interface ContactRow {
-  id: string;
-  email: string;
-  phone: string | null;
-  location: string | null;
-  map_embed_url: string | null;
-}
+interface ContactRow { id: string; email: string; phone: string | null; location: string | null; map_embed_url: string | null; }
 
 const Contact = () => {
   const { toast } = useToast();
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: ""
-  });
+  const [formData, setFormData] = useState({ name: "", email: "", phone: "", message: "" });
   const [contact, setContact] = useState<ContactRow | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { getLabel } = useSectionLabels();
+  const { ref: parallaxRef, y: parallaxY } = useParallax(0.1);
 
   useEffect(() => {
     const load = async () => {
       try {
         const { data, error } = await supabase.from("contacts").select("*").limit(1).maybeSingle();
         if (data && !error) setContact(data as ContactRow);
-      } catch (e) {
-        console.error("Failed to load contact info", e);
-      } finally {
-        setIsLoading(false);
-      }
+      } catch (e) { console.error("Failed to load contact info", e); } finally { setIsLoading(false); }
     };
     load();
   }, []);
@@ -46,21 +33,10 @@ const Contact = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await supabase.from("contact_submissions").insert({
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone || null,
-        message: formData.message,
-      });
-      toast({
-        title: "Tin nhắn đã được gửi!",
-        description: "Cảm ơn bạn đã liên hệ. Tôi sẽ phản hồi sớm nhất có thể.",
-      });
+      await supabase.from("contact_submissions").insert({ name: formData.name, email: formData.email, phone: formData.phone || null, message: formData.message });
+      toast({ title: "Tin nhắn đã được gửi!", description: "Cảm ơn bạn đã liên hệ. Tôi sẽ phản hồi sớm nhất có thể." });
       setFormData({ name: "", email: "", phone: "", message: "" });
-    } catch (err: any) {
-      console.error("Failed to save submission", err);
-      toast({ title: "Lỗi", description: "Không thể gửi tin nhắn, thử lại sau", variant: "destructive" });
-    }
+    } catch (err: any) { toast({ title: "Lỗi", description: "Không thể gửi tin nhắn, thử lại sau", variant: "destructive" }); }
   };
 
   if (isLoading) return <ContactSkeleton />;
@@ -72,14 +48,14 @@ const Contact = () => {
   ].filter((i) => i.value) : [];
 
   return (
-    <section id="contact" className="py-20 lg:py-32 bg-gradient-to-br from-background via-background to-primary/5">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.8 }}
-        >
+    <section id="contact" ref={parallaxRef} className="py-20 lg:py-32 parallax-section noise-overlay mesh-gradient-strong">
+      <motion.div style={{ y: parallaxY }} className="parallax-bg">
+        <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-primary/8 blur-3xl" />
+        <div className="absolute bottom-10 right-20 w-72 h-72 rounded-full bg-accent/6 blur-3xl" />
+      </motion.div>
+
+      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.8 }}>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
             {getLabel("contact")}
           </h2>
@@ -88,43 +64,22 @@ const Contact = () => {
           </p>
 
           <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="space-y-8"
-            >
+            <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, delay: 0.2 }} className="space-y-8">
               <div>
                 <h3 className="text-2xl font-bold mb-6">Thông tin liên hệ</h3>
-                <p className="text-foreground/70 mb-8">
-                  Tôi luôn sẵn sàng lắng nghe và thảo luận về các cơ hội hợp tác mới. 
-                  Đừng ngần ngại liên hệ với tôi qua các kênh dưới đây.
-                </p>
+                <p className="text-foreground/70 mb-8">Tôi luôn sẵn sàng lắng nghe và thảo luận về các cơ hội hợp tác mới.</p>
               </div>
 
               <div className="space-y-6">
                 {contactInfo.map((info, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
-                    className="flex items-start gap-4 group"
-                  >
-                    <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                  <motion.div key={index} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }} className="flex items-start gap-4 group">
+                    <div className="p-3 rounded-xl glass-primary group-hover:glow-primary transition-all duration-300">
                       <info.icon className="h-5 w-5 text-primary" />
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground mb-1">{info.label}</p>
-                      {info.href ? (
-                        <a href={info.href} className="font-medium hover:text-primary transition-colors">
-                          {info.value}
-                        </a>
-                      ) : (
-                        <p className="font-medium">{info.value}</p>
-                      )}
+                      {info.href ? <a href={info.href} className="font-medium hover:text-primary transition-colors">{info.value}</a> : <p className="font-medium">{info.value}</p>}
                     </div>
                   </motion.div>
                 ))}
@@ -134,57 +89,38 @@ const Contact = () => {
                 const raw = contact?.map_embed_url?.trim();
                 const extractSrc = (input: string | null | undefined) => {
                   if (!input) return null;
-                  if (input.startsWith("<")) {
-                    const match = input.match(/src=["']([^"']+)["']/i);
-                    return match ? match[1] : null;
-                  }
-                  const maybe = input.replace(/^\((.*)\)$/s, "$1");
-                  return maybe || null;
+                  if (input.startsWith("<")) { const match = input.match(/src=["']([^"']+)["']/i); return match ? match[1] : null; }
+                  return input.replace(/^\((.*)\)$/s, "$1") || null;
                 };
                 const mapSrc = extractSrc(raw);
                 return mapSrc ? (
-                  <div className="rounded-lg overflow-hidden border border-border">
-                    <iframe
-                      src={mapSrc}
-                      title="Google Map"
-                      width="100%"
-                      height="260"
-                      style={{ border: 0 }}
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      allowFullScreen
-                    />
+                  <div className="rounded-xl overflow-hidden glass glow-card">
+                    <iframe src={mapSrc} title="Google Map" width="100%" height="260" style={{ border: 0 }} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
                   </div>
                 ) : null;
               })()}
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            >
-              <form onSubmit={handleSubmit} className="space-y-6">
+            <motion.div initial={{ opacity: 0, x: 50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, delay: 0.4 }}>
+              <form onSubmit={handleSubmit} className="glass-strong rounded-2xl p-6 sm:p-8 space-y-6 glow-card">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium mb-2">Họ và tên</label>
-                  <Input id="name" type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Nguyễn Văn A" className="bg-card border-border focus:border-primary" />
+                  <Input id="name" type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Nguyễn Văn A" className="bg-background/50 border-border/40 focus:border-primary backdrop-blur-sm" />
                 </div>
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium mb-2">Email</label>
-                  <Input id="email" type="email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="email@example.com" className="bg-card border-border focus:border-primary" />
+                  <Input id="email" type="email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="email@example.com" className="bg-background/50 border-border/40 focus:border-primary backdrop-blur-sm" />
                 </div>
                 <div>
                   <label htmlFor="phone" className="block text-sm font-medium mb-2">Số điện thoại</label>
-                  <Input id="phone" type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="+84 123 456 789" className="bg-card border-border focus:border-primary" />
+                  <Input id="phone" type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="+84 123 456 789" className="bg-background/50 border-border/40 focus:border-primary backdrop-blur-sm" />
                 </div>
                 <div>
                   <label htmlFor="message" className="block text-sm font-medium mb-2">Tin nhắn</label>
-                  <Textarea id="message" required value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} placeholder="Nội dung tin nhắn..." rows={6} className="bg-card border-border focus:border-primary resize-none" />
+                  <Textarea id="message" required value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} placeholder="Nội dung tin nhắn..." rows={6} className="bg-background/50 border-border/40 focus:border-primary resize-none backdrop-blur-sm" />
                 </div>
                 <Button type="submit" className="w-full gold-gradient hover:opacity-90 transition-opacity text-background font-semibold" size="lg">
-                  <Send className="mr-2 h-5 w-5" />
-                  Gửi tin nhắn
+                  <Send className="mr-2 h-5 w-5" />Gửi tin nhắn
                 </Button>
               </form>
             </motion.div>

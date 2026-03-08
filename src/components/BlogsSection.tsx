@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSectionLabels } from "@/hooks/useSectionLabels";
 import { useLayoutTemplate, BlogLayout } from "@/hooks/useLayoutTemplate";
 import { motion } from "framer-motion";
+import { useParallax } from "@/hooks/useParallax";
 
 interface Blog { id: string; title: string; slug: string; excerpt: string; image_url: string | null; created_at: string; }
 
@@ -16,6 +17,7 @@ const BlogsSection = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { getLabel } = useSectionLabels();
   const { layouts } = useLayoutTemplate();
+  const { ref: parallaxRef, y: parallaxY } = useParallax(0.1);
 
   useEffect(() => { fetchBlogs(); }, []);
 
@@ -77,8 +79,12 @@ const BlogsSection = () => {
   );
 
   return (
-    <section className="py-16 sm:py-20 px-4 bg-secondary/30">
-      <div className="container mx-auto">
+     <section ref={parallaxRef} className="py-16 sm:py-20 px-4 parallax-section noise-overlay mesh-gradient">
+      <motion.div style={{ y: parallaxY }} className="parallax-bg">
+        <div className="absolute top-0 left-1/3 w-72 h-72 rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute bottom-10 right-10 w-56 h-56 rounded-full bg-accent/4 blur-3xl" />
+      </motion.div>
+      <div className="container relative z-10 mx-auto">
         <div className="text-center mb-8 sm:mb-12">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">{getLabel("blogs")}</h2>
           <p className="text-muted-foreground text-base sm:text-lg">Chia sẻ kiến thức và kinh nghiệm</p>
