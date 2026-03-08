@@ -5,6 +5,7 @@ import { AboutSkeleton } from "@/components/skeletons/SectionSkeletons";
 import { supabase } from "@/integrations/supabase/client";
 import { useSectionLabels } from "@/hooks/useSectionLabels";
 import { useLayoutTemplate, AboutLayout } from "@/hooks/useLayoutTemplate";
+import { useParallax } from "@/hooks/useParallax";
 
 interface AboutRecord { id: string; headline: string; description: string; image_url: string | null; }
 interface Skill { id: string; name: string; sort_order: number | null; }
