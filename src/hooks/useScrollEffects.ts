@@ -35,7 +35,7 @@ const defaultConfig: ScrollEffectsConfig = {
 export const getMotionVariants = (config: SectionScrollEffect) => {
   const { effect, duration, delay, easing } = config;
   
-  const easingMap: Record<string, number[]> = {
+  const easingMap: Record<string, [number, number, number, number]> = {
     easeOut: [0, 0, 0.2, 1],
     easeIn: [0.4, 0, 1, 1],
     easeInOut: [0.4, 0, 0.2, 1],
