@@ -22,6 +22,15 @@ const Payment = () => {
     delivery_time: "",
     customer_message: ""
   });
+  const [voucherCode, setVoucherCode] = useState("");
+  const [appliedVoucher, setAppliedVoucher] = useState<{
+    id: string;
+    code: string;
+    discount_type: string;
+    discount_value: number;
+    min_order_amount: number | null;
+  } | null>(null);
+  const [voucherError, setVoucherError] = useState("");
 
   const { data: user } = useQuery({
     queryKey: ['user'],
