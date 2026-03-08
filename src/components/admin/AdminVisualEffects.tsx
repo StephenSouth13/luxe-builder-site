@@ -59,7 +59,7 @@ const AdminVisualEffects = () => {
           <p className="text-sm text-muted-foreground mt-1">Bật/tắt các hiệu ứng parallax, glassmorphism và trang trí</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => setLocal(Object.fromEntries(Object.keys(local).map(k => [k, !allOn])) as VisualEffectsConfig)}>
+          <Button variant="outline" size="sm" onClick={() => { const val = !allOn; setLocal({ parallax: val, glassmorphism: val, decorativeOrbs: val, noiseOverlay: val, meshGradient: val, glowCards: val }); }}>
             {allOn ? "Tắt tất cả" : "Bật tất cả"}
           </Button>
           <Button variant="outline" size="sm" onClick={handleReset}>
