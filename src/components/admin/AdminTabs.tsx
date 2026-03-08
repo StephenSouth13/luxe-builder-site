@@ -22,12 +22,13 @@ import AdminThemeSettings from "./AdminThemeSettings";
 import AdminLogoSettings from "./AdminLogoSettings";
 import AdminScrollEffects from "./AdminScrollEffects";
 import AdminLayoutTemplates from "./AdminLayoutTemplates";
+import AdminVisualEffects from "./AdminVisualEffects";
 import { 
   FileText, Newspaper, Store, Phone, Settings,
   User, Briefcase, GraduationCap, Award, FolderKanban,
   Palette, Image, Navigation, MessageSquare, Mail,
   Share2, Info, Link as LinkIcon, BarChart3, Package,
-  Tag, ClipboardList, Cog, Ticket, Wand2, Layout
+  Tag, ClipboardList, Cog, Ticket, Wand2, Layout, Sparkles
 } from "lucide-react";
 
 const SubTab = ({ value, icon: Icon, label }: { value: string; icon: any; label: string }) => (
@@ -135,7 +136,8 @@ const AdminTabs = () => {
           <TabsList className="w-full flex flex-wrap justify-start gap-1 h-auto bg-transparent p-0 mb-4">
             <SubTab value="theme" icon={Palette} label="Theme" />
             <SubTab value="layouts" icon={Layout} label="Bố cục" />
-            <SubTab value="scroll" icon={Wand2} label="Hiệu ứng" />
+            <SubTab value="effects" icon={Sparkles} label="Hiệu ứng" />
+            <SubTab value="scroll" icon={Wand2} label="Cuộn trang" />
             <SubTab value="logo" icon={Image} label="Logo" />
             <SubTab value="navigation" icon={Navigation} label="Điều hướng" />
             <SubTab value="chatbot" icon={MessageSquare} label="Chatbot" />
@@ -143,6 +145,7 @@ const AdminTabs = () => {
           </TabsList>
           <TabsContent value="theme"><AdminThemeSettings /></TabsContent>
           <TabsContent value="layouts"><AdminLayoutTemplates /></TabsContent>
+          <TabsContent value="effects"><AdminVisualEffects /></TabsContent>
           <TabsContent value="scroll"><AdminScrollEffects /></TabsContent>
           <TabsContent value="logo"><AdminLogoSettings /></TabsContent>
           <TabsContent value="navigation"><AdminNavigationSettings /></TabsContent>
