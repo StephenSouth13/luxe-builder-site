@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSectionLabels } from "@/hooks/useSectionLabels";
 import { useLayoutTemplate, BlogLayout } from "@/hooks/useLayoutTemplate";
 import { motion } from "framer-motion";
+import { useParallax } from "@/hooks/useParallax";
 
 interface Blog { id: string; title: string; slug: string; excerpt: string; image_url: string | null; created_at: string; }
 
