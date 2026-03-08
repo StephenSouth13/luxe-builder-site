@@ -65,8 +65,12 @@ const About = () => {
 
   // Side-by-side (default)
   if (layout === "side-by-side") return (
-    <section id="about" className="py-20 lg:py-32 bg-secondary/30">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="about" ref={parallaxRef} className="py-20 lg:py-32 parallax-section noise-overlay mesh-gradient">
+      <motion.div style={{ y: parallaxY }} className="parallax-bg">
+        <div className="absolute top-10 -right-20 w-80 h-80 rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute bottom-20 -left-10 w-64 h-64 rounded-full bg-accent/4 blur-3xl" />
+      </motion.div>
+      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.8 }}>
           <SectionTitle />
           <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
