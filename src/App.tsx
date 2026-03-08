@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { ColorThemeProvider } from "./components/ColorThemeProvider";
+import VisualEffectsProvider from "./components/VisualEffectsProvider";
 import { Loader2 } from "lucide-react";
 
 // Eager load - critical for first paint
