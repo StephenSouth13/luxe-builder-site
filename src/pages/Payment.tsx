@@ -149,6 +149,11 @@ const Payment = () => {
 
       if (clearError) throw clearError;
 
+      // Increment voucher used_count
+      if (appliedVoucher) {
+        await supabase.rpc('increment_voucher_usage' as any, { voucher_id: appliedVoucher.id });
+      }
+
       return order;
     },
     onSuccess: () => {
