@@ -22,12 +22,13 @@ import AdminThemeSettings from "./AdminThemeSettings";
 import AdminLogoSettings from "./AdminLogoSettings";
 import AdminScrollEffects from "./AdminScrollEffects";
 import AdminLayoutTemplates from "./AdminLayoutTemplates";
+import AdminVisualEffects from "./AdminVisualEffects";
 import { 
   FileText, Newspaper, Store, Phone, Settings,
   User, Briefcase, GraduationCap, Award, FolderKanban,
   Palette, Image, Navigation, MessageSquare, Mail,
   Share2, Info, Link as LinkIcon, BarChart3, Package,
-  Tag, ClipboardList, Cog, Ticket, Wand2, Layout
+  Tag, ClipboardList, Cog, Ticket, Wand2, Layout, Sparkles
 } from "lucide-react";
 
 const SubTab = ({ value, icon: Icon, label }: { value: string; icon: any; label: string }) => (
