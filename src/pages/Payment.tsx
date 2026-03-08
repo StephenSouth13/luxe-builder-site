@@ -63,16 +63,53 @@ const Payment = () => {
     }
   });
 
+  const handleApplyVoucher = async () => {
+    if (!voucherCode.trim()) return;
+    setVoucherError("");
+
+    const { data, error } = await supabase
+      .from('vouchers')
+      .select('*')
+      .eq('code', voucherCode.trim().toUpperCase())
+      .eq('active', true)
+      .single();
+
+    if (error || !data) {
+      setVoucherError("Mã giảm giá không hợp lệ");
+      setAppliedVoucher(null);
+      return;
+    }
+
+    if (data.expires_at && new Date(data.expires_at) < new Date()) {
+      setVoucherError("Mã giảm giá đã hết hạn");
+      return;
+    }
+    if (data.max_uses && data.used_count >= data.max_uses) {
+      setVoucherError("Mã giảm giá đã hết lượt sử dụng");
+      return;
+    }
+
+    const subtotal = calculateSubtotal();
+    if (data.min_order_amount && subtotal < data.min_order_amount) {
+      setVoucherError(`Đơn hàng tối thiểu ${Number(data.min_order_amount).toLocaleString()}đ`);
+      return;
+    }
+
+    setAppliedVoucher({
+      id: data.id,
+      code: data.code,
+      discount_type: data.discount_type,
+      discount_value: Number(data.discount_value),
+      min_order_amount: data.min_order_amount ? Number(data.min_order_amount) : null
+    });
+    toast.success(`Áp dụng mã "${data.code}" thành công!`);
+  };
+
   const createOrderMutation = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("Not authenticated");
       
-      const total = cartItems.reduce((sum, item) => {
-        const product = item.products;
-        const price = product.price * (1 - (product.discount_percent || 0) / 100);
-        return sum + (price * item.quantity);
-      }, 0);
-
+      const finalTotal = calculateFinalTotal();
       // Create order
       const { data: order, error: orderError } = await supabase
         .from('orders')
