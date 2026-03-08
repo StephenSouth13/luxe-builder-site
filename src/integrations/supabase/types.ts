@@ -942,6 +942,10 @@ export type Database = {
         Returns: boolean
       }
       increment_blog_view: { Args: { blog_slug: string }; Returns: undefined }
+      increment_voucher_usage: {
+        Args: { voucher_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user"
