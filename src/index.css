@@ -403,6 +403,164 @@ All colors MUST be HSL.
     --dark: 260 20% 6%;
   }
 
+  /* ============ NEW THEMES ============ */
+
+  /* Ocean Dark - Deep navy & teal */
+  .theme-ocean-dark {
+    --background: 210 50% 6%;
+    --foreground: 185 20% 95%;
+    --card: 210 45% 10%;
+    --card-foreground: 185 20% 95%;
+    --popover: 210 45% 10%;
+    --popover-foreground: 185 20% 95%;
+    --primary: 185 75% 48%;
+    --primary-foreground: 210 50% 6%;
+    --secondary: 210 40% 18%;
+    --secondary-foreground: 185 20% 95%;
+    --muted: 210 35% 15%;
+    --muted-foreground: 185 15% 55%;
+    --accent: 170 70% 40%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 210 35% 20%;
+    --input: 210 35% 20%;
+    --ring: 185 75% 48%;
+    --gold: 185 75% 48%;
+    --gold-light: 170 65% 55%;
+    --dark: 210 50% 6%;
+  }
+
+  /* Rose Gold - Luxury pink & gold */
+  .theme-rose-gold {
+    --background: 340 15% 96%;
+    --foreground: 340 30% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 340 30% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 340 30% 15%;
+    --primary: 340 55% 65%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 35 50% 90%;
+    --secondary-foreground: 340 30% 15%;
+    --muted: 340 15% 93%;
+    --muted-foreground: 340 15% 45%;
+    --accent: 35 65% 55%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 340 20% 88%;
+    --input: 340 20% 88%;
+    --ring: 340 55% 65%;
+    --gold: 35 65% 55%;
+    --gold-light: 340 50% 72%;
+    --dark: 340 30% 15%;
+  }
+
+  /* Cyber Neon - Electric green on dark */
+  .theme-cyber-neon {
+    --background: 240 20% 4%;
+    --foreground: 120 80% 90%;
+    --card: 240 18% 8%;
+    --card-foreground: 120 50% 90%;
+    --popover: 240 18% 8%;
+    --popover-foreground: 120 50% 90%;
+    --primary: 120 100% 50%;
+    --primary-foreground: 240 20% 4%;
+    --secondary: 240 25% 15%;
+    --secondary-foreground: 120 80% 90%;
+    --muted: 240 15% 14%;
+    --muted-foreground: 120 20% 50%;
+    --accent: 280 100% 60%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 20% 18%;
+    --input: 240 20% 18%;
+    --ring: 120 100% 50%;
+    --gold: 120 100% 50%;
+    --gold-light: 280 90% 65%;
+    --dark: 240 20% 4%;
+  }
+
+  /* Forest Dark - Deep green mystical */
+  .theme-forest-dark {
+    --background: 150 25% 6%;
+    --foreground: 120 15% 92%;
+    --card: 150 22% 10%;
+    --card-foreground: 120 15% 92%;
+    --popover: 150 22% 10%;
+    --popover-foreground: 120 15% 92%;
+    --primary: 140 60% 42%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 150 30% 18%;
+    --secondary-foreground: 120 15% 92%;
+    --muted: 150 20% 15%;
+    --muted-foreground: 140 15% 50%;
+    --accent: 80 50% 45%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 150 20% 20%;
+    --input: 150 20% 20%;
+    --ring: 140 60% 42%;
+    --gold: 140 60% 42%;
+    --gold-light: 80 45% 52%;
+    --dark: 150 25% 6%;
+  }
+
+  /* Sunset Warm - Coral & warm orange */
+  .theme-sunset-warm {
+    --background: 25 30% 97%;
+    --foreground: 15 40% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 15 40% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 15 40% 15%;
+    --primary: 15 85% 58%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 35 60% 90%;
+    --secondary-foreground: 15 40% 15%;
+    --muted: 25 20% 93%;
+    --muted-foreground: 15 20% 45%;
+    --accent: 350 70% 55%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 25 25% 88%;
+    --input: 25 25% 88%;
+    --ring: 15 85% 58%;
+    --gold: 15 85% 58%;
+    --gold-light: 35 80% 60%;
+    --dark: 15 40% 15%;
+  }
+
+  /* Midnight Blue - Deep elegant blue */
+  .theme-midnight-blue {
+    --background: 225 40% 5%;
+    --foreground: 215 20% 95%;
+    --card: 225 35% 9%;
+    --card-foreground: 215 20% 95%;
+    --popover: 225 35% 9%;
+    --popover-foreground: 215 20% 95%;
+    --primary: 215 70% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 225 30% 18%;
+    --secondary-foreground: 215 20% 95%;
+    --muted: 225 25% 14%;
+    --muted-foreground: 215 15% 50%;
+    --accent: 195 80% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 225 25% 18%;
+    --input: 225 25% 18%;
+    --ring: 215 70% 55%;
+    --gold: 215 70% 55%;
+    --gold-light: 195 70% 58%;
+    --dark: 225 40% 5%;
+  }
+
   /* Light mode overrides - only for gold-black theme */
   .light.theme-gold-black,
   .light:not([class*="theme-"]) {

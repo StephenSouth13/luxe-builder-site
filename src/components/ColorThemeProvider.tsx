@@ -3,23 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Sparkle } from "lucide-react";
 import ThemeParticles from "./ThemeParticles";
-
-type ColorTheme = 
-  | "gold-black" 
-  | "green-white" 
-  | "blue-white" 
-  | "purple-white"
-  | "red-white"
-  | "spring"
-  | "summer"
-  | "autumn"
-  | "winter"
-  | "tet" 
-  | "christmas" 
-  | "halloween"
-  | "valentine"
-  | "vietnam-national"
-  | "new-year";
+import { ColorTheme } from "@/hooks/useColorTheme";
 
 interface ColorThemeContextType {
   colorTheme: ColorTheme;
@@ -37,12 +21,10 @@ const ColorThemeContext = createContext<ColorThemeContextType>({
 
 export const useColorThemeContext = () => useContext(ColorThemeContext);
 
-// Check if theme has particles
 const themeHasParticles = (theme: ColorTheme): boolean => {
   return ['spring', 'summer', 'autumn', 'winter', 'christmas', 'tet', 'valentine', 'new-year'].includes(theme);
 };
 
-// Particle Toggle Button Component
 const ParticleToggle = ({ enabled, onToggle, theme }: { enabled: boolean; onToggle: () => void; theme: ColorTheme }) => {
   if (!themeHasParticles(theme)) return null;
 
@@ -58,23 +40,11 @@ const ParticleToggle = ({ enabled, onToggle, theme }: { enabled: boolean; onTogg
     >
       <AnimatePresence mode="wait">
         {enabled ? (
-          <motion.div
-            key="on"
-            initial={{ rotate: -180, opacity: 0 }}
-            animate={{ rotate: 0, opacity: 1 }}
-            exit={{ rotate: 180, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
+          <motion.div key="on" initial={{ rotate: -180, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 180, opacity: 0 }} transition={{ duration: 0.2 }}>
             <Sparkles className="w-5 h-5 text-primary" />
           </motion.div>
         ) : (
-          <motion.div
-            key="off"
-            initial={{ rotate: -180, opacity: 0 }}
-            animate={{ rotate: 0, opacity: 1 }}
-            exit={{ rotate: 180, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
+          <motion.div key="off" initial={{ rotate: -180, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 180, opacity: 0 }} transition={{ duration: 0.2 }}>
             <Sparkle className="w-5 h-5 text-muted-foreground" />
           </motion.div>
         )}
@@ -107,67 +77,25 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
           .select("value")
           .eq("key", "color_theme")
           .single();
-        
-        if (data?.value) {
-          setColorTheme(data.value as ColorTheme);
-        }
-      } catch (error) {
-        // Use default theme if not found
-      } finally {
-        setIsLoading(false);
-      }
+        if (data?.value) setColorTheme(data.value as ColorTheme);
+      } catch { /* default */ } finally { setIsLoading(false); }
     };
-
     fetchTheme();
 
-    // Subscribe to realtime changes
     const channel = supabase
       .channel("color-theme-changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "settings",
-          filter: "key=eq.color_theme",
-        },
-        (payload) => {
-          if (payload.new && "value" in payload.new) {
-            setColorTheme(payload.new.value as ColorTheme);
-          }
-        }
-      )
-      .subscribe();
+      .on("postgres_changes", { event: "*", schema: "public", table: "settings", filter: "key=eq.color_theme" },
+        (payload) => { if (payload.new && "value" in payload.new) setColorTheme(payload.new.value as ColorTheme); }
+      ).subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   useEffect(() => {
     if (!isLoading) {
       const root = document.documentElement;
-      
-      // Remove all theme classes first
-      root.classList.remove(
-        "theme-gold-black",
-        "theme-green-white",
-        "theme-blue-white",
-        "theme-purple-white",
-        "theme-red-white",
-        "theme-spring",
-        "theme-summer",
-        "theme-autumn",
-        "theme-winter",
-        "theme-tet",
-        "theme-christmas",
-        "theme-halloween",
-        "theme-valentine",
-        "theme-vietnam-national",
-        "theme-new-year"
-      );
-      
-      // Add the new theme class
+      // Remove all theme classes
+      Array.from(root.classList).filter(c => c.startsWith('theme-')).forEach(c => root.classList.remove(c));
       root.classList.add(`theme-${colorTheme}`);
     }
   }, [colorTheme, isLoading]);
