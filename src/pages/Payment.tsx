@@ -66,6 +66,24 @@ const Payment = () => {
     }
   });
 
+  const { data: availableVouchers = [] } = useQuery({
+    queryKey: ['available-vouchers'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('vouchers')
+        .select('*')
+        .eq('active', true)
+        .order('discount_value', { ascending: false });
+      if (error) throw error;
+      const now = new Date();
+      return (data || []).filter(v => {
+        if (v.expires_at && new Date(v.expires_at) < now) return false;
+        if (v.max_uses && v.used_count >= v.max_uses) return false;
+        return true;
+      });
+    }
+  });
+
   const handleApplyVoucher = async () => {
     if (!voucherCode.trim()) return;
     setVoucherError("");
