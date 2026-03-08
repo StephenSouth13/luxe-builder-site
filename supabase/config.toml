@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.backfill-project-slugs]
 verify_jwt = false
+
+[functions.chat]
+verify_jwt = false
