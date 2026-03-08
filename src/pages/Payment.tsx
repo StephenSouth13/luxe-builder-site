@@ -33,6 +33,7 @@ const Payment = () => {
     min_order_amount: number | null;
   } | null>(null);
   const [voucherError, setVoucherError] = useState("");
+  const [showVoucherList, setShowVoucherList] = useState(false);
 
   const { data: user } = useQuery({
     queryKey: ['user'],
