@@ -7,10 +7,12 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import SEOHead from "@/components/SEOHead";
 import Header from "@/components/Header";
 import { QRCodeSVG } from "qrcode.react";
+import { Tag, Ticket, ChevronDown, ChevronUp } from "lucide-react";
 
 const Payment = () => {
   const navigate = useNavigate();
@@ -31,6 +33,7 @@ const Payment = () => {
     min_order_amount: number | null;
   } | null>(null);
   const [voucherError, setVoucherError] = useState("");
+  const [showVoucherList, setShowVoucherList] = useState(false);
 
   const { data: user } = useQuery({
     queryKey: ['user'],
@@ -60,6 +63,24 @@ const Payment = () => {
 
       if (error) throw error;
       return data;
+    }
+  });
+
+  const { data: availableVouchers = [] } = useQuery({
+    queryKey: ['available-vouchers'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('vouchers')
+        .select('*')
+        .eq('active', true)
+        .order('discount_value', { ascending: false });
+      if (error) throw error;
+      const now = new Date();
+      return (data || []).filter(v => {
+        if (v.expires_at && new Date(v.expires_at) < now) return false;
+        if (v.max_uses && v.used_count >= v.max_uses) return false;
+        return true;
+      });
     }
   });
 
@@ -335,10 +356,14 @@ const Payment = () => {
                   </div>
                 </div>
 
-                {/* Voucher input */}
+                {/* Voucher section */}
                 <div className="pt-3 border-t mt-2">
-                  <Label htmlFor="voucher" className="text-sm font-medium">Mã giảm giá</Label>
-                  <div className="flex gap-2 mt-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Ticket className="h-4 w-4 text-primary" />
+                    <Label className="text-sm font-medium">Mã giảm giá</Label>
+                  </div>
+                  
+                  <div className="flex gap-2">
                     <Input
                       id="voucher"
                       placeholder="Nhập mã voucher"
@@ -358,7 +383,82 @@ const Payment = () => {
                     )}
                   </div>
                   {voucherError && <p className="text-sm text-destructive mt-1">{voucherError}</p>}
-                  {appliedVoucher && <p className="text-sm text-green-600 mt-1">✓ Đã áp dụng mã {appliedVoucher.code}</p>}
+                  {appliedVoucher && <p className="text-sm text-accent-foreground mt-1">✓ Đã áp dụng mã <strong>{appliedVoucher.code}</strong></p>}
+
+                  {/* Available vouchers toggle */}
+                  {availableVouchers.length > 0 && !appliedVoucher && (
+                    <div className="mt-3">
+                      <button
+                        type="button"
+                        className="flex items-center gap-1 text-sm text-primary hover:underline"
+                        onClick={() => setShowVoucherList(!showVoucherList)}
+                      >
+                        <Tag className="h-3.5 w-3.5" />
+                        {showVoucherList ? "Ẩn danh sách" : `Xem ${availableVouchers.length} voucher có sẵn`}
+                        {showVoucherList ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+                      </button>
+
+                      {showVoucherList && (
+                        <div className="mt-2 space-y-2 max-h-48 overflow-y-auto">
+                          {availableVouchers.map((v) => {
+                            const meetsMin = !v.min_order_amount || subtotalAmount >= Number(v.min_order_amount);
+                            return (
+                              <button
+                                key={v.id}
+                                type="button"
+                                disabled={!meetsMin}
+                                onClick={() => {
+                                  setVoucherCode(v.code);
+                                  setAppliedVoucher({
+                                    id: v.id,
+                                    code: v.code,
+                                    discount_type: v.discount_type,
+                                    discount_value: Number(v.discount_value),
+                                    min_order_amount: v.min_order_amount ? Number(v.min_order_amount) : null
+                                  });
+                                  setVoucherError("");
+                                  setShowVoucherList(false);
+                                  toast.success(`Áp dụng mã "${v.code}" thành công!`);
+                                }}
+                                className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                                  meetsMin
+                                    ? "border-primary/30 bg-primary/5 hover:bg-primary/10 cursor-pointer"
+                                    : "border-muted bg-muted/30 opacity-60 cursor-not-allowed"
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <Badge variant="secondary" className="font-mono text-xs">
+                                      {v.code}
+                                    </Badge>
+                                    <span className="text-sm font-semibold text-primary">
+                                      {v.discount_type === 'percent'
+                                        ? `-${v.discount_value}%`
+                                        : `-${Number(v.discount_value).toLocaleString()}đ`}
+                                    </span>
+                                  </div>
+                                </div>
+                                {v.description && (
+                                  <p className="text-xs text-muted-foreground mt-1">{v.description}</p>
+                                )}
+                                {v.min_order_amount && Number(v.min_order_amount) > 0 && (
+                                  <p className={`text-xs mt-1 ${meetsMin ? "text-muted-foreground" : "text-destructive"}`}>
+                                    Đơn tối thiểu {Number(v.min_order_amount).toLocaleString()}đ
+                                    {!meetsMin && " (chưa đủ)"}
+                                  </p>
+                                )}
+                                {v.expires_at && (
+                                  <p className="text-xs text-muted-foreground mt-0.5">
+                                    HSD: {new Date(v.expires_at).toLocaleDateString('vi-VN')}
+                                  </p>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </Card>
